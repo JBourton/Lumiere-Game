@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./style.css">
+    <title>Lumiere Game</title>
+</head>
+<body>
+    <button id="mute-button">🔊</button>
+    <div id="introModal" class="modal">
+        <div class="modal-content">
+            <!-- Setting the intro to the game to welcome new players + provide context on what they'll be doing-->
+            <h3>Welcome to Lumiere Festival Planner!</h3>
+            <p>It&rsquo;s the first night of Lumiere. All signs point to a great night; the sky is clear, the trains are running and 
+                we&rsquo;ve just sold our last ticket.</p>
+
+            <p>But wait - something&rsquo;s awry! Durham is still… undecorated!? Oh no! The senior event planner has pulled a sickie 
+                to go watch the Newcastle game tonight. Thanks to him, it looks like we&rsquo;ll have to cancel the festival and leave all those children upset :( Unless... </p>
+                
+
+            <p><b>INTERN!</b> Yes, you! You want event planning experience? Well, now&rsquo;s your time to shine! </p>
+            <p>Your mission, (should you choose to accept it), is to single-handedly manage the Lumiere festival. 
+                You&rsquo;ll be responsible for placing attractions, food stalls and performance stages around the city 
+                to give the families of Durham the most magical night possible.</p>
+
+            <button id="startButton">Let's Go!</button>
+        </div>
+    </div>
+    <h1 id="game-title">Lumiere Festival Planning Game</h1>
+    <div id="game-area">
+    <div id='map-display'>
+
+        <div id="resource-ui">
+            <!-- This is a progress-bar-eseque type design for the magc, as its the most important resource, and its a %-->
+            <span id="magic-text">Magic: 50%</span>
+            <div id="magic-container">
+                <div id="magic-bar"></div>
+            </div>
+            
+
+            <!-- These are both just counters, much simpler-->
+            <div id="staff-container">
+                <span id="staff-display">👷‍♂️ Staff: 1</span>
+            </div>
+            <div id="visitor-container">
+                <span id="visitor-display">👨‍👩‍👧‍👦 Visitors: 0</span>
+            </div>
+        </div>
+
+        <!--[DEV NOTE]: I set these up to test the ability to alter magic/staff lvls - just uncomment to manually alter the values at the top-->
+        <div style="display: flex; gap: 10px;">
+            <button onclick="Magic.increase(10)">Add Magic</button>
+            <button onclick="Magic.decrease(10)">Lose Magic</button>
+            <button onclick="Staff.add(1)">Hire Staff</button>
+            <button onclick="Staff.remove(1)">Remove Staff</button>
+            <button onclick="Visitors.add(1)">Add Visitor</button>
+            <button onclick="Visitors.remove(1)">Kick Out Visitor</button>
+            <button onclick="Frustration.increase(10)">Make Visitors Angrier</button>
+            <button onclick="Frustration.decrease(10)">Placate Visitors</button>
+        </div>
+
+        <div id="play-area">
+            <div id="grid"></div>
+            <div id="frustration-wrapper">
+                <div id="frustration-bar-container">
+                    <div id="frustration-bar"></div>
+                </div>
+                <div id="frustration-label">😀 HAPPY</div>
+            </div>
+        </div>
+  
+    </div>
+    
+
+    
+
+    </div>
+
+    <script type="module" src="./src/main.js"></script>
+</body>
