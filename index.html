@@ -28,7 +28,7 @@
         </div>
     </div>
     <h1 id="game-title">Lumiere Festival Planning Game</h1>
-    <div id="game-area">
+
     <div id='map-display'>
 
         <div id="resource-ui">
@@ -61,6 +61,21 @@
         </div>
 
         <div id="play-area">
+
+            <!-- Putting in the sidebar here to let the player drag/drop the various placeables -->
+            <aside id="sidebar">
+                <div id="sidebar-tabs">
+                    <button class="tab active">Lights</button>
+                    <button class="tab">Stages</button>
+                    <button class="tab">Food Stalls</button>
+                </div>
+
+                <div id="sidebar-content">
+                    <!-- Temporary placeholder items -->
+                    <p>Select an item to place…</p>
+                </div>
+            </aside>
+
             <div id="grid"></div>
             <div id="frustration-wrapper">
                 <div id="frustration-bar-container">

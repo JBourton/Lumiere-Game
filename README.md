@@ -73,8 +73,8 @@ To keep things manageable for a range of players, the prototype includes:
 All external assets are either:
 
 - Created by me  
-- Generated using ChatGPT 5.1  
-- Or free-to-use assets with attribution where relevant  
+- Generated using ChatGPT 5.1 (pretty much all the artwork, as my focus was the actual gameplay loop)
+- Or free-to-use assets with attribution where relevant (like the background audio)
 
 Full details are provided in the accompanying report.
 

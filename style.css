@@ -15,11 +15,7 @@ html, body {
 :root {
     --max-cols: 50;
     --max-rows: 30;
-    --cell-size: min(
-        25px,
-        calc((100vw - 40px) / var(--max-cols)),
-        calc((100vh - 160px) / var(--max-rows))
-    );
+    --cell-size: min(40px,calc((100vw - 40px) / var(--max-cols)),calc((100vh - 160px) / var(--max-rows))); /* This kind of dynamic sizing lets me ensure that each grid cell doesn't go too small */
 }
 
 body {
@@ -89,10 +85,9 @@ body {
     background-size: cover;
     background-position: centre;
     background-repeat: no-repeat;
-    /* Limit the component to the viewport using the computed grid size */
-    max-width: calc(var(--cell-size) * var(--max-cols) + 60px);
+    /* Limit the componant to the viewport using the computed grid size */
     max-height: calc(var(--cell-size) * var(--max-rows) + 160px);
-    width: auto;
+    width: 100%;
 }
 
 /* Play-area is the combo of a few elements for easy wrapping */
@@ -103,27 +98,70 @@ body {
     align-items: stretch;
     width: 100%;
     box-sizing: border-box;
-    /* this is important to prevent the page scrolling, which is really annoying for the player */
-    max-width: calc(var(--cell-size) * var(--max-cols) + 220px);
 }
 
+
+/* Now I add in the sidebar styles */
+#sidebar {
+    width: 300px;
+    background: rgba(20, 20, 20, 0.85);
+    border: 4px solid #f3e7b3;
+    border-radius: 8px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    box-shadow: 0 0 6px #000;
+}
+#sidebar-tabs { /* there's the tabs at the top of the sidebar where the user can switch between attraction types; this is what's being styled */
+    display: flex;
+    gap: 4px;
+    margin-bottom: 10px;
+}
+#sidebar-tabs .tab {
+    flex: 1;
+    padding: 6px;
+    background: #222;
+    border: 3px solid #fff;
+    font-family: 'Press Start 2P', monospace;
+    font-size: 10px;
+    cursor: pointer;
+    color: #fff;
+}
+#sidebar-tabs .tab.active {
+    background: #444;
+    border-color: #ffeb3b; 
+}
+#sidebar-content {
+    background: #111;
+    border: 3px solid #444;
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px;
+    color: #eee;
+    font-size: 12px;
+}
+
+
+
+
 #grid {
-    border: 2px solid #CD7F32;
+    border: 1px solid #CD7F32;
     position: relative;
     display: grid;
     grid-template-columns: repeat(var(--max-cols), var(--cell-size));
     grid-template-rows: repeat(var(--max-rows), var(--cell-size));
-    gap: 0.05px;
+    gap: 0px;
     background-color: white;
     align-self: flex-start;
     flex: 0 0 auto;
 }
+/* [Dev note]: toggle between border style & border: none here to experiment w/ what looks best*/
 .cell {
     width: var(--cell-size);
     height: var(--cell-size);
-    border: 0.5px solid rgba(255,255,255,0.25);
-    border-radius: 0.01px;
-    border-color: #F2D2BD;
+    border: 0.01px solid #F2D2BD; /* I want it as small as it can get w/out removing the lines entireley */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -133,6 +171,14 @@ body {
 /* here's where the individual styling for the different tyle types are defined */
 .empty {
     background: white;
+}
+.grass {
+    background-image: url(assets/imgs/Grass\ Tile\ 8bit\ -\ Generated\ by\ ChatGPT.png);
+    background-size: cover;
+}
+.pavement {
+    background-image: url(assets/imgs/Tile\ 8Bit\ -\ Generated\ by\ ChatGPT.png);
+    background-size: cover;
 }
 
 .path {
@@ -271,16 +317,6 @@ body {
 }
 
 /* now the styling of the actual gameplay area (map + frustration bar) */
-#game-area {
-    display: flex;
-    flex-direction: row;
-    align-items: stretch; /* make children stretch to same height */
-    justify-content: center;
-    gap: 20px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
 /* this is the bar that tracks visitor frustration; it sits just off to the right of the map */
 #frustration-wrapper {
     display: flex;
@@ -293,9 +329,9 @@ body {
     align-self: stretch; 
     justify-content: flex-start;
     padding: 8px 6px 6px 6px;
-    margin-left: 50px; /* [Dev note]: I found that depending on the length of the emotion word, this can overlap w/ the grid; adjust if needed */
+    margin-left: 10px; /* [Dev note]: I found that depending on the length of the emotion word, this can overlap w/ the grid; adjust if needed */
     box-sizing: border-box;
-    width: clamp(60px, 10vw, 100px);
+    width: 50px;
     min-width: 56px;
 }
 
@@ -350,7 +386,9 @@ body {
 .cathedral {
     background-image: url(assets/imgs/Durham\ Cathedral\ 8Bit\ -\ Generated\ by\ ChatGPT.png);
 }
-
+.castle {
+    background-image: url(assets/imgs/Durham\ Castle\ 8Bit\ -\ Generated\ by\ ChatGPT.png);
+}
 
 
 

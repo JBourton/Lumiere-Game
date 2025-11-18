@@ -4,6 +4,7 @@ import { Player, enablePlayerMovement } from "./logic/playerMovement.js";
 import { setupIntroModal } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
+import { setupSidebar } from "./components/sidebar.js";
 
 // Then set game constants - this is map size, but to change it you also have to go into styles.css & change the '#grid' repeat values to the same as consts here
 const WIDTH = 50;
@@ -58,6 +59,11 @@ document.addEventListener("DOMContentLoaded", () => {
     frustrationBar.style.height = Frustration.get() + "%"; // dynamic adjusting of hieght lets the palyer view live updates of visitor frustation
 });
 
+// next comes the event listner for the sidebar that let's the player drag/drop the Lumiere items onto the city
+document.addEventListener("DOMContentLoaded", () => {
+    setupSidebar();
+});
+
 // render pop up to introduce player to the game
 const funky_background_audio = new AudioManager(); // turning on the tunes!
 
@@ -80,6 +86,7 @@ const player = new Player(10, 0, map, statics);
 renderMap(map, statics, player.row, player.col);
 
 enablePlayerMovement(player);
+
 
 
 
