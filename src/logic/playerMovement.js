@@ -2,11 +2,12 @@ import { renderMap } from "./map.js";
 
 // Handles the player logic – just keeping it all together here compartmentalised away from rest of the repo
 export class Player {
-    constructor(initialRow, initialCol, levelMap, statics) {
+    constructor(initialRow, initialCol, levelMap, statics_fixed_on_map, attractions_placed_on_map) {
         this.row = initialRow;
         this.col = initialCol;
         this.map = levelMap;
-        this.statics = statics; // adding this in to accout for player collision with fixed structures
+        this.statics_fixed_on_map = statics_fixed_on_map; // adding this in to accout for player collision with fixed structures
+        this.attractions_placed_on_map = attractions_placed_on_map; // and this too so that the player can actually place attractions down (whole point of game)
         // [Dev note] change this to a MUCH lower value (like, 30ms) if you want the player to zoom around and quickly reach areas
         this.canMove = true;  // this is a shackle on the user's movements (so they don't go too fast around durham)
         this.moveDelay = 150; // and this is the movement delay in ms (when it expires, it unlocks above)
@@ -35,8 +36,8 @@ export class Player {
         //this.map[this.row][this.col] = 0; // I can uncoment this to clear old position (i.e. remove path player was just on)
 
         if (this.map[targetRow][targetCol] !== 1) {return;} // this little peice of logic forces player to stick to paths only
-        //if (this.statics[targetRow][targetCol] !== null) {return;}
-        if (this.statics[targetRow][targetCol] && this.statics[targetRow][targetCol].id) {return;} // and this is explicitly defining that the player can't bump into fixed structures
+        //if (this.statics_fixed_on_map[targetRow][targetCol] !== null) {return;}
+        if (this.statics_fixed_on_map[targetRow][targetCol] && this.statics_fixed_on_map[targetRow][targetCol].id) {return;} // and this is explicitly defining that the player can't bump into fixed structures
 
 
         // Now update to new position
@@ -44,7 +45,7 @@ export class Player {
         this.col = targetCol;
 
         // [Note]: Could move this out later if rendering gets more complex?
-        renderMap(this.map, this.statics, this.row, this.col);
+        renderMap(this.map, this.statics_fixed_on_map, this.attractions_placed_on_map, this.row, this.col);
     }
 }
 

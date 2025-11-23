@@ -431,7 +431,51 @@ body {
 .castle {
     background-image: url(assets/imgs/Durham\ Castle\ 8Bit\ -\ Generated\ by\ ChatGPT.png);
 }
+.framwellgate-bridge {
+    background-image: url(assets/imgs/Framwellgate\ Bridge\ 8bit\ -\ Generated\ by\ ChatGPT.png);
+    background-repeat: no-repeat;
+    background-size: 100% 100%;  /* had to do this for this img specifically because the img dimensions don't quite work out with the space I'd like it to take up */
+}
 
 
 
 
+/* This next section is responsible for styling the placement of attractions */
+.placement-preview {
+    position: absolute;
+    pointer-events: none;
+    z-index: 10; /* i.e. place highlighting under static overlay */
+    background-color: rgba(0, 255, 180, 0.2);
+    image-rendering: pixelated;
+    transition: left 40ms linear, top 40ms linear;
+}
+.placement-preview-tile {
+    outline: 2px solid rgba(0, 255, 180, 0.85);
+    background-color: rgba(0, 255, 180, 0.25);
+    image-rendering: pixelated;
+} /* this is valid tiles */
+.placement-preview-tile.invalid {
+    outline: 2px solid rgba(255, 80, 80, 0.85);
+    background-color: rgba(255, 0, 0, 0.20);
+} /* and this one invalid */
+
+
+/* now when the placment is valid and the player clicks to place, the attractions needs to be overlayed on top of the tile */
+.placed-overlay {
+    position: absolute;
+    background-size: contain;
+    background-repeat: no-repeat;
+    image-rendering: pixelated;
+    z-index: 12;
+}  /* and then the background imgs for the individual overlays when the player actually places an item can be set */
+.placed-overlay.string_lights {
+    background-image: url("assets/imgs/String%20Lights%208bit%20-%20Generated%20by%20ChatGPT.png");
+}
+
+.placed-overlay.mythical_screen {
+    background-image: url("assets/imgs/Magical%20Mirror%208bit-%20Generated%20by%20ChatGPT.png");
+}
+
+.placed-overlay.luminescent_webs {
+    background-image: url("assets/imgs/Spider%20Lights%208bit-%20Generated%20by%20ChatGPT.png");
+}

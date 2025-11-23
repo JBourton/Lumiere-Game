@@ -1,5 +1,6 @@
 // This file is responsible for the coding of the sidebar, including the button switching and the drag-drop behaviour
-
+import { setPlacementItem } from "../logic/placementPreview.js";  // this is needed for setting up the interaction w/ the sidebar and the placement preview
+import { ALL_ATTRACTIONS_PLACEABLE_ON_MAP } from "../logic/placeableDefinitions.js";
 
 // All logic to setup sidebar is encapsulated nicely in this
 export function setupSidebar() {
@@ -11,12 +12,9 @@ export function setupSidebar() {
     clickSound.volume = 0.6; // play about w/ this to get the sound bite noise just right
 
 
-    // here I setup a data structure that stores the name and associated img for each light display
-    const lightItems = [
-        { name: "String Lights", img: "assets/imgs/String%20Lights%208bit%20-%20Generated%20by%20ChatGPT.png", locked: false },
-        { name: "Mythical Screen", img: "assets/imgs/Magical%20Mirror%208bit-%20Generated%20by%20ChatGPT.png", locked: true },
-        { name: "Luminescent Webs", img: "assets/imgs/Spider%20Lights%208bit-%20Generated%20by%20ChatGPT.png", locked: true }
-    ];
+    // here I import the data structure that stores the names & imgs for each light display
+    const lightItems = Object.values(ALL_ATTRACTIONS_PLACEABLE_ON_MAP);
+
 
 
 
@@ -25,7 +23,7 @@ export function setupSidebar() {
         return `
             <div id="item-list">
                 ${items.map(item => `
-                    <div class="item-row ${item.locked ? "locked" : ""}" data-item="${item.name}">
+                    <div class="item-row ${item.locked ? "locked" : ""}" data-item-id="${item.id}">
                         <img src="${item.img}" class="item-icon" alt="${item.name}">
                         <span class="item-name">${item.name}</span>
                     </div>
@@ -59,7 +57,7 @@ export function setupSidebar() {
     content.innerHTML = typeof panels["Lights"] === "function" ? panels["Lights"]() : panels["Lights"];
 
     // post-render, this function attatches listners onto the clickable items
-    function attachItemListeners() {
+    function attachItemListeners() { // passing in the attractions dict here
         const rows = document.querySelectorAll('.item-row');
 
         rows.forEach(row => {
@@ -73,11 +71,20 @@ export function setupSidebar() {
                 clickSound.currentTime = 0;  // this is to account for v fast player clicks
                 clickSound.play().catch(err => console.warn("Audio blocked:", err));
 
-                const selected = row.dataset.item;
-                console.log("Selected:", selected);
+                // FIX: correct identifier retrieval
+                const selectedId = row.dataset.itemId;
+
+                // FIX: lookup by dictionary id, not array index
+                const item = ALL_ATTRACTIONS_PLACEABLE_ON_MAP[selectedId];
+
+                // FIX: corrected debug var (selectedId instead of selected)
+                console.log("[DEBUG] Item Selected:", selectedId);
+
+                setPlacementItem(item);
             });
         });
     }
+
 
 
 

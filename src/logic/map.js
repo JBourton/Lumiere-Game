@@ -12,9 +12,9 @@ export const DURHAM_MAP_LAYOUT = [
   [3,3,3,3,3,3,3,1,3,3,3,3,3,3,1,3,3,1,1,1,1,1,1,1,1,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [3,3,3,3,3,3,3,1,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
   [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,1],
@@ -35,8 +35,8 @@ export const DURHAM_MAP_LAYOUT = [
 
 
 // this function builds on the map, adding another layer on top of it for static objects (like the cathedrel, i.e. non-interactable)
-export function build_objects_layer(map_width, map_height) {
-    const objects = [];  // just setting out the space to store statics
+export function build_a_new_layer(map_width, map_height) {
+    const objects = [];  // just setting out the space to store statics_fixed_on_map
     for (let r = 0; r < map_height;r++) { //going through rows
         objects[r] = [];
         for (let c = 0; c < map_width; c++) {// and then cols
@@ -58,17 +58,19 @@ export function build_grid_map(width, height) {
         }
     }
 
-    let statics = build_objects_layer(width, height);
+    let statics_fixed_on_map = build_a_new_layer(width, height);  // I'm using these as layers placed on top of the map in order to abstract away some of the logic. Layer 2 is statics (i.e. imgs of places in Durham)
+    let attractions_placed_on_map = build_a_new_layer(width, height); // and layer 3 is the items the player places
 
     // now placing the static objects defined below:
-    place_static_object(statics, 0, 4, STATIC_OBJECTS.gala);
-    place_static_object(statics, 6, 18, STATIC_OBJECTS.marketplace_trident_statue);
-    place_static_object(statics, 5, 26, STATIC_OBJECTS.marketplace_horse_statue);
-    place_static_object(statics, 22, 42, STATIC_OBJECTS.cathedral);
-    place_static_object(statics, 10, 45, STATIC_OBJECTS.castle);
+    place_static_object(statics_fixed_on_map, 0, 4, STATIC_OBJECTS.gala);
+    place_static_object(statics_fixed_on_map, 6, 18, STATIC_OBJECTS.marketplace_trident_statue);
+    place_static_object(statics_fixed_on_map, 5, 26, STATIC_OBJECTS.marketplace_horse_statue);
+    place_static_object(statics_fixed_on_map, 22, 42, STATIC_OBJECTS.cathedral);
+    place_static_object(statics_fixed_on_map, 10, 45, STATIC_OBJECTS.castle);
+    place_static_object(statics_fixed_on_map, 24, 5, STATIC_OBJECTS.framwellgate_bridge)
 
     // now the object layer will get built on top
-    return {map, statics};
+    return {map, statics_fixed_on_map, attractions_placed_on_map};
 }
 
 
@@ -82,7 +84,7 @@ This coding scheme is used below; it represnets the each of the in-game objects 
 */
 
 // Then rendering that map for dispaly in html 
-export function renderMap(map, statics, playerRow, playerCol) {
+export function renderMap(map, statics_fixed_on_map, attractions_placed_on_map, playerRow, playerCol) {
     const map_container = document.getElementById("grid");
     
     if (!map_container) { // verify presence of container from which to display the map
@@ -91,6 +93,10 @@ export function renderMap(map, statics, playerRow, playerCol) {
     }  // Marker/reader note: I'm adding these debug logs throughout to help my development - genreally, these aren't impacting on game functionality, they just help me
 
     map_container.innerHTML = "";
+
+    // // [important]:the grid dimensions are needed here so that the player preview can read the bounds
+    map_container.dataset.rows = map.length;
+    map_container.dataset.cols = map[0].length;
 
     for (let w = 0; w < map.length; w++) {
         for (let h = 0; h < map[w].length; h++) {
@@ -115,7 +121,7 @@ export function renderMap(map, statics, playerRow, playerCol) {
             }
 
             // next the static objects need to be placed on the map (non-interactiable buildings/features of durham)
-            const fixed_structure = statics[w][h];
+            const fixed_structure = statics_fixed_on_map[w][h];
             if (fixed_structure && fixed_structure.anchor) {//because I only want the first tile to have the id
                 sq.classList.add(fixed_structure.id); // add to class list for css styling
                 //sq.textContent = STATIC_OBJECTS[fixed_structure.id].label.charAt(0).toUpperCase(); // [Dev note]: fetching first letter of name of structure for easy labeling (looks horrible though)
@@ -125,6 +131,10 @@ export function renderMap(map, statics, playerRow, playerCol) {
             if (w === playerRow && h === playerCol) {
                 sq.classList.add("player");
             }
+
+            // set the row & col for the placement preview
+            sq.dataset.x = h;
+            sq.dataset.y = w;
 
             map_container.appendChild(sq);
 
@@ -137,14 +147,14 @@ export function renderMap(map, statics, playerRow, playerCol) {
         }
     }
 
-    // the next bit here is designed to permit an overlay of an image onto an object zone, rather than have a bunch of repeats of one image. Looks much better w/ this!
+    // Layer 2: the next bit here is designed to permit an overlay of an image onto an object zone, rather than have a bunch of repeats of one image. Looks much better w/ this!
     Object.keys(STATIC_OBJECTS).forEach(key => {
         const obj = STATIC_OBJECTS[key];
 
-        for (let r = 0; r < statics.length; r++) {//same structure; going through rows
-            for (let c = 0; c < statics[r].length; c++) {// & cols
+        for (let r = 0; r < statics_fixed_on_map.length; r++) {//same structure; going through rows
+            for (let c = 0; c < statics_fixed_on_map[r].length; c++) {// & cols
 
-                const cell = statics[r][c];// pulling the cell
+                const cell = statics_fixed_on_map[r][c];// pulling the cell
                 if (cell && cell.anchor && cell.id === obj.id) { // using the anchor cell here to paste the image over the first cell
                     const overlay = document.createElement("div");// creating a div to put the img in
                     overlay.classList.add("static-overlay", cell.id);
@@ -156,12 +166,47 @@ export function renderMap(map, statics, playerRow, playerCol) {
                     overlay.style.width = `calc(${obj.width} * var(--cell-size))`;
                     overlay.style.height = `calc(${obj.height} * var(--cell-size))`;
 
-                    map_container.appendChild(overlay);// and there we have it, image is now overlayed!
+                    map_container.appendChild(overlay);// now finally theres an overlayed img on this cell that's being hovered over.
                 }
             }
         }
     });
+
+    // Layer 3: This bit is responsible for the attractions the player placed on the map
+
+    Object.keys(window.ALL_ATTRACTIONS_PLACEABLE_ON_MAP || {}).forEach(key => {
+        const obj = window.ALL_ATTRACTIONS_PLACEABLE_ON_MAP[key];
+
+        for (let r = 0; r < attractions_placed_on_map.length; r++) {
+            for (let c = 0; c < attractions_placed_on_map[r].length; c++) {
+
+                const cell = attractions_placed_on_map[r][c];
+                if (cell && cell.anchor && cell.id === obj.id) {
+
+                    const overlay = document.createElement("div");
+
+                    // apply generic overlay class + attraction-specific class
+                    overlay.classList.add("placed-overlay", obj.id);
+
+                    overlay.style.left   = `calc(${c} * var(--cell-size))`;
+                    overlay.style.top    = `calc(${r} * var(--cell-size))`;
+                    overlay.style.width  = `calc(${obj.w} * var(--cell-size))`;
+                    overlay.style.height = `calc(${obj.h} * var(--cell-size))`;
+
+                    map_container.appendChild(overlay);
+                }
+            }
+        }
+    });
+
+
+    // now the grid is cleared, placement previews must be restored
+    if (window.__rebuildPreviewEl) {
+        window.__rebuildPreviewEl();  // this has to be rebuilt w/ every rerender otherwise the placment preview wouldn't work
+    }
+
 }
+
 
 
 
@@ -171,7 +216,8 @@ export const STATIC_OBJECTS = {
     gala: {id: "gala",width: 4, height:4, label:"Gala"},
     marketplace_horse_statue: {id: "equestrian-statue",width:2,height:2,label:"Horse"},
     marketplace_trident_statue: {id: "trident-statue", width:2, height: 2, label: "Trident"},
-    castle: {id:"castle", width: 5, height: 5, label: "Castle"}
+    castle: {id:"castle", width: 5, height: 5, label: "Castle"},
+    framwellgate_bridge: {id: "framwellgate-bridge", width: 9, height: 6, label: "FramwellgateBridge"},
 }; //[Dev note]: don't really need the labels but they're useful for debugging if I don't want to overlay an img
 
 // and here is where the logic is to actually place the static objects defined above

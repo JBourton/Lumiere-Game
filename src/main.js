@@ -5,6 +5,7 @@ import { setupIntroModal } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
+import { initPlacementPreview, setPlacementItem } from "./logic/placementPreview.js";
 
 // Then set game constants - this is map size, but to change it you also have to go into styles.css & change the '#grid' repeat values to the same as consts here
 const WIDTH = 50;
@@ -79,13 +80,19 @@ muteBtn.addEventListener("click", () => {
 });
 
 // Start Lumiere Game!
-const { map, statics } = build_grid_map(WIDTH, HEIGHT);
+const { map, statics_fixed_on_map, attractions_placed_on_map } = build_grid_map(WIDTH, HEIGHT);
+window.currentMap = map; // for the purpose of item placing
+window.currentStatics = statics_fixed_on_map;
+window.placedObjects = attractions_placed_on_map;
 
-const player = new Player(10, 0, map, statics);
+const player = new Player(10, 0, map, statics_fixed_on_map, attractions_placed_on_map);
+window.playerInstance = player; // and similarley the player (row,col) pos needs to be globally exposed for adjacency checking w/ item placement
 
-renderMap(map, statics, player.row, player.col);
+renderMap(map, statics_fixed_on_map, attractions_placed_on_map, player.row, player.col);
 
 enablePlayerMovement(player);
+
+initPlacementPreview(); // allow items to be placed on the grid
 
 
 
