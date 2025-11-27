@@ -5,7 +5,7 @@ import { setupIntroModal } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
-import { initPlacementPreview, setPlacementItem } from "./logic/placementPreview.js";
+import { initPlacementPreview, turn_off_the_placement_preview } from "./logic/placementPreview.js";
 
 // Then set game constants - this is map size, but to change it you also have to go into styles.css & change the '#grid' repeat values to the same as consts here
 const WIDTH = 50;
@@ -29,7 +29,15 @@ document.addEventListener("DOMContentLoaded", () => {
     Magic.addListener(magiclvl => {magicBar.style.width = magiclvl + "%"}); // this updates width of blue 'magic' bar
 
     // & this updates counter for staff
-    Staff.addListener(StaffCnt => {staffDisplay.textContent = `👷 Staff: ${StaffCnt}`;});
+    Staff.addListener(staffCnt => {
+        staffDisplay.textContent = `👷 Staff: ${staffCnt}`;
+
+        if (window.refreshSidebarAffordability) {
+            window.refreshSidebarAffordability();
+        }
+    });
+
+
 
     // & then this updates the counter for total num of visitors
     Visitors.addListener(visCnt => {visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${visCnt}`;})

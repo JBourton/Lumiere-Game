@@ -1,7 +1,8 @@
 // This file is responsible for showing the area around the player that can have an item placed on it
-// Inspiration for this placement system actually came from the StarDew Valley game, which used a similar system. However, the code from that game was not used here. An improvised version is coded instead.
+// Inspiration for this placement system comes from other citybuilder videogames I've played, which tend to use similar systems. However, the code from no other game was used here. An improvised version is coded instead.
 
 import { renderMap } from "./map.js";
+import { Staff } from "./resources.js";  // so that staff cnt can be decremented
 
 let preview_el_in_doc = null;
 let curr_item_of_interest = null;
@@ -78,7 +79,7 @@ function updatePreviewDimensions() {
     preview_el_in_doc.style.height = `calc(var(--cell-size) * ${curr_item_of_interest.h})`;
 
     preview_el_in_doc.style.backgroundImage = `url(${curr_item_of_interest.img})`;
-    preview_el_in_doc.style.backgroundSize  = "contain";
+    preview_el_in_doc.style.backgroundSize  = "100% 100%";
     preview_el_in_doc.style.backgroundRepeat = "no-repeat";
     preview_el_in_doc.style.opacity = "0.6";
 }
@@ -223,6 +224,10 @@ function placeItemOnMap(x, y, item) {
         }
     }
 
+    Staff.remove(item.staff_cost);
+
+    turn_off_the_placement_preview();  // get rid of the placement preview once the item's been placed
+
     // Re-render map so the overlay loads
     renderMap(
         window.currentMap,
@@ -234,4 +239,16 @@ function placeItemOnMap(x, y, item) {
 
     // Rebuild preview after map refresh (map.js also calls this, but this is safe)
     if (window.__rebuildPreviewEl) window.__rebuildPreviewEl();
+}
+
+
+// this function turns off the placement preview; this activates either when the player places the selected item or presses esc
+export function turn_off_the_placement_preview() {
+    curr_item_of_interest = null;
+    if (preview_el_in_doc) {
+        preview_el_in_doc.style.backgroundImage = "";
+        preview_el_in_doc.style.opacity = "0";
+        preview_el_in_doc.style.visibility = "hidden";
+    }
+    if (window.hidePlacementHint) window.hidePlacementHint();
 }

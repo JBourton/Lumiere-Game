@@ -1,36 +1,36 @@
 // As part of the level design, I'm manually defineing the layout of the initial paths of Durham
 // It's very extendable & customisable using the coding scheme defined below where a number represents a certain tile or the player
 export const DURHAM_MAP_LAYOUT = [
-  [3,3,3,1,0,0,0,0,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [3,3,3,1,0,0,0,0,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [3,3,3,1,0,0,0,0,1,1,1,1,1,1,1,3,3,1,1,1,1,1,1,1,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [3,3,3,1,0,0,0,0,1,3,3,3,3,3,1,3,3,1,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [3,3,3,1,1,1,1,1,1,3,3,3,3,3,1,3,3,1,3,3,3,3,3,3,3,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,1,0,0,0,0,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0],
+  [3,3,3,1,0,0,0,0,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,1,1,1,3,3,3,3,3,3,3,1,0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0],
+  [3,3,3,1,0,0,0,0,1,1,1,1,1,1,1,3,3,1,1,1,1,1,1,1,3,1,1,1,1,1,1,1,1,1,0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0],
+  [3,3,3,1,0,0,0,0,1,3,3,3,3,3,1,3,3,1,3,3,3,3,3,3,3,1,3,3,3,3,3,3,3,1,0,0,0,0,1,3,3,3,3,3,3,1,0,0,0,0],
+  [3,3,3,1,1,1,1,1,1,3,3,3,3,3,1,3,3,1,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
   [3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,3,3,1,1,1,1,1,1,1,1,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [3,3,3,3,3,3,3,1,3,3,3,3,3,3,1,1,1,1,0,0,1,3,3,3,3,1,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,1,1,1,1,1,1,1,3,3,3,3,3,3,1,1,1,1,0,0,1,3,3,3,3,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [3,3,3,3,3,3,3,1,3,3,3,3,3,3,1,3,3,1,1,1,1,1,1,1,1,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [3,3,3,3,3,3,3,1,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
   [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,1],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
-  [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
+  [3,3,3,3,3,1,3,3,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,1,3,3,3,3,3,3,3,3,1,3,3,1,3,3,3,3,3,1,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,1,3,3,3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,1,3,3,3,3,3,3,3,1,3,3,3,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0],
+  [3,3,3,3,3,1,3,3,3,1,1,1,1,1,3,3,3,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1],
+  [3,3,3,3,3,1,3,3,3,1,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,1],
+  [3,3,3,3,3,1,1,1,1,1,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,1],
+  [3,3,3,3,3,1,3,3,3,3,3,3,3,3,3,3,3,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,1],
+  [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,1],
+  [3,3,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,0,0,0,0,0,0,2,2,2,2,2,2,2,2,1],
+  [3,3,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,1,3,3,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,1,3,3,1,0,0,0,0,0,0,0,0,0,0,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0],
+  [3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,3,3,3,3,0,0,0,0,0,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0]
 ];
 
 
@@ -62,12 +62,16 @@ export function build_grid_map(width, height) {
     let attractions_placed_on_map = build_a_new_layer(width, height); // and layer 3 is the items the player places
 
     // now placing the static objects defined below:
-    place_static_object(statics_fixed_on_map, 0, 4, STATIC_OBJECTS.gala);
-    place_static_object(statics_fixed_on_map, 6, 18, STATIC_OBJECTS.marketplace_trident_statue);
-    place_static_object(statics_fixed_on_map, 5, 26, STATIC_OBJECTS.marketplace_horse_statue);
-    place_static_object(statics_fixed_on_map, 22, 42, STATIC_OBJECTS.cathedral);
-    place_static_object(statics_fixed_on_map, 10, 45, STATIC_OBJECTS.castle);
-    place_static_object(statics_fixed_on_map, 24, 5, STATIC_OBJECTS.framwellgate_bridge)
+    place_static_object(statics_fixed_on_map, 0, 4, STATIC_BUILDINGS_AROUND_DURHAM.gala);
+    place_static_object(statics_fixed_on_map, 6, 18, STATIC_BUILDINGS_AROUND_DURHAM.marketplace_trident_statue);
+    place_static_object(statics_fixed_on_map, 5, 26, STATIC_BUILDINGS_AROUND_DURHAM.marketplace_horse_statue);
+    place_static_object(statics_fixed_on_map, 21, 41, STATIC_BUILDINGS_AROUND_DURHAM.cathedral);
+    place_static_object(statics_fixed_on_map, 10, 45, STATIC_BUILDINGS_AROUND_DURHAM.castle);
+    place_static_object(statics_fixed_on_map, 23, 6, STATIC_BUILDINGS_AROUND_DURHAM.framwellgate_bridge);
+    place_static_object(statics_fixed_on_map, 23, 20, STATIC_BUILDINGS_AROUND_DURHAM.riverside);
+    place_static_object(statics_fixed_on_map, 0, 46, STATIC_BUILDINGS_AROUND_DURHAM.cuthberts);
+    place_static_object(statics_fixed_on_map, 0, 34, STATIC_BUILDINGS_AROUND_DURHAM.hatfield);
+    place_static_object(statics_fixed_on_map, 14, 29, STATIC_BUILDINGS_AROUND_DURHAM.north_road);
 
     // now the object layer will get built on top
     return {map, statics_fixed_on_map, attractions_placed_on_map};
@@ -124,7 +128,7 @@ export function renderMap(map, statics_fixed_on_map, attractions_placed_on_map, 
             const fixed_structure = statics_fixed_on_map[w][h];
             if (fixed_structure && fixed_structure.anchor) {//because I only want the first tile to have the id
                 sq.classList.add(fixed_structure.id); // add to class list for css styling
-                //sq.textContent = STATIC_OBJECTS[fixed_structure.id].label.charAt(0).toUpperCase(); // [Dev note]: fetching first letter of name of structure for easy labeling (looks horrible though)
+                //sq.textContent = STATIC_BUILDINGS_AROUND_DURHAM[fixed_structure.id].label.charAt(0).toUpperCase(); // [Dev note]: fetching first letter of name of structure for easy labeling (looks horrible though)
             }
             
             // here the player sprite is overlayed if the player's on this square
@@ -148,8 +152,8 @@ export function renderMap(map, statics_fixed_on_map, attractions_placed_on_map, 
     }
 
     // Layer 2: the next bit here is designed to permit an overlay of an image onto an object zone, rather than have a bunch of repeats of one image. Looks much better w/ this!
-    Object.keys(STATIC_OBJECTS).forEach(key => {
-        const obj = STATIC_OBJECTS[key];
+    Object.keys(STATIC_BUILDINGS_AROUND_DURHAM).forEach(key => {
+        const obj = STATIC_BUILDINGS_AROUND_DURHAM[key];
 
         for (let r = 0; r < statics_fixed_on_map.length; r++) {//same structure; going through rows
             for (let c = 0; c < statics_fixed_on_map[r].length; c++) {// & cols
@@ -211,13 +215,17 @@ export function renderMap(map, statics_fixed_on_map, attractions_placed_on_map, 
 
 
 // this is the space I'm using to define dimensions & ids for each static on the map (e.g. cathedrel)
-export const STATIC_OBJECTS = {
-    cathedral: {id: "cathedral",width: 8,height: 8,label: "Cathedral"},
+export const STATIC_BUILDINGS_AROUND_DURHAM = {
+    cathedral: {id: "cathedral",width: 9,height: 9,label: "Cathedral"},
     gala: {id: "gala",width: 4, height:4, label:"Gala"},
     marketplace_horse_statue: {id: "equestrian-statue",width:2,height:2,label:"Horse"},
     marketplace_trident_statue: {id: "trident-statue", width:2, height: 2, label: "Trident"},
     castle: {id:"castle", width: 5, height: 5, label: "Castle"},
-    framwellgate_bridge: {id: "framwellgate-bridge", width: 9, height: 6, label: "FramwellgateBridge"},
+    framwellgate_bridge: {id: "framwellgate-bridge", width: 10, height: 7, label: "FramwellgateBridge"},
+    riverside: {id: "riverside", width: 5, height: 7, label: "Riverside"},
+    cuthberts: {id: "cuthberts", width: 4, height: 4, label: "StCuthberts"},
+    hatfield: {id: "hatfield", width: 4, height: 4, label: "Hatfield"},
+    north_road: {id: "north-road", width: 6, height: 6, label: "NorthRoad"},
 }; //[Dev note]: don't really need the labels but they're useful for debugging if I don't want to overlay an img
 
 // and here is where the logic is to actually place the static objects defined above

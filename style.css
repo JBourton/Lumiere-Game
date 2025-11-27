@@ -183,6 +183,18 @@ body {
     background: #1a1a1a;  /* this turns off the hoverglow for locked items */
     border-color: #333;
 }
+.staff-cost {
+    display: block;
+    font-size: 9px;
+    color: #ffeb3b;
+    margin-top: 4px;
+    font-family: 'Press Start 2P', monospace;
+}
+.staff-cost.cannot-afford { /* if the player doesn't have sufficient staff to pay for the attraction, this will show up visually by highlighting the staff cnt label red */
+    color: #ff4d4d;
+}
+
+
 
 
 
@@ -436,7 +448,22 @@ body {
     background-repeat: no-repeat;
     background-size: 100% 100%;  /* had to do this for this img specifically because the img dimensions don't quite work out with the space I'd like it to take up */
 }
-
+.riverside {
+    background-image: url(assets/imgs/Riverside\ 8bit\ -\ Generated\ by\ ChatGPT.png);
+    background-repeat: no-repeat;
+    background-size: 100% 100%; /* actually needs quite a lot of stretching but distortion isn't too bad because its lowres */
+}
+.cuthberts {
+    background-image: url(assets/imgs/Cuthberts\ 8bit\ -\ Generated\ by\ ChatGPT.png);
+}
+.hatfield {
+    background-image: url(assets/imgs/Hatfield\ 8bit\ -\ Generated\ by\ ChatGPT.png);
+    background-repeat: no-repeat;
+    background-size: 100% 100%; /* didn't quite fit the dimensions so have to stretch it a tad */
+}
+.north-road {
+    background-image: url(assets/imgs/North\ Road\ 8bit\ -\ Generated\ by\ ChatGPT.png);
+}
 
 
 
@@ -478,4 +505,6 @@ body {
 
 .placed-overlay.luminescent_webs {
     background-image: url("assets/imgs/Spider%20Lights%208bit-%20Generated%20by%20ChatGPT.png");
+    background-repeat: no-repeat;
+    background-size: 100% 100%;  /* this one looks beter when stretched out longer */
 }

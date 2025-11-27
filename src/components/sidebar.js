@@ -1,6 +1,7 @@
 // This file is responsible for the coding of the sidebar, including the button switching and the drag-drop behaviour
 import { setPlacementItem } from "../logic/placementPreview.js";  // this is needed for setting up the interaction w/ the sidebar and the placement preview
-import { ALL_ATTRACTIONS_PLACEABLE_ON_MAP } from "../logic/placeableDefinitions.js";
+import { ATTRACTION_TYPES, ALL_ATTRACTIONS_PLACEABLE_ON_MAP } from "../logic/placeableDefinitions.js";
+import { Staff } from "../logic/resources.js";  // have to know about current staff available so whether or not it can be afforded can be displayed in the sidebar w/ colour red
 
 // All logic to setup sidebar is encapsulated nicely in this
 export function setupSidebar() {
@@ -19,13 +20,35 @@ export function setupSidebar() {
 
 
     //this function is intended as a nice little generator to build the rows of items
-    function generateLightItems(items) {
+    // function generateLightItems(items) {
+    //     return `
+    //         <div id="item-list">
+    //             ${items.map(item => `
+    //                 <div class="item-row ${item.locked ? "locked" : ""}" data-item-id="${item.id}">
+    //                     <img src="${item.img}" class="item-icon" alt="${item.name}">
+    //                     <span class="item-name">
+    //                         ${item.name}  <! -- this is the styling for the actual attraction -->
+    //                         <span class="staff-cost">👷 ${item.staff_cost}</span> <!-- this part's responible for showing the staff cost of each atraction -->
+    //                     </span>
+    //                 </div>
+    //             `).join('')}
+    //         </div>
+    //     `;
+    // }
+
+    function generateItemsByType(typeName) {
+        const items = Object.values(ALL_ATTRACTIONS_PLACEABLE_ON_MAP)
+            .filter(item => item.type === typeName);
+
         return `
             <div id="item-list">
                 ${items.map(item => `
                     <div class="item-row ${item.locked ? "locked" : ""}" data-item-id="${item.id}">
                         <img src="${item.img}" class="item-icon" alt="${item.name}">
-                        <span class="item-name">${item.name}</span>
+                        <span class="item-name">
+                            ${item.name}   <! -- this is the styling for the actual attraction -->
+                            <span class="staff-cost">👷 ${item.staff_cost}</span>  <!-- this part's responible for showing the staff cost of each atraction -->
+                        </span>
                     </div>
                 `).join('')}
             </div>
@@ -35,49 +58,63 @@ export function setupSidebar() {
     // Example placeholder panels for each tab
     // (Lights panel upgraded to dynamic generator above)
     const panels = {
-        Lights: () => generateLightItems(lightItems),
-        Stages: `
-            <p>Stages available:</p>
-            <ul>
-                <li>🎤 Mini Stage</li>
-                <li>🎪 Main Showcase Stage</li>
-            </ul>
-        `,
-        "Food Stalls": `
-            <p>Food Stalls available:</p>
-            <ul>
-                <li>🍔 Burger Van</li>
-                <li>🍕 Pizza Stand</li>
-                <li>🍩 Doughnut Cart</li>
-            </ul>
-        `
+        [ATTRACTION_TYPES.LIGHTS]: () => generateItemsByType(ATTRACTION_TYPES.LIGHTS),
+        [ATTRACTION_TYPES.STAGES]: () => generateItemsByType(ATTRACTION_TYPES.STAGES),
+        [ATTRACTION_TYPES.FOOD]: () => generateItemsByType(ATTRACTION_TYPES.FOOD)
     };
 
+
     // the first tab that should be open is the "lights" one - that's the theme of Lumiere after all, and the core structure of the 3
-    content.innerHTML = typeof panels["Lights"] === "function" ? panels["Lights"]() : panels["Lights"];
+    //content.innerHTML = typeof panels["Lights"] === "function" ? panels["Lights"]() : panels["Lights"];
+    content.innerHTML = panels[ATTRACTION_TYPES.LIGHTS]();
+
 
     // post-render, this function attatches listners onto the clickable items
-    function attachItemListeners() { // passing in the attractions dict here
+    function attachItemListeners() {  // no need for args as I'm referencing global vals like Staff from resources.js
         const rows = document.querySelectorAll('.item-row');
 
         rows.forEach(row => {
+
+            const itemId = row.dataset.itemId;
+            const item = ALL_ATTRACTIONS_PLACEABLE_ON_MAP[itemId];
+
+            // fetch the staff-cost label (needed so only the text becomes red)
+            const costLabel = row.querySelector(".staff-cost");
+
             if (row.classList.contains('locked')) {
                 row.style.pointerEvents = "none";  // cannot click locked items
                 return;
             }
 
+            const canAfford = (Staff.get() >= item.staff_cost);  // have to ensure the player can actually afford the staff cost to placing an attraction 1st
+
+            // NEW: apply affordability to ONLY the cost label
+            if (costLabel) {
+                if (!canAfford) {
+                    costLabel.classList.add("cannot-afford");
+                } else {
+                    costLabel.classList.remove("cannot-afford");
+                }
+            }
+
+            // control clickability (original logic preserved)
+            if (!canAfford) {
+                row.style.pointerEvents = "none";   // disable it
+            } else {
+                row.style.pointerEvents = "auto";   // enable it
+            }
+
             row.addEventListener('click', () => {
+                if (!canAfford) return;  // do absoltutley nothing if the player can't afford to place the attraction 
                 // Play the little 8bit soundbite for clicking on an item
                 clickSound.currentTime = 0;  // this is to account for v fast player clicks
                 clickSound.play().catch(err => console.warn("Audio blocked:", err));
 
-                // FIX: correct identifier retrieval
+                // fetch correct id
                 const selectedId = row.dataset.itemId;
 
-                // FIX: lookup by dictionary id, not array index
+                // lookup attraction id in dict (check placeableDefinitions for more details of this though)
                 const item = ALL_ATTRACTIONS_PLACEABLE_ON_MAP[selectedId];
-
-                // FIX: corrected debug var (selectedId instead of selected)
                 console.log("[DEBUG] Item Selected:", selectedId);
 
                 setPlacementItem(item);
@@ -88,8 +125,13 @@ export function setupSidebar() {
 
 
 
+
     // ensure rows respond on initial load
     attachItemListeners();
+
+    window.refreshSidebarAffordability = () => {  // this is needed so that the staff cost can be updated as staff cnt varies
+        attachItemListeners();
+    };
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -109,4 +151,4 @@ export function setupSidebar() {
             attachItemListeners();
         });
     });
-}
+}  // these nested functions actually encapsulte the logic pretty well for main.js, so it's a deliberate design choice on my end
