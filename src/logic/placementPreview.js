@@ -191,6 +191,12 @@ function checkPlacementValidity(itemx, itemy, w, h) {
             if (window.currentStatics?.[itemy + dy]?.[itemx + dx]) {
                 return false; 
             }
+            
+            // also need to prevent attractions overlapping w/ other attractions
+            if (window.placedObjects?.[itemy + dy]?.[itemx + dx]) {
+                return false; 
+            }
+
         }
     }
     return true;

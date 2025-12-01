@@ -65,8 +65,7 @@ export function setupSidebar() {
 
 
     // the first tab that should be open is the "lights" one - that's the theme of Lumiere after all, and the core structure of the 3
-    //content.innerHTML = typeof panels["Lights"] === "function" ? panels["Lights"]() : panels["Lights"];
-    content.innerHTML = panels[ATTRACTION_TYPES.LIGHTS]();
+    content.innerHTML = panels[ATTRACTION_TYPES.LIGHTS]();  // this just loads all the attractions into the sidebar ready for game-start
 
 
     // post-render, this function attatches listners onto the clickable items

@@ -498,13 +498,17 @@ body {
 .placed-overlay.string_lights {
     background-image: url("assets/imgs/String%20Lights%208bit%20-%20Generated%20by%20ChatGPT.png");
 }
-
 .placed-overlay.mythical_screen {
-    background-image: url("assets/imgs/Magical%20Mirror%208bit-%20Generated%20by%20ChatGPT.png");
+    background-image: url("assets/imgs/Magical%20Mirror%208bit%20-%20Generated%20by%20ChatGPT.png");
 }
-
 .placed-overlay.luminescent_webs {
     background-image: url("assets/imgs/Spider%20Lights%208bit-%20Generated%20by%20ChatGPT.png");
     background-repeat: no-repeat;
     background-size: 100% 100%;  /* this one looks beter when stretched out longer */
+}
+.placed-overlay.kaleidoscope {
+    background-image: url("assets/imgs/Kaleidoscope\ 8bit\ -\ Generated\ by\ ChatGPT.png");
+}
+.placed-overlay.light_forest {
+    background-image: url("assets/imgs/Light\ Forest\ 8bit\ -\ Generated\ by\ ChatGPT.png");
 }

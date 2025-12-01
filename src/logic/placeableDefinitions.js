@@ -9,6 +9,7 @@ export const ATTRACTION_TYPES = {  // this is just a bit nicer way of defining t
 
 // here I setup a data structure that stores the name and associated img for each light display
 export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
+    // [DEV NOTE]: Remeber to add ".png" onto the end of imgs, as this causes bugs if its omited
     string_lights: {
         id: "string_lights",  // for html/css refrencing
         name: "String Lights",
@@ -19,11 +20,21 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         staff_cost: 1,
     },
 
+    kaleidoscope: {
+        id: "kaleidoscope",
+        name: "Kaleidoscope",
+        type: ATTRACTION_TYPES.LIGHTS,
+        img: "assets/imgs/Kaleidoscope%208bit%20-%20Generated%20by%20ChatGPT.png",
+        w: 2, h: 2,
+        locked: false,
+        staff_cost: 2,
+    },
+
     mythical_screen: {
         id: "mythical_screen",
         name: "Mythical Screen",
         type: ATTRACTION_TYPES.LIGHTS,
-        img: "assets/imgs/Magical%20Mirror%208bit-%20Generated%20by%20ChatGPT.png",
+        img: "assets/imgs/Magical%20Mirror%208bit%20-%20Generated%20by%20ChatGPT.png",
         w: 4, h: 4,
         locked: false,
         staff_cost: 3
@@ -36,10 +47,34 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/Spider%20Lights%208bit-%20Generated%20by%20ChatGPT.png",
         w: 6, h: 2,
         locked: false,
-        staff_cost: 4
-    }
-};
+        staff_cost: 5
+    },
+
+    light_forest: {
+        id: "light_forest",
+        name: "Light Forest",
+        type: ATTRACTION_TYPES.LIGHTS,
+        img: "assets/imgs/Light%20Forest%208bit%20-%20Generated%20by%20ChatGPT.png",
+        w: 4, h: 4,
+        locked: false,
+        staff_cost: 8
+    },
+
+};  // [DEV NOTE]: If the img isn't rendering, it's probably because it's not added to the ".place-overlay.xyz" css part, so do that!
 
 // Importantly, this has to be globally exposed so it can be used in other files like map.js to enable lvl3 over the map
 window.ALL_ATTRACTIONS_PLACEABLE_ON_MAP = ALL_ATTRACTIONS_PLACEABLE_ON_MAP;
 
+
+
+
+// [DEV NOTE] To add more just use this template rather than typing it all out again
+// attrac_name: {
+//     id: ,
+//     name: ,
+//     type: ATTRACTION_TYPES.,
+//     img: ,
+//     w: , h: ,
+//     locked: ,
+//     staff_cost: ,
+// }
