@@ -221,14 +221,15 @@ function placeItemOnMap(x, y, item) {
         h: item.h
     };
 
-    for (let dy = 0; dy < item.h; dy++) {
-        for (let dx = 0; dx < item.w; dx++) {
-            window.placedObjects[y + dy][x + dx] = {
-                id: item.id,
-                anchor: (dx === 0 && dy === 0)
-            };
-        }
+    for (let dx = 0; dx < item.w; dx++) {
+        window.placedObjects[y + dy][x + dx] = {
+            id: item.id, // the id of the attraction placed
+            anchor: (dx === 0 && dy === 0), // I'm using the top-left tile as the anchor for it
+            currentVisitors: (dx === 0 && dy === 0) ? 0 : undefined  // setting for npc logic
+        };
     }
+    
+
 
     Staff.remove(item.staff_cost);
 

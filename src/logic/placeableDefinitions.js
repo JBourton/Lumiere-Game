@@ -19,6 +19,9 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,  // here I expliclty define the width-height dimensions for the attraction
         locked: false,  // Only items that the player is able to place will have this set to True; this evolves throughout the game as the player reaches higher magic lvls
         staff_cost: 1,
+        capacity: 1,
+        visitTime: 4,
+        magicGain: 0.1,
     },
 
     kaleidoscope: {
@@ -29,6 +32,9 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 2, h: 2,
         locked: false,
         staff_cost: 2,
+        capacity: 2,
+        visitTime: 7,
+        magicGain: 0.3,
     },
 
     mythical_screen: {
@@ -38,7 +44,10 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/attractions/Magical%20Mirror%208bit%20-%20Generated%20by%20ChatGPT.png",
         w: 4, h: 4,
         locked: false,
-        staff_cost: 3
+        staff_cost: 3,
+        capacity: 4,
+        visitTime: 9,
+        magicGain: 0.4,
     },
 
     luminescent_webs: {
@@ -48,7 +57,10 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/attractions/Spider%20Lights%208bit-%20Generated%20by%20ChatGPT.png",
         w: 6, h: 2,
         locked: false,
-        staff_cost: 5
+        staff_cost: 5,
+        capacity: 5,
+        visitTime: 10,
+        magicGain: 0.5
     },
 
     light_forest: {
@@ -58,7 +70,10 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/attractions/Light%20Forest%208bit%20-%20Generated%20by%20ChatGPT.png",
         w: 4, h: 4,
         locked: false,
-        staff_cost: 8
+        staff_cost: 8,
+        capacity: 6,
+        visitTime: 14,
+        magicGain: 0.7
     },
 
 
@@ -71,6 +86,9 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 3, h: 3,
         locked: false,
         staff_cost: 3,
+        capacity: 10,
+        visitTime: 15,
+        magicGain: 0.1,
     },
 
     clown_stage: {
@@ -81,6 +99,9 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 3, h: 3,
         locked: false,
         staff_cost: 6,
+        capacity: 15,
+        visitTime: 15,
+        magicGain: 0.15
     },
 
     music_stage: {
@@ -91,6 +112,9 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 3, h: 3,
         locked: false,
         staff_cost: 8,
+        capacity: 20,
+        visitTime: 20,
+        magicGain: 0.2
     },
 
 
@@ -153,4 +177,7 @@ window.ALL_ATTRACTIONS_PLACEABLE_ON_MAP = ALL_ATTRACTIONS_PLACEABLE_ON_MAP;
 //     w: , h: ,
 //     locked: ,
 //     staff_cost: ,
+//     capacity: ,
+//     visitTime: ,
+//     magicGain: 
 // },

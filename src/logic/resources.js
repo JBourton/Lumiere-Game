@@ -70,7 +70,7 @@ export const Visitors = {
         this.visitor_cnt = Math.max(0, this.visitor_cnt - amount);  // again a lower limit as you can't have negative visitors
         this.notify();
     }
-}  // [DEV NOTE]: could litererally just make this into one reusable function to avoid replication later
+}  // [DEV NOTE]: could actually just make this into one reusable function to avoid replication later
 
 /* Constant 4: Visitor frustraution. This one is complicated one, a bit like magic as its a progress bar.
 The extra layer of depth is that it will change colour for each threshold (Happy, Miffed, Irritated, Annoyed) but that's implemented elsewhere*/

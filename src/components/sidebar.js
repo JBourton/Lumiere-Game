@@ -16,26 +16,7 @@ export function setupSidebar() {
     // here I import the data structure that stores the names & imgs for each light display
     const lightItems = Object.values(ALL_ATTRACTIONS_PLACEABLE_ON_MAP);
 
-
-
-
-    //this function is intended as a nice little generator to build the rows of items
-    // function generateLightItems(items) {
-    //     return `
-    //         <div id="item-list">
-    //             ${items.map(item => `
-    //                 <div class="item-row ${item.locked ? "locked" : ""}" data-item-id="${item.id}">
-    //                     <img src="${item.img}" class="item-icon" alt="${item.name}">
-    //                     <span class="item-name">
-    //                         ${item.name}  <! -- this is the styling for the actual attraction -->
-    //                         <span class="staff-cost">👷 ${item.staff_cost}</span> <!-- this part's responible for showing the staff cost of each atraction -->
-    //                     </span>
-    //                 </div>
-    //             `).join('')}
-    //         </div>
-    //     `;
-    // }
-
+    // now the sidebar's ready to be built, using the predefined attraction details
     function generateItemsByType(typeName) {
         const items = Object.values(ALL_ATTRACTIONS_PLACEABLE_ON_MAP)
             .filter(item => item.type === typeName);

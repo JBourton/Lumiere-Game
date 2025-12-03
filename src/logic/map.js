@@ -80,11 +80,10 @@ export function build_grid_map(width, height) {
 
 /* 
 This coding scheme is used below; it represnets the each of the in-game objects that can be on the durham map
-0: blank space
-1: path
-2: player
-3: visitor
-4: ... (i'll add later on)
+0: blank space (just a placeholder used for development, shouldn't be any in my final version)
+1: cobble (for placing attractions)
+2: grass (also for placing attractions)
+3: path (walkable for player & npcs)
 */
 
 // Then rendering that map for dispaly in html 
@@ -177,7 +176,6 @@ export function renderMap(map, statics_fixed_on_map, attractions_placed_on_map, 
     });
 
     // Layer 3: This bit is responsible for the attractions the player placed on the map
-
     Object.keys(window.ALL_ATTRACTIONS_PLACEABLE_ON_MAP || {}).forEach(key => {
         const obj = window.ALL_ATTRACTIONS_PLACEABLE_ON_MAP[key];
 
@@ -241,7 +239,6 @@ export function place_static_object(map, baseRow, baseCol, objectDef) {
                 id: objectDef.id,
                 anchor: (r === 0 && c === 0)
             };
-            //map[baseRow + r][baseCol + c] = objectDef.id; // this is the logic that lets a static object that takes up multiple tiles be placed
         }
     }
 }
