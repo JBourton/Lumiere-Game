@@ -4,7 +4,7 @@
 import { ALL_ATTRACTIONS_PLACEABLE_ON_MAP as placeableDefinitions } from '../placeableDefinitions.js'
 import * as Resources from '../resources.js'      // I need this as visistors interacting w/ attractions impacts magic useage
 import * as Pathfinding from './pathfinding.js'    // this is linking the npc with its movement logic
-//import { getAttractions } from '../map.js'  // [TO BE IMPLEMENTED]
+//import { get_all_attractions_on_map } from '../map.js'  // [TO BE IMPLEMENTED]
 
 // Here I'm taking a layered strucured by treating the npc logic as 3 seperate layered: funadmental design, current STATE_OF_NPC and attraction selection logic
 // I can then make the architecture nicely decoupled from the main game logic
@@ -19,28 +19,27 @@ const STATE_OF_NPC = {  // i.e. a visitor npc can be doing one of these 4 things
   VISITING: 'visiting'
 }
 
-// this helper fetches all attractions currently on the map from the attraction_layer layer
+// this helper fetches all attractions currently on the map from the attr_layer layer
 // it scans anchor cells in attractions_placed_on_map & pairs them w/ their definitions
-function getAttractions() {
-  const attraction_layer = window.placedObjects  // this is holding the 3rd map layer, i.e. the one with the attraction locations
-  if (!attraction_layer) {
-    return []  // and edge case here, if no attractions are placed there's no need to go ahead with all the next logic
+function get_all_attractions_on_map() {
+  const attr_layer = window.placedObjects  // this is holding the 3rd map layer, i.e. the one with the attraction locations (I defined it in main.js)
+  if (!attr_layer) {
+    return []  // edge case here; if no attractions placed theres no need to do next logic
   } 
 
   const attractions_on_map = []
 
-  for (let row = 0; row < attraction_layer.length; row++) {  // go through each row/col of layer 3 to look for the anchor cell's id
-    for (let col = 0; col < attraction_layer[row].length; col++) {
-      const map_sq = attraction_layer[row][col]  // i.e. one of the squares on the grid-based map (that I'm using as the anchor)
+  for (let row = 0; row < attr_layer.length; row++) {  // go through each row/col of layer 3 to look for the anchor cell's id
+    for (let col = 0; col < attr_layer[row].length; col++) {
+      const map_sq = attr_layer[row][col]  // i.e. one of the squares on the grid-based map (that I'm using as the anchor)
       if (!map_sq || !map_sq.anchor) continue
 
       const def = placeableDefinitions[map_sq.id]
       if (!def) continue
 
       attractions_on_map.push({
-        // definition linkage
-        defId: map_sq.id,
-        // position (anchor tile on the attraction_layer)
+        defId: map_sq.id,  // I'm pulling the id from the actual map of durham here
+        // position (anchor tile on the attr_layer)
         x: col,
         y: row,
         // I fetch the runtime state from the map square
@@ -136,7 +135,7 @@ function npc_central_controller(npc, dt) {
 
     // if npc's ready to pick, the function to do so is ran for it
     case STATE_OF_NPC.PICKING: {
-      const attractions = getAttractions()
+      const attractions = get_all_attractions_on_map()
       const next_target_attr = select_next_attraction(npc, attractions)
 
       if (!next_target_attr) return  // there's a few edge cases (like no attractions placed yet) that need to be accounted for
@@ -193,7 +192,7 @@ function visit_new_attraction(npc) {
   }
 
   const [targetX, targetY] = npc.targetId.split(',').map(Number)
-  const attraction = getAttractions().find(a => a.x === targetX && a.y === targetY)
+  const attraction = get_all_attractions_on_map().find(a => a.x === targetX && a.y === targetY)
   if (!attraction) {
     npc.STATE_OF_NPC = STATE_OF_NPC.IDLE
     return
@@ -216,7 +215,7 @@ function finish_visiting_attraction(npc) {
   }
 
   const [targetX, targetY] = npc.targetId.split(',').map(Number)
-  const attraction = getAttractions().find(a => a.x === targetX && a.y === targetY)
+  const attraction = get_all_attractions_on_map().find(a => a.x === targetX && a.y === targetY)
 
   if (attraction) {
     // decrement visitor count on the anchor cell (clamped at 0)
@@ -241,9 +240,9 @@ function finish_visiting_attraction(npc) {
 
 
 // a function for publicly updating the npcs
-export function update(dt) {
+export function update_npc_system(time_change) {
   for (const npc of npcs_on_map) {
-    npc_central_controller(npc, dt)
+    npc_central_controller(npc, time_change)
   }
 }
 

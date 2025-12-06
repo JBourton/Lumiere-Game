@@ -5,7 +5,9 @@ import { setupIntroModal } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
-import { initPlacementPreview, turn_off_the_placement_preview } from "./logic/placementPreview.js";
+import { initPlacementPreview } from "./logic/placementPreview.js";
+import { spawn_new_visitor, update_npc_system } from "./logic/visitorLogic/visitors.js";
+import { draw_visitor_sprites_onto_map } from "./components/renderVisitors.js";  // I'm separating vistor gameplay (above) from visitor asthetics
 
 // Then set game constants - this is map size, but to change it you also have to go into styles.css & change the '#grid' repeat values to the same as consts here
 const WIDTH = 50;
@@ -87,7 +89,7 @@ muteBtn.addEventListener("click", () => {
     muteBtn.textContent = ismuted ? "🔇" : "🔊";  // basically flip whatever the current value is to mute/unmute
 });
 
-// Start Lumiere Game!
+// Start Lumiere Game! Firstly I'm loading in all the assets for a proper setup
 const { map, statics_fixed_on_map, attractions_placed_on_map } = build_grid_map(WIDTH, HEIGHT);
 window.currentMap = map; // for the purpose of item placing
 window.currentStatics = statics_fixed_on_map;
@@ -102,9 +104,47 @@ enablePlayerMovement(player);
 
 initPlacementPreview(); // allow items to be placed on the grid
 
+// Track player position to only re-render when the player moves
+let last_player_row = player.row;
+let last_player_col = player.col;
 
+// ---------- Now: The core gameplay loop begins! --------------- //
 
+// a. intialise timings to get the game rythm going
+let curr_time_frame = performance.now()
+let time_since_last_npc_spawn = 0;
+const SPAWN_INTERVAL = 10000; // [DEV NOTE]: I'll remove this later but for now it's best to test with freqeunt NPCs coming in
 
+function lumiere_gameplay_loop(game_timing_data) {
+    const change_in_time = game_timing_data - curr_time_frame; // need to track the timing as game goes along
+    curr_time_frame = game_timing_data; // need later
+
+    // now visitors will spawn, for now on a timer and later in line w/ gameplay rules
+    time_since_last_npc_spawn += change_in_time; // using this as a clean way to check how long it's been since npc spawn
+    if (time_since_last_npc_spawn >= SPAWN_INTERVAL) {  // time to spawn npc!
+        spawn_new_visitor(0, 10) // [DEV NOTE]: For now visitors can just spawn in where the player does but probably later this needs to be more dynamic from other entracne points
+        time_since_last_npc_spawn = 0;  // timeing resets
+    }
+
+    // Now NPC behaviour like movement, selecting a fun attraction to go visit + actually visiting happens
+    update_npc_system(change_in_time)
+
+    // now re-render the map iff the player actually moved
+    if (player.row !== last_player_row || player.col !== last_player_col) {
+        last_player_row = player.row;
+        last_player_col = player.col;
+        renderMap(map, statics_fixed_on_map, attractions_placed_on_map, player.row, player.col);
+    }
+
+    // Redraw visitor sprites every frame (they move independently of the player)
+    draw_visitor_sprites_onto_map()
+
+    // finally I request the next frame:
+    requestAnimationFrame(lumiere_gameplay_loop);
+}
+
+// For this I use the predefined fucntion, details found at: https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
+requestAnimationFrame(lumiere_gameplay_loop)
 
 
 

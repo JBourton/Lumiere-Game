@@ -18,11 +18,12 @@ export function initPlacementPreview() {
     }
 
     // this is the function responsible for creating the actual preview element part
-    setup_preview_elem();  
+    setup_preview_elem();
 
     // now this event listener is possible, that picks up on the mouse moving round the grid squares
     main_map.addEventListener("mousemove", handleMouseMove);
     main_map.addEventListener("click", tryPlaceItem);
+    console.debug("[PLACEMENT] initPlacementPreview: listeners attached");
 }
 
 function setup_preview_elem() {  // this helper facillitates re-rending of the map to allow for overlay of attraction imgs with each map refresh
@@ -42,6 +43,7 @@ function setup_preview_elem() {  // this helper facillitates re-rending of the m
 
     main_map.appendChild(preview_el_in_doc);
     if (curr_item_of_interest) updatePreviewDimensions(); // finally, grab the item image to re-overlay it
+    console.debug("[PLACEMENT] setup_preview_elem: preview element appended", preview_el_in_doc);
 }
 
 // now global exposing to ensure this works after the map is re-rendered
@@ -54,8 +56,8 @@ window.__rebuildPreviewEl = setup_preview_elem;
 function checkIsAdjacentToPlayer(item_pos_on_x, item_pos_on_y) {
     if (!window.playerInstance) return false; // this just makes sure the playerInstance is globally exposed for referncing their position on the map
 
-    const player_pos_on_x = playerInstance.col; 
-    const player_pos_on_y = playerInstance.row;
+    const player_pos_on_x = window.playerInstance.col; 
+    const player_pos_on_y = window.playerInstance.row;
 
     // this line enables the player to have an 8-directional adjacency placment for all the items types
     return Math.abs(item_pos_on_x - player_pos_on_x) <= 1 && Math.abs(item_pos_on_y - player_pos_on_y) <= 1 && 
@@ -67,6 +69,13 @@ function checkIsAdjacentToPlayer(item_pos_on_x, item_pos_on_y) {
 // called whenever the user selects an item from the sidebar
 export function setPlacementItem(item) {
     curr_item_of_interest = item;
+    console.debug("[PLACEMENT] setPlacementItem: item set", item, "previewElExists=", !!preview_el_in_doc);
+    console.log("[PLACEMENT] setPlacementItem: item set", item);
+    // Ensure the preview element exists (in case init wasn't run or was torn down)
+    if (!preview_el_in_doc) {
+        console.log("[PLACEMENT] preview element missing - creating now");
+        setup_preview_elem();
+    }
     updatePreviewDimensions();
 }
 
@@ -221,13 +230,19 @@ function placeItemOnMap(x, y, item) {
         h: item.h
     };
 
-    for (let dx = 0; dx < item.w; dx++) {
-        window.placedObjects[y + dy][x + dx] = {
-            id: item.id, // the id of the attraction placed
-            anchor: (dx === 0 && dy === 0), // I'm using the top-left tile as the anchor for it
-            currentVisitors: (dx === 0 && dy === 0) ? 0 : undefined  // setting for npc logic
-        };
+    for (let dy = 0; dy < item.h; dy++) {
+        for (let dx = 0; dx < item.w; dx++) {
+            // ensure rows/cols exist
+            if (!window.placedObjects[y + dy]) window.placedObjects[y + dy] = [];
+            window.placedObjects[y + dy][x + dx] = {
+                id: item.id,  // the id of the attraction placed
+                anchor: (dx === 0 && dy === 0),  // I'm using the top-left tile as the anchor for it
+                currentVisitors: (dx === 0 && dy === 0) ? 0 : undefined // seting npc logic
+            };
+        }
     }
+
+    console.log(`[PLACEMENT] placeItemOnMap: placed '${item.id}' at x=${x} y=${y} w=${item.w} h=${item.h}`);
     
 
 
@@ -240,8 +255,8 @@ function placeItemOnMap(x, y, item) {
         window.currentMap,
         window.currentStatics,
         window.placedObjects,
-        playerInstance.row,
-        playerInstance.col
+        window.playerInstance.row,
+        window.playerInstance.col
     );
 
     // Rebuild preview after map refresh (map.js also calls this, but this is safe)

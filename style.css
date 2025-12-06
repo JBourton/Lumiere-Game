@@ -253,6 +253,10 @@ body {
     image-rendering: pixelated;
 }
 
+.npc-sprite {
+    pointer-events: none;
+}
+
 /* Styling the pop up that gives the user an intro + context for the game */
 .modal {
     font-size: clamp(12px, 1.8vw, 18px);
