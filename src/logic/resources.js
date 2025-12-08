@@ -4,25 +4,30 @@ Also it's tied in VERY closely with machinations diagram 01: this should make it
 
 /* Constant 1 (most important, as its vital to gameplay): MAGIC meter! */
 export const Magic = {
-    value: 50, // I've decided to set the magic at 50%; that way, the player has movement to increase or decrease magic from the get-go
+    mgc_value: 10, // I've decided to set the magic at 10%; that way, the player has movement to increase or decrease magic from the get-go
     listeners: [],
 
     // there's a listner set up just for magic
     addListener(fn) {this.listeners.push(fn);},
-    notify() {this.listeners.forEach(fn => fn(this.value));},
+    notify() {this.listeners.forEach(fn => fn(this.mgc_value));},
 
     // fetch % of magic
-    get() {return this.value;},
+    get() {return this.mgc_value;},
 
     // increase & decrease magic, which will be used all througout the game constantly as visitors interact/leave
     increase(amount) {
-        this.value = Math.min(100, this.value + amount); // first capping at 100% (its a meter)
+        this.mgc_value = Math.min(100, this.mgc_value + amount); // first capping at 100% (its a meter)
         this.notify();
     },
 
     decrease(amount) {
-        this.value = Math.max(0, this.value - amount); // and then capping at 0%
+        this.mgc_value = Math.max(0, this.mgc_value - amount); // and then capping at 0%
         this.notify();
+    },
+
+    set_mgc(new_mgc_lvl) { // I use that in reset game to just hard-set it
+        this.mgc_value = new_mgc_lvl;
+        this.notify(); // say hi to the listners (so ui can update)
     }
 }
 
@@ -45,6 +50,11 @@ export const Staff = {
 
     remove(amount) {
         this.staff_cnt = Math.max(0, this.staff_cnt - amount);  // but obviously there's a lower limit as the player can't have -ve staff
+        this.notify();
+    },
+
+    set_stf(new_stf_cnt) {
+        this.staff_cnt = new_stf_cnt;
         this.notify();
     }
 }
@@ -69,6 +79,11 @@ export const Visitors = {
     remove(amount) {
         this.visitor_cnt = Math.max(0, this.visitor_cnt - amount);  // again a lower limit as you can't have negative visitors
         this.notify();
+    },
+
+    set_vstrs(new_vstr_cnt) {
+        this.visitor_cnt = new_vstr_cnt;
+        this.notify();
     }
 }  // [DEV NOTE]: could actually just make this into one reusable function to avoid replication later
 
@@ -92,6 +107,10 @@ export const Frustration = {
     },
     decrease(amount) {
         this.frustration_lvl = Math.max(0, this.frustration_lvl - amount); // and thresholded at 0
+        this.notify();
+    },
+    set_frust(new_frust_lvl) {
+        this.frustration_lvl = new_frust_lvl;
         this.notify();
     }
 }

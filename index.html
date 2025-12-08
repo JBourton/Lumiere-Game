@@ -9,7 +9,7 @@
 <body>
     <button id="mute-button">🔊</button>
     <div id="introModal" class="modal">
-        <div class="modal-content">
+        <div class="intro-modal-content">
             <!-- Setting the intro to the game to welcome new players + provide context on what they'll be doing-->
             <h3>Welcome to Lumiere Festival Planner!</h3>
             <p>It&rsquo;s the first night of Lumiere. All signs point to a great night; the sky is clear, the trains are running and 
@@ -27,13 +27,19 @@
             <button id="startButton">Let's Go!</button>
         </div>
     </div>
+    <div id="gameoverModal" class="modal"> <!-- This is the "gameover" popup, like the intro one but shows only when magic == 0 (i.e. player lost)-->
+        <div class="gameover-modal-content">
+            <p>Oh no! Just like we thought, you couldn't hack it. Shame, looks like someone isn't getting that grad job. Fancy another unpaid overworked retry, Itern?</p>
+            <button id="restartButton">Why not!</button>
+        </div>
+    </div>
     <h1 id="game-title">Lumiere Festival Planning Game</h1>
 
     <div id='map-display'>
 
         <div id="resource-ui">
             <!-- This is a progress-bar-eseque type design for the magc, as its the most important resource, and its a %-->
-            <span id="magic-text">Magic: 50%</span>
+            <span id="magic-text">Magic: 10%</span>
             <div id="magic-container">
                 <div id="magic-bar"></div>
             </div>

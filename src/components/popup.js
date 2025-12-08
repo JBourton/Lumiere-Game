@@ -12,9 +12,9 @@ export function setupIntroModal(bg_tunes) {
         }
 
         // this is to make sure that it's seen by user once per SESSION (i.e. page reload will render it again)
-        const hasSeenIntro = sessionStorage.getItem("introSeen");
+        const has_intro_occured_yet = sessionStorage.getItem("introSeen");
 
-        if (!hasSeenIntro) {
+        if (!has_intro_occured_yet) {
             // displaying modal (default styling 'none' in CSS)
             introModal.style.display = "flex";  // [Note]: could always use a class toggle here instead
             sessionStorage.setItem("introSeen", "true"); // now mark as seen to prevent a later reapperance (once per session ONLY otherwise player's getting annoyed)
@@ -32,4 +32,32 @@ export function setupIntroModal(bg_tunes) {
         // for later debugging; useful for double-checking its working
         // console.log("Intro modal setup complete");
     });
+}
+
+
+// this function is the "Game Over" screen, which will preceed the resetting of the whole game w/ systems back to nil
+export function setupGameOverModal(game_restart_logic) {
+    document.addEventListener("DOMContentLoaded", function () {
+        const popup_for_gameover = document.getElementById("gameoverModal");
+        const restart_the_game = document.getElementById("restartButton");  // fetch the restart buttons id
+        if (!popup_for_gameover || !restart_the_game) {
+            return;  // this is only if either the modal or restart button isn't here, so should never be the case but using for debug still
+        }
+
+        // I setup the restart button to close this modal and then begin all the restart logic, reseting game systems to nil
+        restart_the_game.addEventListener("click", function () {
+            popup_for_gameover.style.display = "none"; // (close it)
+            if (typeof game_restart_logic === "function") game_restart_logic();  // back to nothing player, unlucky ;)
+        });
+    });
+}
+
+// activating at gameover condition (no magic in the city, the people had a bad night :-(   )
+export function game_over() {
+    // event listner setup to track magic & appear when magic == 0
+    const the_hidden_gameover_popup = document.getElementById("gameoverModal");
+    if (!the_hidden_gameover_popup) {
+        return;  // though this should never trigger, but I'm using for debug
+    }
+    the_hidden_gameover_popup.style.display = "flex"; // activeating
 }

@@ -1,7 +1,7 @@
 // First load in all game componants needed
 import { build_grid_map, renderMap } from "./logic/map.js";
 import { Player, enablePlayerMovement } from "./logic/playerMovement.js";
-import { setupIntroModal } from "./components/popup.js";
+import { setupIntroModal, setupGameOverModal, game_over } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
@@ -19,16 +19,63 @@ window.Magic = Magic;
 window.Staff = Staff;
 window.Visitors = Visitors;
 window.Frustration = Frustration;
+
+
+// this function resets everything back to how it was at game start
+function reset_the_game() {
+    // back to how it all was at 1st time
+    Magic.set_mgc(10);
+    Staff.set_stf(1);
+    Visitors.set_vstrs(0);
+    Frustration.set_frust(0);
+
+    // git rid of all npcs
+    if (window.clear_all_npcs) window.clear_all_npcs();
+
+    // reset player back to initial pos used at launch
+    player.row = 10;
+    player.col = 0;
+    last_player_row = player.row;
+    last_player_col = player.col;
+
+    // reset timers for npc spawn & animation frame
+    curr_time_frame = performance.now();
+    time_since_last_npc_spawn = 0;
+
+    // redraw map & player as theres now a clean slate
+    renderMap(
+        window.currentMap,
+        window.currentStatics,
+        window.placedObjects,
+        player.row,
+        player.col
+    );
+
+    // restart the gameplay loop cleanly after game over
+    requestAnimationFrame(lumiere_gameplay_loop);
+}
+
+
+
 // The next part is to set up the trackers for the main resources; i.e. magic, staff & visitors
 document.addEventListener("DOMContentLoaded", () => {
     const magicBar = document.getElementById("magic-bar"); // fetch the magic bar to start updating it throught game
+    const magicText = document.getElementById("magic-text"); // fetch the magic text to keep it in sync
     const staffDisplay = document.getElementById("staff-display"); // same w/ staff but as a counter not a bar
     const visitorDisplay = document.getElementById("visitor-display");
     const frustrationBar = document.getElementById("frustration-bar");
     const frustrationLabel = document.getElementById("frustration-label");
 
     // now setup a listner for both magic & staff
-    Magic.addListener(magiclvl => {magicBar.style.width = magiclvl + "%"}); // this updates width of blue 'magic' bar
+    Magic.addListener(magiclvl => {
+        magicBar.style.width = magiclvl + "%"; // first the magic bar
+        magicText.textContent = `Magic: ${magiclvl}%`; // then the text display too
+
+        // noooo the player lost the game - restart time!
+        if (magiclvl <= 0) {
+            game_over();
+        }
+    });
 
     // & this updates counter for staff
     Staff.addListener(staffCnt => {
@@ -40,12 +87,11 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-
     // & then this updates the counter for total num of visitors
     Visitors.addListener(visCnt => {visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${visCnt}`;})
 
     // finally (and most complex) is the dynamic frustration bar adjusting
-   Frustration.addListener(frustrationlvl => {
+    Frustration.addListener(frustrationlvl => {
         frustrationBar.style.height = frustrationlvl + "%";
         if (frustrationlvl <= 25) { // here congestion = low, visitor frustration = low, rate of visitor loss = 0
             frustrationBar.style.background = "limegreen";
@@ -65,10 +111,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // step 1 here is to initialise w/ current vals
     magicBar.style.width = Magic.get() + "%"; // dynamiclly adjusting width based on current magic %
+    magicText.textContent = `Magic: ${Magic.get()}%`; // initialize magic text with current value
     staffDisplay.textContent = `👷 Staff: ${Staff.get()}`;
     visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${Visitors.get()}`;
     frustrationBar.style.height = Frustration.get() + "%"; // dynamic adjusting of hieght lets the palyer view live updates of visitor frustation
 });
+
 
 // next comes the event listner for the sidebar that let's the player drag/drop the Lumiere items onto the city
 document.addEventListener("DOMContentLoaded", () => {
@@ -81,6 +129,9 @@ const funky_background_audio = new AudioManager(); // turning on the tunes!
 funky_background_audio.toggleMute();  // [Dev note] Starting on muted because it's annoying when developing, but usually it'll start on unmuted for standard player
 
 setupIntroModal(funky_background_audio);
+
+// enabling the game over modal w/ restart logic
+setupGameOverModal(reset_the_game);
 
 const muteBtn = document.getElementById("mute-button"); // this event lisnter tracks the mute/unmute button on the top left
 muteBtn.textContent = "🔇"; // [Dev note 2] also comment out this line to start on the unmuted emoji
@@ -145,7 +196,3 @@ function lumiere_gameplay_loop(game_timing_data) {
 
 // For this I use the predefined fucntion, details found at: https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
 requestAnimationFrame(lumiere_gameplay_loop)
-
-
-
-
