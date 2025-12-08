@@ -1,6 +1,6 @@
 // this file segments the visitor code to ensure modularity - visitors.js handles all the gameplay / interaction logic, whereas this file is the actual drawing of them on the map using their pngs
 
-import { getnpcs_on_map } from "../logic/visitorLogic/visitors.js";  // I just use this to details about the visitors already in play
+import { getnpcs_on_map, STATE_OF_NPC } from "../logic/visitorLogic/visitors.js";  // I just use this to details about the visitors already in play
 
 // these are the list of all the pngs created to represent the visitors to durham lumiere
 const VISITOR_SPRITES = [
@@ -18,6 +18,9 @@ export function draw_visitor_sprites_onto_map() {
 
     // I just remove all previous npcs and redraw them later
     const all_available_npcs = document.querySelectorAll(".npc-sprite");  // i.e. everything on the map w/ npc class
+    // & same w/ progress bars above the hears of all durham's visitors
+    const all_progress_bars = document.querySelectorAll(".npc-progress");
+    all_progress_bars.forEach(progbar => progbar.remove());
 
     // then go through list of npcs & remove them 1 by 1
     for (let i = 0; i < all_available_npcs.length; i++) {
@@ -41,8 +44,8 @@ export function draw_visitor_sprites_onto_map() {
         new_sprite_rep.classList.add("npc-sprite");  // now adding to the list of overall npcs
 
         new_sprite_rep.style.position = "absolute";
-        new_sprite_rep.style.left = `calc(${npc.vis_x_pos} * var(--cell-size))`;
-        new_sprite_rep.style.top  = `calc(${npc.vis_y_pos} * var(--cell-size))`;
+        new_sprite_rep.style.left = `calc(${npc.vis_col} * var(--cell-size))`;
+        new_sprite_rep.style.top  = `calc(${npc.vis_row} * var(--cell-size))`;
         new_sprite_rep.style.width = `var(--cell-size)`;
         new_sprite_rep.style.height = `var(--cell-size)`;
 
@@ -51,5 +54,33 @@ export function draw_visitor_sprites_onto_map() {
         new_sprite_rep.style.zIndex = "10";  // I need them to be below the placment preview to not interefere w/ it
 
         lumiere_map.appendChild(new_sprite_rep);
+
+        // the next part is to add the progress bars above the heads of durham visitors to show how long the npcs take interacting w/ each attraction
+        if ( // i.e. if the visitor is there and still interacting
+          npc.STATE_OF_NPC === STATE_OF_NPC.VISITING &&
+          npc.interactionTotal > 0 && npc.interactionTimer >= 0 
+        ) {
+            const visitors_curr_prog = 1 - (npc.interactionTimer / npc.interactionTotal);
+            const fit_to_visitor = Math.max(0, Math.min(1,  visitors_curr_prog));
+
+            const progressContainer = document.createElement("div");  // this needs to be added to html to appear above heads
+            progressContainer.classList.add("npc-progress");
+            progressContainer.style.position = "absolute";
+            progressContainer.style.left = `calc(${npc.vis_col} * var(--cell-size))`;
+
+            // now I add a bit of inline css here to position the bar right above the visitor's head
+            progressContainer.style.top  = `calc(${npc.vis_row} * var(--cell-size) - 4px)`;
+            progressContainer.style.width = `var(--cell-size)`;
+            progressContainer.style.height = "4px";
+            progressContainer.style.pointerEvents = "none";
+            progressContainer.style.zIndex = "11";
+
+            const progressFill = document.createElement("div");
+            progressFill.classList.add("npc-progress-fill");
+            progressFill.style.width = `${fit_to_visitor * 100}%`;
+
+            progressContainer.appendChild(progressFill);
+            lumiere_map.appendChild(progressContainer);
+        }
     }
 }

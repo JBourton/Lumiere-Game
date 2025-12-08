@@ -9,15 +9,18 @@ import * as Pathfinding from './pathfinding.js'    // this is linking the npc wi
 // Here I'm taking a layered strucured by treating the npc logic as 3 seperate layered: funadmental design, current STATE_OF_NPC and attraction selection logic
 // I can then make the architecture nicely decoupled from the main game logic
 
+// First the metadata: how fast visitor can go around durham
+let VISTOR_MOVE_SPEED = 1000; // (ms)
 
-// First, I define the actual data structure for the npcs_on_map
+
+// Second, I define the actual data structure for the npcs_on_map
 const npcs_on_map = []
-const STATE_OF_NPC = {  // i.e. a visitor npc can be doing one of these 4 things at any given time
+export const STATE_OF_NPC = {  // i.e. a visitor npc can be doing one of these 4 things at any given time
   IDLE: 'idle',
   PICKING: 'pickingTarget',
   MOVING: 'moving',
   VISITING: 'visiting'
-}
+}  // but needs to be export so npc renderer can see it
 
 // this helper fetches all attractions currently on the map from the attr_layer layer
 // it scans anchor cells in attractions_placed_on_map & pairs them w/ their definitions
@@ -34,18 +37,20 @@ function get_all_attractions_on_map() {
       const map_sq = attr_layer[row][col]  // i.e. one of the squares on the grid-based map (that I'm using as the anchor)
       if (!map_sq || !map_sq.anchor) continue
 
-      const def = placeableDefinitions[map_sq.id]
-      if (!def) continue
+      const obj_on_the_map = placeableDefinitions[map_sq.id]
+      if (!obj_on_the_map) {  // need to check if there's actually anythign to go to
+        continue
+      }
 
       attractions_on_map.push({
         defId: map_sq.id,  // I'm pulling the id from the actual map of durham here
         // position (anchor tile on the attr_layer)
-        x: col,
-        y: row,
+        col: col,
+        row: row,
         // I fetch the runtime state from the map square
-        capacity: def.capacity ?? 0,
-        visitTime: def.visitTime ?? 0,
-        magicGain: def.magicGain ?? 0,
+        capacity: obj_on_the_map.capacity ?? 0,
+        visitTime: obj_on_the_map.visitTime ?? 0,
+        magicGain: obj_on_the_map.magicGain ?? 0,
         currentVisitors: map_sq.currentVisitors || 0,
         cellRef: map_sq
       })
@@ -56,17 +61,25 @@ function get_all_attractions_on_map() {
 }
 
 // Now I define a function that creates the npc
-export function spawn_new_visitor(vis_x_pos, vis_y_pos) {
+export function spawn_new_visitor(vis_col, vis_row) {
+  // ensure visitor spawns on a valid path, not attraction/undefined square
+  const curr_map = window.currentMap;
+  if (!curr_map || !curr_map[vis_row] || curr_map[vis_row][vis_col] !== 1) {
+    console.error(`[SPAWN MSG] an invaild spawn pos (${vis_col}, ${vis_row}) - curr tile val == ${curr_map?.[vis_row]?.[vis_col] ?? 'til_val_unknown'}, not 1 (which is path code).`); //because npcs can only spawn on paths, otherwise they're stuck
+    return null;
+  }
+
   const npc = {
     id: crypto.randomUUID(), // set a random id
-    vis_x_pos,
-    vis_y_pos,
+    vis_col,
+    vis_row,
     path: [],  // no path has been taken initially
     pathIndex: 0,
     STATE_OF_NPC: STATE_OF_NPC.IDLE,  // when npc spawns they 1st do nothing
     targetId: null,  // the id on the map of the next attraction to visit
     interactionTimer: 0,  // timing how long the npcs has been interacting w/ the current attraction
-
+    interactionTotal: 0, // count how long the visitor's been at the attraction
+    visitor_move_cooldown: VISTOR_MOVE_SPEED,  // (set above so can be changed througout dev)
     lastVisited_memory: {} // I designed this so that the npc 'remembers' when it last visited attractions, so more natural pathfinding behaviour can be coded
   }
 
@@ -78,30 +91,30 @@ export function spawn_new_visitor(vis_x_pos, vis_y_pos) {
 
 // now the visitor seeks out the next attraction
 function select_next_attraction(npc_to_move, attractions_on_map) {
-  let best_attr_score = 0  // each attraction will be assigned a score determining how good of a fit it is for natural pathfinding
-  let best_attr_to_visit = null  // this holds the most valid attraction object
+  let best_attr_score = 0;  // each attraction will be assigned a score determining how good of a fit it is for natural pathfinding
+  let best_attr_to_visit = null;  // this holds the most valid attraction object
   const time_right_now = performance.now()  // this is a browser api responsible for timing and I use it in to check how recently an attraction was visited
 
-  const RECENTLY_VISITED_DEFINITION = 30000 // i.e. how long has to pass (in ms) for an attraction to no longer be classed as "recently visited"
+  const RECENTLY_VISITED_DEFINITION = 30000; // i.e. how long has to pass (in ms) for an attraction to no longer be classed as "recently visited"
 
   // here I'm looping through all attractions
   for (const att of attractions_on_map) {
-    const def = placeableDefinitions[att.defId]
+    const def = placeableDefinitions[att.defId];
     if (!def || !def.capacity) continue
 
     // then calculating distance from npc->attraction
-    const dist_x = att.x - npc_to_move.vis_x_pos
-    const dist_y = att.y - npc_to_move.vis_y_pos
-    const distance_to_attr = Math.abs(dist_x) + Math.abs(dist_y)  // just basic manhattan distance here as the npcs can move in 4 directions just like the player
+    const dist_col = att.col - npc_to_move.vis_col;
+    const dist_row = att.row - npc_to_move.vis_row;
+    const distance_to_attr = Math.abs(dist_col) + Math.abs(dist_row);  // just basic manhattan distance here as the npcs can move in 4 directions just like the player
 
     // use the attraction's anchor coordinates as its identity key
-    const memKey = `${att.x},${att.y}`
+    const memKey = `${att.col},${att.row}`
 
     // then checking when the npc last visited it
-    const last_visited = npc_to_move.lastVisited_memory[memKey]  // pull time out of storage
-    const recentlyVisited = last_visited && (time_right_now - last_visited < RECENTLY_VISITED_DEFINITION)  // i.e. make this true if there's a stored timestamp (was visited before) AND was visited in the last Xs (controlled by hyperparam above)
+    const last_visited = npc_to_move.lastVisited_memory[memKey];  // pull time out of storage
+    const recentlyVisited = last_visited && (time_right_now - last_visited < RECENTLY_VISITED_DEFINITION);  // i.e. make this true if there's a stored timestamp (was visited before) AND was visited in the last Xs (controlled by hyperparam above)
 
-    const baseScore = def.baseScore ?? 1  // default to 1 if not explicitly set
+    const baseScore = def.baseScore ?? 1;  // default to 1 if not explicitly set
 
     // now the core logic: this is the formula i use to determine suitability of an attraction for a given npc
     const specific_attr_score =
@@ -123,7 +136,7 @@ function select_next_attraction(npc_to_move, attractions_on_map) {
 
 // this function is responsible for updating all npc-related states
 // I run it once/frame for every NPC
-function npc_central_controller(npc, dt) {
+function npc_central_controller(npc, time_change) {
   // PURPOSE: to update NPC state, if it should move/interact and if it should pick new attraction
 
   // move npc state to the next suitable action
@@ -135,24 +148,67 @@ function npc_central_controller(npc, dt) {
 
     // if npc's ready to pick, the function to do so is ran for it
     case STATE_OF_NPC.PICKING: {
-      const attractions = get_all_attractions_on_map()
-      const next_target_attr = select_next_attraction(npc, attractions)
+        const attractions = get_all_attractions_on_map()
+        const next_target_attr = select_next_attraction(npc, attractions)
 
-      if (!next_target_attr) return  // there's a few edge cases (like no attractions placed yet) that need to be accounted for
+        if (!next_target_attr) {
+            // No attractions available → wander to a random path tile on the entire map
+            const randomTarget = pick_random_path_destination(npc);
 
-      // use the attraction's coordinates as the target identifier
-      npc.targetId = `${next_target_attr.x},${next_target_attr.y}`
+            if (!randomTarget) {
+            npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+            return;
+            }
 
-      npc.path = Pathfinding.findPath(
-        npc.vis_x_pos,
-        npc.vis_y_pos,
-        next_target_attr.x,
-        next_target_attr.y
-      )
-      npc.pathIndex = 0
+            const path = Pathfinding.run_full_Astar(
+            npc.vis_col,
+            npc.vis_row,
+            randomTarget.col,
+            randomTarget.row
+            );
 
-      npc.STATE_OF_NPC = STATE_OF_NPC.MOVING  // now the npc's picked an attraction they need to move towards it
-      break
+            if (!path || path.length === 0) {
+            npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+            return;
+            }
+
+            npc.path = path;
+            npc.pathIndex = 0;
+            npc.goalCol = randomTarget.col;
+            npc.goalRow = randomTarget.row;
+            npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
+
+            return;  
+        }
+
+        // use the attraction's coordinates as the target identifier
+        npc.targetId = `${next_target_attr.col},${next_target_attr.row}`
+
+        // the next step is to select a path (I segmented this logic into pathfinding.js, and I'm calling it here)
+        const walkable_spots = Pathfinding.finding_nearest_path_walkable(next_target_attr.col, next_target_attr.row);
+        if (walkable_spots.length === 0) {
+            npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;  // the visitor's stuck, so they have to move to idle
+            return;
+        }
+
+        const target = walkable_spots[0]; // for now take first
+        npc.path = Pathfinding.run_full_Astar( //fetch the actual path based on curr position and pos of attraction to go to
+            npc.vis_col,
+            npc.vis_row,
+            target.col,
+            target.row
+        );
+        
+        if (!npc.path || npc.path.length === 0) {
+            npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+            return;
+        }
+        
+        npc.pathIndex = 0;
+        npc.goalCol = target.col;
+        npc.goalRow = target.row;
+        npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
+        break;
     }
 
     // next is checking that (if the npcs is moving) they've reached their destination, and if so, "visit" the attraction
@@ -163,17 +219,49 @@ function npc_central_controller(npc, dt) {
         break
       }
 
+      // check each step if a new/better attraction has been placed
+      const attractions = get_all_attractions_on_map()
+      const better_target = select_next_attraction(npc, attractions)
+      
+      if (better_target && npc.targetId !== `${better_target.col},${better_target.row}`) {
+        // found a better attraction, reroute immediately
+        npc.targetId = `${better_target.col},${better_target.row}`
+        const walkable_spots = Pathfinding.finding_nearest_path_walkable(better_target.col, better_target.row)
+        
+        if (walkable_spots.length > 0) {
+          const target = walkable_spots[0]
+          const new_path = Pathfinding.run_full_Astar(
+            npc.vis_col,
+            npc.vis_row,
+            target.col,
+            target.row
+          )
+          
+          if (new_path && new_path.length > 0) {
+            npc.path = new_path
+            npc.pathIndex = 0
+            npc.goalCol = target.col
+            npc.goalRow = target.row
+          }
+        }
+      }
+
+      // now, the move can only happen if the npc isn't on a cooldown
+      npc.visitor_move_cooldown -= time_change;
+      if (npc.visitor_move_cooldown > 0) break; // it's not their time to move yet!
+
       // otherwise, keep on moving this round
       const next = npc.path[npc.pathIndex]
-      npc.vis_x_pos = next.x
-      npc.vis_y_pos = next.y
+      npc.vis_col = next.col
+      npc.vis_row = next.row
       npc.pathIndex++
+      npc.visitor_move_cooldown = VISTOR_MOVE_SPEED  // this is the inverval they wait per move
       break
     }
 
     // finally, check if the npc has finished visiting
     case STATE_OF_NPC.VISITING:
-      npc.interactionTimer -= dt
+      npc.interactionTimer -= time_change
       if (npc.interactionTimer <= 0) {
         finish_visiting_attraction(npc)
       }
@@ -191,20 +279,21 @@ function visit_new_attraction(npc) {
     return
   }
 
-  const [targetX, targetY] = npc.targetId.split(',').map(Number)
-  const attraction = get_all_attractions_on_map().find(a => a.x === targetX && a.y === targetY)
+  const [targetCol, targetRow] = npc.targetId.split(',').map(Number)
+  const attraction = get_all_attractions_on_map().find(a => a.col === targetCol && a.row === targetRow)
   if (!attraction) {
-    npc.STATE_OF_NPC = STATE_OF_NPC.IDLE
+    npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
     return
   }
 
-  const def = placeableDefinitions[attraction.defId]
+  const placeable_thing_present = placeableDefinitions[attraction.defId] ; // fetch curr attraction by it's id
 
   // keep the runtime visitor count on the anchor cell itself
   attraction.cellRef.currentVisitors = (attraction.cellRef.currentVisitors || 0) + 1
 
-  npc.interactionTimer = def.visitTime
-  npc.STATE_OF_NPC = STATE_OF_NPC.VISITING
+  npc.interactionTimer = placeable_thing_present.visitTime;
+  npc.interactionTotal = placeable_thing_present.visitTime;
+  npc.STATE_OF_NPC = STATE_OF_NPC.VISITING;
 }
 
 // and the 2nd function ends it
@@ -214,28 +303,30 @@ function finish_visiting_attraction(npc) {
     return
   }
 
-  const [targetX, targetY] = npc.targetId.split(',').map(Number)
-  const attraction = get_all_attractions_on_map().find(a => a.x === targetX && a.y === targetY)
+  const [targetCol, targetRow] = npc.targetId.split(',').map(Number)
+  const attraction = get_all_attractions_on_map().find(a => a.col === targetCol && a.row === targetRow)
 
   if (attraction) {
     // decrement visitor count on the anchor cell (clamped at 0)
-    const current = attraction.cellRef.currentVisitors || 0
-    attraction.cellRef.currentVisitors = Math.max(0, current - 1)
+    const current = attraction.cellRef.currentVisitors || 0;
+    attraction.cellRef.currentVisitors = Math.max(0, current - 1);
 
-    const placed_attr_def = placeableDefinitions[attraction.defId]
+    const placed_attr_def = placeableDefinitions[attraction.defId];
 
     // now update the magic bar based based on the preset value for this particular attraction
-    Resources.Magic.increase(placed_attr_def.magicGain)
+    Resources.Magic.increase(placed_attr_def.magicGain);
 
     // update NPC lastVisited_memory (keyed by coordinate)
-    npc.lastVisited_memory[npc.targetId] = performance.now()
+    npc.lastVisited_memory[npc.targetId] = performance.now();
   }
 
   // now the npc can go back to idle mode (the preliminary before looking for a new attraction to visit)
-  npc.STATE_OF_NPC = STATE_OF_NPC.IDLE
-  npc.targetId = null
-  npc.path = []
-  npc.pathIndex = 0
+  npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+  npc.targetId = null;
+  npc.path = [];
+  npc.pathIndex = 0;
+  npc.interactionTimer = 0;
+  npc.interactionTotal = 0;
 }
 
 
@@ -251,3 +342,46 @@ export function update_npc_system(time_change) {
 export function getnpcs_on_map() {
   return npcs_on_map
 }
+
+
+// I wanted to expand the idle walking part to be a bit more realistic; that's where this function comes in, which firstly identifies all possible paths on the map for walking
+function get_all_walkable_path_tiles() {
+  const map = window.currentMap;
+  const staticLayer = window.currentStatics;
+  const placedLayer = window.placedObjects;
+
+  const tiles = [];
+
+  for (let row = 0; row < map.length; row++) {
+    for (let col = 0; col < map[row].length; col++) {
+
+      // must be a path tile
+      if (map[row][col] !== 1) continue;
+
+      // avoid static objects
+      if (staticLayer[row] && staticLayer[row][col]) continue;
+
+      // avoid placed attractions
+      if (placedLayer[row] && placedLayer[row][col]) continue;
+
+      tiles.push({ col, row });
+    }
+  }
+
+  return tiles;
+}
+
+// then this uses above to actually generate a random path based on valid tile movements
+function pick_random_path_destination(npc) {
+  const all = get_all_walkable_path_tiles();
+  if (all.length === 0) return null;
+
+  // remove current tile to avoid picking the tile they stand on
+  const filtered = all.filter(t => !(t.col === npc.vis_col && t.row === npc.vis_row));
+
+  if (filtered.length === 0) return null;
+
+  // pick random tile anywhere on the map
+  return filtered[Math.floor(Math.random() * filtered.length)];
+}
+

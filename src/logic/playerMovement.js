@@ -1,4 +1,6 @@
 import { renderMap } from "./map.js";
+import { draw_visitor_sprites_onto_map } from "../components/renderVisitors.js";
+
 
 // Handles the player logic – just keeping it all together here compartmentalised away from rest of the repo
 export class Player {
@@ -46,6 +48,7 @@ export class Player {
 
         // [Note]: Could move this out later if rendering gets more complex?
         renderMap(this.map, this.statics_fixed_on_map, this.attractions_placed_on_map, this.row, this.col);
+        draw_visitor_sprites_onto_map();
     }
 }
 

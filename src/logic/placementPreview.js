@@ -3,6 +3,7 @@
 
 import { renderMap } from "./map.js";
 import { Staff } from "./resources.js";  // so that staff cnt can be decremented
+import { draw_visitor_sprites_onto_map } from "../components/renderVisitors.js";  // I'm separating vistor gameplay (above) from visitor asthetics
 
 let preview_el_in_doc = null;
 let curr_item_of_interest = null;
@@ -261,6 +262,7 @@ function placeItemOnMap(x, y, item) {
 
     // Rebuild preview after map refresh (map.js also calls this, but this is safe)
     if (window.__rebuildPreviewEl) window.__rebuildPreviewEl();
+    draw_visitor_sprites_onto_map();
 }
 
 
