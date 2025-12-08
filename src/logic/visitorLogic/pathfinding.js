@@ -39,7 +39,7 @@ function can_npc_walk_on_tile(map_col, map_row, attr_col_goal, attr_row_goal) {
 
     const map_cell = curr_map_state[map_row][map_col];
 
-    // only map number = 1 is walkable (path)
+    // only map number = 1 is walkable (path tile)
     const is_map_cell_walkable = (map_cell === 1)
     if (!is_map_cell_walkable) {
         return false; // can't walk on an invalid tile
@@ -63,15 +63,79 @@ function can_npc_walk_on_tile(map_col, map_row, attr_col_goal, attr_row_goal) {
 }
 
 
-// next is a function that finds a path that's adjacent to the target attraction
-export function finding_nearest_path_walkable(attraction_col, attraction_row) {
-    // adjacent tiles start, then bfs outward
-    const queue = [
-        { col: attraction_col + 1, row: attraction_row,     dist: 1 },
-        { col: attraction_col - 1, row: attraction_row,     dist: 1 },
-        { col: attraction_col,     row: attraction_row + 1, dist: 1 },
-        { col: attraction_col,     row: attraction_row - 1, dist: 1 }
-    ];
+// next is a function that finds walkable tiles adjacent to the target attraction (looking at whole attr footprint)
+export function finding_nearest_path_walkable(attraction_anchor_col, attraction_anchor_row) {
+    // First, we need to determine the actual footprint of the attraction (all tiles it occupies)
+    const attraction_layer = window.placedObjects;
+    const attraction_cell = attraction_layer[attraction_anchor_row]?.[attraction_anchor_col];
+    
+    if (!attraction_cell || !attraction_cell.id) {
+        console.warn(`[PATHFINDING] No attraction found at anchor (${attraction_anchor_col},${attraction_anchor_row})`);
+        return [];
+    }
+
+    // Find all tiles that are part of this attraction by scanning outward
+    const attraction_tiles = new Set();
+    attraction_tiles.add(`${attraction_anchor_col},${attraction_anchor_row}`);
+    
+    // BFS to find all tiles belonging to this attraction (same id, same anchor group)
+    const attraction_id = attraction_cell.id;
+    const bfs_queue = [{ col: attraction_anchor_col, row: attraction_anchor_row }];
+    const checked = new Set([`${attraction_anchor_col},${attraction_anchor_row}`]);
+    
+    while (bfs_queue.length > 0) {
+        const curr = bfs_queue.shift();
+        const neighbors = [
+            { col: curr.col + 1, row: curr.row },
+            { col: curr.col - 1, row: curr.row },
+            { col: curr.col,     row: curr.row + 1 },
+            { col: curr.col,     row: curr.row - 1 }
+        ];
+        
+        for (const neighbor of neighbors) {
+            const key = `${neighbor.col},${neighbor.row}`;
+            if (checked.has(key)) continue;
+            checked.add(key);
+            
+            const cell = attraction_layer[neighbor.row]?.[neighbor.col];
+            if (cell && cell.id === attraction_id) {
+                attraction_tiles.add(key);
+                bfs_queue.push(neighbor);
+            }
+        }
+    }
+
+    // Now find all perimeter tiles (tiles adjacent to the attraction footprint)
+    const perimeter_tiles = new Set();
+    for (const tile_key of attraction_tiles) {
+        const [col_str, row_str] = tile_key.split(",");
+        const col = parseInt(col_str, 10);
+        const row = parseInt(row_str, 10);
+        
+        const neighbors = [
+            { col: col + 1, row: row },
+            { col: col - 1, row: row },
+            { col: col,     row: row + 1 },
+            { col: col,     row: row - 1 }
+        ];
+        
+        for (const neighbor of neighbors) {
+            const neighbor_key = `${neighbor.col},${neighbor.row}`;
+            // Only add if it's not part of the attraction itself
+            if (!attraction_tiles.has(neighbor_key)) {
+                perimeter_tiles.add(neighbor_key);
+            }
+        }
+    }
+
+    // BFS from all perimeter tiles to find closest walkable ones
+    const queue = [];
+    for (const tile_key of perimeter_tiles) {
+        const [col_str, row_str] = tile_key.split(",");
+        const col = parseInt(col_str, 10);
+        const row = parseInt(row_str, 10);
+        queue.push({ col, row, dist: 1 });
+    }
 
     const visited = new Set();
     const walkable_candidates = [];
@@ -90,7 +154,7 @@ export function finding_nearest_path_walkable(attraction_col, attraction_row) {
         visited.add(key);
 
         // Check if this tile is walkable
-        if (can_npc_walk_on_tile(current.col, current.row, attraction_col, attraction_row)) {
+        if (can_npc_walk_on_tile(current.col, current.row, attraction_anchor_col, attraction_anchor_row)) {
             walkable_candidates.push({ col: current.col, row: current.row, dist: current.dist });
             min_walkable_distance = Math.min(min_walkable_distance, current.dist);
             // Continue to check other tiles at this same distance
@@ -113,9 +177,9 @@ export function finding_nearest_path_walkable(attraction_col, attraction_row) {
     walkable_candidates.sort((a, b) => a.dist - b.dist);
     
     if (walkable_candidates.length > 0) {
-        console.log(`[PATHFINDING] Found ${walkable_candidates.length} walkable candidates. Closest at distance ${walkable_candidates[0].dist}`);
+        console.log(`[PATHFINDING] Found ${walkable_candidates.length} walkable candidates around attraction at (${attraction_anchor_col},${attraction_anchor_row}). Closest at distance ${walkable_candidates[0].dist}`);
     } else {
-        console.warn(`[PATHFINDING] No walkable tiles found adjacent to attraction at (${attraction_col},${attraction_row})`);
+        console.warn(`[PATHFINDING] No walkable tiles found adjacent to attraction at (${attraction_anchor_col},${attraction_anchor_row})`);
     }
     
     return walkable_candidates;

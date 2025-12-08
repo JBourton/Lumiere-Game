@@ -217,31 +217,72 @@ function npc_central_controller(npc, time_change) {
             return;
         }
 
-        const target = walkable_spots[0]; // take closest walkable tile
-        
-        // If NPC is already at an adjacent tile to the attraction, skip pathfinding and go straight to visiting
-        if (npc.vis_col === target.col && npc.vis_row === target.row) {
+        // Try each walkable candidate in order of distance until we find one that's actually reachable
+        let reachable_target = null;
+        for (const candidate of walkable_spots) {
+            // If NPC is already at this tile, we can visit immediately
+            if (npc.vis_col === candidate.col && npc.vis_row === candidate.row) {
+                reachable_target = candidate;
+                break;
+            }
+
+            // Otherwise, validate reachability with A* pathfinding
+            const path = Pathfinding.run_full_Astar(
+                npc.vis_col,
+                npc.vis_row,
+                candidate.col,
+                candidate.row
+            );
+
+            // If we found a valid path to this candidate, use it
+            if (path && path.length > 0) {
+                reachable_target = candidate;
+                npc.path = path;
+                npc.pathIndex = 0;
+                break;
+            }
+            // Otherwise, continue to the next candidate
+        }
+
+        if (!reachable_target) {
+            // None of the adjacent walkable tiles are reachable - try a random destination instead
+            console.warn(`[NPC] Could not find reachable path to attraction at (${next_target_attr.col},${next_target_attr.row}). Attempting to wander instead.`);
+            const randomTarget = pick_random_path_destination(npc);
+
+            if (!randomTarget) {
+                npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+                return;
+            }
+
+            const path = Pathfinding.run_full_Astar(
+                npc.vis_col,
+                npc.vis_row,
+                randomTarget.col,
+                randomTarget.row
+            );
+
+            if (!path || path.length === 0) {
+                npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+                return;
+            }
+
+            npc.path = path;
+            npc.pathIndex = 0;
+            npc.goalCol = randomTarget.col;
+            npc.goalRow = randomTarget.row;
+            npc.targetId = null; // clear target since we're wandering
+            npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
+            return;
+        }
+
+        // If NPC is already at a valid adjacent tile, go straight to visiting
+        if (npc.vis_col === reachable_target.col && npc.vis_row === reachable_target.row) {
             visit_new_attraction(npc);
             break;
         }
         
-        npc.path = Pathfinding.run_full_Astar( //fetch the actual path based on curr position and pos of attraction to go to
-            npc.vis_col,
-            npc.vis_row,
-            target.col,
-            target.row
-        );
-        
-        if (!npc.path || npc.path.length === 0) {
-            // pathfinding failed despite walkable adjacent tile - shouldnt happen often
-            npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
-            npc.targetId = null;
-            return;
-        }
-        
-        npc.pathIndex = 0;
-        npc.goalCol = target.col;
-        npc.goalRow = target.row;
+        npc.goalCol = reachable_target.col;
+        npc.goalRow = reachable_target.row;
         npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
         break;
     }
@@ -259,25 +300,34 @@ function npc_central_controller(npc, time_change) {
       const better_target = select_next_attraction(npc, attractions)
       
       if (better_target && npc.targetId !== `${better_target.col},${better_target.row}`) {
-        // found a better attraction, reroute immediately
-        npc.targetId = `${better_target.col},${better_target.row}`
+        // found a better attraction, try to reroute - but only if we can reach it
         const walkable_spots = Pathfinding.finding_nearest_path_walkable(better_target.col, better_target.row)
         
         if (walkable_spots.length > 0) {
-          const target = walkable_spots[0]
-          const new_path = Pathfinding.run_full_Astar(
-            npc.vis_col,
-            npc.vis_row,
-            target.col,
-            target.row
-          )
-          
-          if (new_path && new_path.length > 0) {
-            npc.path = new_path
-            npc.pathIndex = 0
-            npc.goalCol = target.col
-            npc.goalRow = target.row
+          // Try to find a reachable candidate
+          let reachable_target = null;
+          for (const candidate of walkable_spots) {
+            const new_path = Pathfinding.run_full_Astar(
+              npc.vis_col,
+              npc.vis_row,
+              candidate.col,
+              candidate.row
+            )
+            
+            if (new_path && new_path.length > 0) {
+              reachable_target = candidate;
+              npc.path = new_path;
+              npc.pathIndex = 0;
+              npc.goalCol = candidate.col;
+              npc.goalRow = candidate.row;
+              break;
+            }
           }
+          
+          if (reachable_target) {
+            npc.targetId = `${better_target.col},${better_target.row}`;
+          }
+          // If no reachable target found, keep current path
         }
       }
 
