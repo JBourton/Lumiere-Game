@@ -65,7 +65,7 @@ function can_npc_walk_on_tile(map_col, map_row, attr_col_goal, attr_row_goal) {
 
 // next is a function that finds a path that's adjacent to the target attraction
 export function finding_nearest_path_walkable(attraction_col, attraction_row) {
-    // Start with tiles adjacent to the attraction and do a BFS to find the closest walkable tile
+    // adjacent tiles start, then bfs outward
     const queue = [
         { col: attraction_col + 1, row: attraction_row,     dist: 1 },
         { col: attraction_col - 1, row: attraction_row,     dist: 1 },
@@ -75,10 +75,16 @@ export function finding_nearest_path_walkable(attraction_col, attraction_row) {
 
     const visited = new Set();
     const walkable_candidates = [];
+    let min_walkable_distance = Infinity;
 
     while (queue.length > 0) {
         const current = queue.shift();
         const key = `${current.col},${current.row}`;
+
+        // If we've found a walkable tile and this tile is further away, we can stop
+        if (current.dist > min_walkable_distance) {
+            break;
+        }
 
         if (visited.has(key)) continue;
         visited.add(key);
@@ -86,7 +92,8 @@ export function finding_nearest_path_walkable(attraction_col, attraction_row) {
         // Check if this tile is walkable
         if (can_npc_walk_on_tile(current.col, current.row, attraction_col, attraction_row)) {
             walkable_candidates.push({ col: current.col, row: current.row, dist: current.dist });
-            // Continue searching to find all candidates at this distance
+            min_walkable_distance = Math.min(min_walkable_distance, current.dist);
+            // Continue to check other tiles at this same distance
             continue;
         }
 
@@ -107,6 +114,8 @@ export function finding_nearest_path_walkable(attraction_col, attraction_row) {
     
     if (walkable_candidates.length > 0) {
         console.log(`[PATHFINDING] Found ${walkable_candidates.length} walkable candidates. Closest at distance ${walkable_candidates[0].dist}`);
+    } else {
+        console.warn(`[PATHFINDING] No walkable tiles found adjacent to attraction at (${attraction_col},${attraction_row})`);
     }
     
     return walkable_candidates;

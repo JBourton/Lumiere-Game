@@ -187,11 +187,44 @@ function npc_central_controller(npc, time_change) {
         // the next step is to select a path (I segmented this logic into pathfinding.js, and I'm calling it here)
         const walkable_spots = Pathfinding.finding_nearest_path_walkable(next_target_attr.col, next_target_attr.row);
         if (walkable_spots.length === 0) {
-            npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;  // the visitor's stuck, so they have to move to idle
+            // No adjacent walkable tiles found - try a random destination instead
+            console.warn(`[NPC] Could not find walkable tiles adjacent to attraction at (${next_target_attr.col},${next_target_attr.row}). Attempting to wander instead.`);
+            const randomTarget = pick_random_path_destination(npc);
+
+            if (!randomTarget) {
+                npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+                return;
+            }
+
+            const path = Pathfinding.run_full_Astar(
+                npc.vis_col,
+                npc.vis_row,
+                randomTarget.col,
+                randomTarget.row
+            );
+
+            if (!path || path.length === 0) {
+                npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+                return;
+            }
+
+            npc.path = path;
+            npc.pathIndex = 0;
+            npc.goalCol = randomTarget.col;
+            npc.goalRow = randomTarget.row;
+            npc.targetId = null; // clear target since we're wandering
+            npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
             return;
         }
 
-        const target = walkable_spots[0]; // for now take first
+        const target = walkable_spots[0]; // take closest walkable tile
+        
+        // If NPC is already at an adjacent tile to the attraction, skip pathfinding and go straight to visiting
+        if (npc.vis_col === target.col && npc.vis_row === target.row) {
+            visit_new_attraction(npc);
+            break;
+        }
+        
         npc.path = Pathfinding.run_full_Astar( //fetch the actual path based on curr position and pos of attraction to go to
             npc.vis_col,
             npc.vis_row,
@@ -200,7 +233,9 @@ function npc_central_controller(npc, time_change) {
         );
         
         if (!npc.path || npc.path.length === 0) {
+            // pathfinding failed despite walkable adjacent tile - shouldnt happen often
             npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
+            npc.targetId = null;
             return;
         }
         

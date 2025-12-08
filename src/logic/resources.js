@@ -17,11 +17,13 @@ export const Magic = {
     // increase & decrease magic, which will be used all througout the game constantly as visitors interact/leave
     increase(amount) {
         this.mgc_value = Math.min(100, this.mgc_value + amount); // first capping at 100% (its a meter)
+        this.mgc_value = Number(this.mgc_value.toFixed(1)); // to stop the weird rouding bug
         this.notify();
     },
 
     decrease(amount) {
         this.mgc_value = Math.max(0, this.mgc_value - amount); // and then capping at 0%
+        this.mgc_value = Number(this.mgc_value.toFixed(1));
         this.notify();
     },
 
