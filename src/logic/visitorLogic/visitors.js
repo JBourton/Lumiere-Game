@@ -5,6 +5,7 @@ import { ALL_ATTRACTIONS_PLACEABLE_ON_MAP as placeableDefinitions } from '../pla
 import * as Resources from '../resources.js'      // I need this as visistors interacting w/ attractions impacts magic useage
 import * as Pathfinding from './pathfinding.js'    // this is linking the npc with its movement logic
 //import { get_all_attractions_on_map } from '../map.js'  // [TO BE IMPLEMENTED]
+import { reset_heatmap_counts, register_visitor_on_heatmap, update_heatmap_visual } from '../../components/heatmap.js';
 
 // Here I'm taking a layered strucured by treating the npc logic as 3 seperate layered: funadmental design, current STATE_OF_NPC and attraction selection logic
 // I can then make the architecture nicely decoupled from the main game logic
@@ -417,9 +418,14 @@ function finish_visiting_attraction(npc) {
 
 // a function for publicly updating the npcs
 export function update_npc_system(time_change) {
+  reset_heatmap_counts(); // this frame, also update hmap
   for (const npc of npcs_on_map) {
-    npc_central_controller(npc, time_change)
+    npc_central_controller(npc, time_change);
+    const npc_col = Math.floor(npc.vis_col);
+    const npc_row = Math.floor(npc.vis_row);
+    register_visitor_on_heatmap(npc_col, npc_row);
   }
+  update_heatmap_visual(); // then resetting visual overlay for hmap
 }
 
 

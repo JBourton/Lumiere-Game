@@ -1,17 +1,18 @@
 // First load in all game componants needed
 import { build_grid_map, renderMap } from "./logic/map.js";
 import { Player, enablePlayerMovement } from "./logic/playerMovement.js";
-import { setupIntroModal, setupGameOverModal, game_over } from "./components/popup.js";
+import { setupIntroModal, setupGameOverModal, game_over, setupGameWonModal, game_won } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
 import { initPlacementPreview } from "./logic/placementPreview.js";
 import { spawn_new_visitor, update_npc_system } from "./logic/visitorLogic/visitors.js";
 import { draw_visitor_sprites_onto_map } from "./components/renderVisitors.js";  // I'm separating vistor gameplay (above) from visitor asthetics
+import { draw_on_empty_hmap } from "./components/heatmap.js";  // for the heatmap in top-right
 
 // Then set game constants - this is map size, but to change it you also have to go into styles.css & change the '#grid' repeat values to the same as consts here
-const WIDTH = 50;
-const HEIGHT = 30;
+export const WIDTH = 50; // (p.s. I'm also using these in src/components/heatmap.js too for an accurate representation)
+export const HEIGHT = 30;
 
 
 // these let the dev buttons in DOM 'see' the functions below
@@ -59,6 +60,8 @@ function reset_the_game() {
 
 // The next part is to set up the trackers for the main resources; i.e. magic, staff & visitors
 document.addEventListener("DOMContentLoaded", () => {
+    draw_on_empty_hmap(); // heatmap for top-right
+
     const magicBar = document.getElementById("magic-bar"); // fetch the magic bar to start updating it throught game
     const magicText = document.getElementById("magic-text"); // fetch the magic text to keep it in sync
     const staffDisplay = document.getElementById("staff-display"); // same w/ staff but as a counter not a bar
@@ -74,6 +77,8 @@ document.addEventListener("DOMContentLoaded", () => {
         // noooo the player lost the game - restart time!
         if (magiclvl <= 0) {
             game_over();
+        } else if (magiclvl >= 100) {
+            game_won();
         }
     });
 
@@ -128,10 +133,10 @@ const funky_background_audio = new AudioManager(); // turning on the tunes!
 
 funky_background_audio.toggleMute();  // [Dev note] Starting on muted because it's annoying when developing, but usually it'll start on unmuted for standard player
 
+// now for all the popups, though only intro modal shows for now (others are win/loss conditions)
 setupIntroModal(funky_background_audio);
-
-// enabling the game over modal w/ restart logic
-setupGameOverModal(reset_the_game);
+setupGameOverModal(reset_the_game);  // enabling the game over modal w/ restart logic
+setupGameWonModal(reset_the_game); // & game won
 
 const muteBtn = document.getElementById("mute-button"); // this event lisnter tracks the mute/unmute button on the top left
 muteBtn.textContent = "🔇"; // [Dev note 2] also comment out this line to start on the unmuted emoji
@@ -139,6 +144,14 @@ muteBtn.addEventListener("click", () => {
     const ismuted = funky_background_audio.toggleMute();
     muteBtn.textContent = ismuted ? "🔇" : "🔊";  // basically flip whatever the current value is to mute/unmute
 });
+const hmapBtn = document.getElementById("toggle-heatmap-button");
+const heatmapMini = document.getElementById("heatmapMiniContainer");
+hmapBtn.addEventListener("click", () => {
+    const is_hmap_on = hmapBtn.textContent === "Heatmap: On";
+    hmapBtn.textContent = is_hmap_on ? "Heatmap: Off" : "Heatmap: On";
+    heatmapMini.style.display = is_hmap_on ? "none" : "block"; // either show/hide heatmap
+});
+
 
 // Start Lumiere Game! Firstly I'm loading in all the assets for a proper setup
 const { map, statics_fixed_on_map, attractions_placed_on_map } = build_grid_map(WIDTH, HEIGHT);

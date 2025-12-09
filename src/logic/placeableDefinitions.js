@@ -127,6 +127,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,
         locked: false,
         staff_cost: 1,
+        effect_w: 3, effect_h: 3,
     },
 
     hotdog_stand: {
@@ -137,6 +138,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,
         locked: false,
         staff_cost: 2,
+        effect_w: 4, effect_h: 4,
     },
 
     cotton_candy_stand: {
@@ -147,6 +149,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,
         locked: false,
         staff_cost: 3,
+        effect_w: 5, effect_h: 5,
     },
 
     gyros_stand: {
@@ -157,6 +160,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,
         locked: false,
         staff_cost: 4,
+        effect_w: 6, effect_h: 6,
     },
 
 
@@ -181,3 +185,4 @@ window.ALL_ATTRACTIONS_PLACEABLE_ON_MAP = ALL_ATTRACTIONS_PLACEABLE_ON_MAP;
 //     visitTime: ,
 //     magicGain: 
 // },
+// (note it's a tad different for food stalls as they're fundamentally different: they have effect_w and _h to cover an area with their effect)

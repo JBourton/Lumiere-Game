@@ -138,7 +138,7 @@ export function finding_nearest_path_walkable(attraction_anchor_col, attraction_
     }
 
     const visited = new Set();
-    const walkable_candidates = [];
+    const all_walkable_routes = [];
     let min_walkable_distance = Infinity;
 
     while (queue.length > 0) {
@@ -155,14 +155,14 @@ export function finding_nearest_path_walkable(attraction_anchor_col, attraction_
 
         // Check if this tile is walkable
         if (can_npc_walk_on_tile(current.col, current.row, attraction_anchor_col, attraction_anchor_row)) {
-            walkable_candidates.push({ col: current.col, row: current.row, dist: current.dist });
+            all_walkable_routes.push({ col: current.col, row: current.row, dist: current.dist });
             min_walkable_distance = Math.min(min_walkable_distance, current.dist);
             // Continue to check other tiles at this same distance
             continue;
         }
 
-        // If not walkable, expand search radius by checking neighbors
-        // But only if we haven't gone too far (max 10 tiles away to avoid infinite search)
+        // if not walkable i'm expanding search radius by checking neighbors
+        // I also add a 10-tile-limit here to prevent infinity lapse
         if (current.dist < 10) {
             queue.push(
                 { col: current.col + 1, row: current.row,     dist: current.dist + 1 },
@@ -173,16 +173,10 @@ export function finding_nearest_path_walkable(attraction_anchor_col, attraction_
         }
     }
 
-    // Return candidates sorted by distance (closest first)
-    walkable_candidates.sort((a, b) => a.dist - b.dist);
+    // returning by closest dist 1st
+    all_walkable_routes.sort((a, b) => a.dist - b.dist);
     
-    if (walkable_candidates.length > 0) {
-        console.log(`[PATHFINDING] Found ${walkable_candidates.length} walkable candidates around attraction at (${attraction_anchor_col},${attraction_anchor_row}). Closest at distance ${walkable_candidates[0].dist}`);
-    } else {
-        console.warn(`[PATHFINDING] No walkable tiles found adjacent to attraction at (${attraction_anchor_col},${attraction_anchor_row})`);
-    }
-    
-    return walkable_candidates;
+    return all_walkable_routes;
 }
 
 

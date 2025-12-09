@@ -54,6 +54,23 @@ body {
 #mute-button:hover {
     background: rgba(0, 0, 0, 0.6);
 }
+#toggle-heatmap-button {
+    position: fixed;
+    top: 10px;
+    left: 70px;
+    font-size: 22px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 9999;
+    border-radius: 6px;
+}
+
+#toggle-heatmap-button:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
 
 
 
@@ -88,6 +105,30 @@ body {
     /* Limit the componant to the viewport using the computed grid size */
     max-height: calc(var(--cell-size) * var(--max-rows) + 160px);
     width: 100%;
+}
+
+/* Heatmap container I'm putting up in top-right */
+#heatmapMiniContainer {
+    position: absolute;
+    top: 13px;
+    right: 13px;
+    width: 160px;
+    height: 160px;
+    background: rgba(20, 20, 20, 0.9);
+    border: 3px solid #f3e7b3;
+    border-radius: 8px;
+    padding: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+    z-index: 100;
+}
+
+#heatmapMini {
+    width: 100%;
+    height: 100%;
+    background: rgba(100, 100, 100, 0.5);
+    border: 2px solid #666;
+    border-radius: 4px;
+
 }
 
 /* Play-area is the combo of a few elements for easy wrapping */
@@ -195,11 +236,6 @@ body {
 }
 
 
-
-
-
-
-
 #grid {
     border: 1px solid #CD7F32;
     position: relative;
@@ -215,7 +251,7 @@ body {
 .cell {
     width: var(--cell-size);
     height: var(--cell-size);
-    border: 0.01px solid #F2D2BD; /* I want it as small as it can get w/out removing the lines entireley */
+    border: 0.01px solid #c0c0c0; /* #F2D2BD;*/ /* I want it as small as it can get w/out removing the lines entireley */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -261,7 +297,7 @@ body {
 .modal {
     font-size: clamp(12px, 1.8vw, 18px);
     line-height: 1.5;
-    color: #a89a63;
+    color: #dfd1b4; /*#a89a63;*/
     position: fixed;
     top: 0;
     left: 0;
@@ -288,10 +324,8 @@ body {
     background-repeat: no-repeat;
 }
 
-#gameoverModal {
-    display: none;
-}
-.gameover-modal-content {
+.gameover-modal-content,
+.gamewon-modal-content {
     background: white;
     padding: clamp(12px, 2.5vw, 32px);
     border-radius: 10px;
@@ -299,15 +333,42 @@ body {
     height: min(600px, 80vw);
     text-align: center;
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-    /* Background artwork generated with ChatGPT v5.1 by OpenAI. */
-    background-image: url("assets/imgs/Game\ Over\ Screen\ -\ Generated\ by\ ChatGPT.png");
-    background-size: cover;
-    background-position: centre;
+    background-size: 100% 100%;  
+    background-position: center; 
     background-repeat: no-repeat;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    user-select: none;
 }
 
-#startButton {
-    margin-top: 1rem;
+#gameoverModal {
+    display: none;
+}
+.gameover-modal-content {
+    /* Background artwork generated with ChatGPT v5.1 by OpenAI. */
+    background-image: url("assets/imgs/Game\ Over\ Screen\ -\ Generated\ by\ ChatGPT.png");
+}
+
+#gamewonModal {
+    display: none;
+}
+.gamewon-modal-content {
+    /* Background artwork generated with ChatGPT v5.1 by OpenAI. */
+    background-image: url("assets/imgs/Game\ Won\ Screen\ -\ Generated\ by\ ChatGPT.png");
+}
+
+.gameover-modal-content > p,
+.gamewon-modal-content > p {
+    width: calc(100% - 20px);
+    margin: 0 auto 10px auto;
+}
+
+/* Base styling as fallback + the specific styles */
+#startButton,
+#gameOverButton,
+#gameWonButton {
+    margin: 1rem auto 0;
     padding: 0.6rem 1rem;
     font-size: clamp(12px, 1.8vw, 16px);
     cursor: pointer;
@@ -324,19 +385,22 @@ body {
     -webkit-font-smoothing: none;
     -moz-osx-font-smoothing: grayscale;
 }
-
-#startButton:hover {
-  filter: brightness(1.06);
+#startButton:hover,
+#gameOverButton:hover,
+#gameWonButton:hover {
+    filter: brightness(1.06);
 }
-
-#startButton:active {
-  transform: translateY(6px);
-  box-shadow: 0 0 0 #111, inset 0 6px 0 rgba(255,255,255,0.06);
+#startButton:active,
+#gameOverButton:active,
+#gameWonButton:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #111, inset 0 6px 0 rgba(255,255,255,0.06);
 }
-
-#startButton:focus {
-  outline: none;
-  box-shadow: 0 6px 0 #111, 0 0 0 6px rgba(255,200,70,0.12);
+#startButton:focus,
+#gameOverButton:focus,
+#gameWonButton:focus {
+    outline: none;
+    box-shadow: 0 6px 0 #111, 0 0 0 6px rgba(255,200,70,0.12);
 }
 
 /* Now I define how the UI displaying key resources (from the machinations diagrams) are displayed: */
@@ -384,12 +448,12 @@ body {
 
 /* Here I'm adding styling for the frusration bar */
 #game-wrapper {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        justify-content: center;
-        gap: 30px;
-        width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 30px;
+    width: 100%;
 }
 
 /* now the styling of the actual gameplay area (map + frustration bar) */
@@ -409,6 +473,8 @@ body {
     box-sizing: border-box;
     width: 50px;
     min-width: 56px;
+    height: 85%;
+    margin-top: 100px;
 }
 
 #frustration-bar-container {

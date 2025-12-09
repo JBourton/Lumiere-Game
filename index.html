@@ -8,6 +8,7 @@
 </head>
 <body>
     <button id="mute-button">🔊</button>
+    <button id="toggle-heatmap-button">Heatmap: On</button>
     <div id="introModal" class="modal">
         <div class="intro-modal-content">
             <!-- Setting the intro to the game to welcome new players + provide context on what they'll be doing-->
@@ -30,7 +31,13 @@
     <div id="gameoverModal" class="modal"> <!-- This is the "gameover" popup, like the intro one but shows only when magic == 0 (i.e. player lost)-->
         <div class="gameover-modal-content">
             <p>Oh no! Just like we thought, you couldn't hack it. Shame, looks like someone isn't getting that grad job. Fancy another unpaid overworked retry, Itern?</p>
-            <button id="restartButton">Why not!</button>
+            <button id="gameOverButton">Why not!</button>
+        </div>
+    </div>
+    <div id="gamewonModal" class="modal"> <!-- Player won ooh yeahhhh -->
+        <div class="gamewon-modal-content">
+            <p>Wait... What!? You... actually pulled it off? Do a lad a solid and give me credit, ok intern?</p>
+            <button id="gameWonButton">Play Again</button>
         </div>
     </div>
     <h1 id="game-title">Lumiere Festival Planning Game</h1>
@@ -66,6 +73,10 @@
             <button onclick="Frustration.decrease(10)">Placate Visitors</button>
         </div>
 
+        <div id="heatmapMiniContainer">
+            <div id="heatmapMini"></div>
+        </div>
+
         <div id="play-area">
 
             <!-- Putting in the sidebar here to let the player drag/drop the various placeables -->
@@ -98,5 +109,6 @@
 
     </div>
 
-    <script type="module" src="./src/main.js"></script>
+    <script type="module" src="./src/main.js"></script>#
+    <script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
 </body>

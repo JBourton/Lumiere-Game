@@ -39,7 +39,7 @@ export function setupIntroModal(bg_tunes) {
 export function setupGameOverModal(game_restart_logic) {
     document.addEventListener("DOMContentLoaded", function () {
         const popup_for_gameover = document.getElementById("gameoverModal");
-        const restart_the_game = document.getElementById("restartButton");  // fetch the restart buttons id
+        const restart_the_game = document.getElementById("gameOverButton");  // fetch the restart buttons id
         if (!popup_for_gameover || !restart_the_game) {
             return;  // this is only if either the modal or restart button isn't here, so should never be the case but using for debug still
         }
@@ -60,4 +60,34 @@ export function game_over() {
         return;  // though this should never trigger, but I'm using for debug
     }
     the_hidden_gameover_popup.style.display = "flex"; // activeating
+}
+
+
+// and now for the winning popup - just as important ofc!!
+export function setupGameWonModal(game_restart_logic) {
+    document.addEventListener("DOMContentLoaded", function () {
+        const popup_for_gamewon = document.getElementById("gamewonModal"); // find the win modal
+        const restart_after_win = document.getElementById("gameWonButton"); // fetch the restart btn id
+
+        if (!popup_for_gamewon || !restart_after_win) {
+            return;  // debugging only, just in case either element is missing
+        }
+
+        // setup the restart btn so that it closes this win popup + runs the restart logic
+        restart_after_win.addEventListener("click", function () {
+            popup_for_gamewon.style.display = "none";  // (close it)
+            if (typeof game_restart_logic === "function") game_restart_logic(); // same restart logic as game over
+        });
+    });
+}
+
+
+// activating the "game won" condition (player did an excellent job 🎉)
+export function game_won() {
+    // fetch the hidden game-won popup + activate it
+    const the_hidden_gamewon_popup = document.getElementById("gamewonModal");
+    if (!the_hidden_gamewon_popup) {
+        return; // another line that shouldn't ever be needed, but a little sheild in case
+    }
+    the_hidden_gamewon_popup.style.display = "flex"; // annndd activate! player celebration time! :D
 }
