@@ -4,6 +4,8 @@
 import { renderMap } from "./map.js";
 import { Staff } from "./resources.js";  // so that staff cnt can be decremented
 import { draw_visitor_sprites_onto_map } from "../components/renderVisitors.js";  // I'm separating vistor gameplay (above) from visitor asthetics
+import * as FoodCoverage from "./foodCoverage.js";
+import { ATTRACTION_TYPES } from "./placeableDefinitions.js";
 
 let preview_el_in_doc = null;
 let curr_item_of_interest = null;
@@ -23,7 +25,7 @@ export function initPlacementPreview() {
 
     // now this event listener is possible, that picks up on the mouse moving round the grid squares
     main_map.addEventListener("mousemove", handleMouseMove);
-    main_map.addEventListener("click", tryPlaceItem);
+    main_map.addEventListener("click", try_to_place_an_item);
     console.debug("[PLACEMENT] initPlacementPreview: listeners attached");
 }
 
@@ -117,10 +119,10 @@ function handleMouseMove(e) {
     highlightFootprint(x, y);
 }
 
-function tryPlaceItem(e) {  // this is the 2nd event listener for the initplacementpreview() function, designed to permit the player to place (overlay) and object where its permissible
+function try_to_place_an_item(item_to_place) {  // this is the 2nd event listener for the initplacementpreview() function, designed to permit the player to place (overlay) and object where its permissible
     if (!curr_item_of_interest) return;
 
-    const cell = e.target.closest(".cell");
+    const cell = item_to_place.target.closest(".cell");
     if (!cell) return;
 
     const x = parseInt(cell.dataset.x);
@@ -132,7 +134,7 @@ function tryPlaceItem(e) {  // this is the 2nd event listener for the initplacem
         return;
     }
 
-    placeItemOnMap(x, y, curr_item_of_interest);   // all's good, so go ahead & place item
+    place_item_on_map(x, y, curr_item_of_interest);   // all's good, so go ahead & place item
 }
 
 
@@ -224,13 +226,7 @@ function clearFootprintTiles() {
 
 
 // Above handled the preview; now comes the logic for placing the item on the map
-function placeItemOnMap(x, y, item) {
-    const obj = {
-        id: item.id,
-        w: item.w,
-        h: item.h
-    };
-
+function place_item_on_map(x, y, item) {
     for (let dy = 0; dy < item.h; dy++) {
         for (let dx = 0; dx < item.w; dx++) {
             // ensure rows/cols exist
@@ -243,9 +239,16 @@ function placeItemOnMap(x, y, item) {
         }
     }
 
-    console.log(`[PLACEMENT] placeItemOnMap: placed '${item.id}' at x=${x} y=${y} w=${item.w} h=${item.h}`);
-    
-
+    // If this is a food stall, record its anchor & effect
+    if (item.type === ATTRACTION_TYPES.FOOD) {
+        if (!window.foodStallAnchors) window.foodStallAnchors = [];
+        window.foodStallAnchors.push({
+            x,
+            y,
+            effect_w: item.effect_w,
+            effect_h: item.effect_h
+        });
+    }
 
     Staff.remove(item.staff_cost);
 
@@ -259,6 +262,11 @@ function placeItemOnMap(x, y, item) {
         window.playerInstance.row,
         window.playerInstance.col
     );
+
+    // now render the coverage area for each food stall
+    if (window.foodStallAnchors?.length) {
+        FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
+    }
 
     // Rebuild preview after map refresh (map.js also calls this, but this is safe)
     if (window.__rebuildPreviewEl) window.__rebuildPreviewEl();

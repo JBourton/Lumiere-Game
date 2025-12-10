@@ -138,7 +138,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,
         locked: false,
         staff_cost: 2,
-        effect_w: 4, effect_h: 4,
+        effect_w: 5, effect_h: 5,
     },
 
     cotton_candy_stand: {
@@ -149,7 +149,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,
         locked: false,
         staff_cost: 3,
-        effect_w: 5, effect_h: 5,
+        effect_w: 7, effect_h: 7,
     },
 
     gyros_stand: {
@@ -160,7 +160,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 1, h: 1,
         locked: false,
         staff_cost: 4,
-        effect_w: 6, effect_h: 6,
+        effect_w: 9, effect_h: 9,
     },
 
 

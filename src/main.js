@@ -12,6 +12,7 @@ import { draw_on_empty_hmap } from "./components/heatmap.js";  // for the heatma
 import { update_congestion_lvl, bootup_congestion_system } from "./logic/visitorLogic/congestion.js"; // for monitioring business of the map -> impacts magic
 import * as config from "./config.js"; // fixing circular dependencies
 import { cleanup_the_map } from "./logic/map.js";
+import { FoodCoverage } from "./logic/foodCoverage.js";
 
 // these let the dev buttons in DOM 'see' the functions below
 window.Magic = Magic;
@@ -159,6 +160,7 @@ const { map, statics_fixed_on_map, attractions_placed_on_map } = build_grid_map(
 window.currentMap = map; // for the purpose of item placing
 window.currentStatics = statics_fixed_on_map;
 window.placedObjects = attractions_placed_on_map;
+window.foodStallAnchors = [];  // track location of foodstall + its coverage area
 
 const player = new Player(10, 0, map, statics_fixed_on_map, attractions_placed_on_map);
 window.playerInstance = player; // and similarley the player (row,col) pos needs to be globally exposed for adjacency checking w/ item placement
@@ -220,13 +222,23 @@ function lumiere_gameplay_loop(game_timing_data) {
         last_player_row = player.row;
         last_player_col = player.col;
         renderMap(map, statics_fixed_on_map, attractions_placed_on_map, player.row, player.col);
+
+        if (window.foodStallAnchors?.length) {
+            FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
+        }
     }
 
-    // Redraw visitor sprites every frame once per second (I tried every frame but when the city gets busy, it gets a tad laggy)
-    time_since_last_visitor_redraw += change_in_time;
-    if (time_since_last_visitor_redraw >= config.VISITOR_REDRAW_INTERVAL) {
-        draw_visitor_sprites_onto_map();
-        time_since_last_visitor_redraw = 0;
+    // Redraw visitor sprites every frame once per second (can do this to reduce lag at high npc cnt)
+    // time_since_last_visitor_redraw += change_in_time;
+    // if (time_since_last_visitor_redraw >= config.VISITOR_REDRAW_INTERVAL) {
+    //     draw_visitor_sprites_onto_map();
+    //     time_since_last_visitor_redraw = 0;
+    // }
+    draw_visitor_sprites_onto_map();
+
+    // rerender food covering overlays
+    if (window.foodStallAnchors?.length) {
+        FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
     }
 
     // finally I request the next frame:

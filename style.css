@@ -1,3 +1,13 @@
+/* Food coverage overlay for food stalls */
+.food-coverage-tile {
+    position: absolute;
+    inset: 0;
+    background: rgba(98, 153, 66, 0.4); 
+    border: 2px solid rgba(9, 61, 16, 0.7);
+    pointer-events: none;
+    z-index: 10;
+    box-sizing: border-box;
+}
 
 /* this font will give the video-game-esque style needed to spruce up the personality a bit */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
@@ -11,7 +21,6 @@ html, body {
 }
 
 * { box-sizing: border-box; }
-
 :root {
     --max-cols: 50;
     --max-rows: 30;
@@ -256,6 +265,7 @@ body {
     align-items: center;
     justify-content: center;
     padding: max(2px, calc(var(--cell-size) * 0.06));
+    position: relative;
 }
 
 /* here's where the individual styling for the different tyle types are defined */
