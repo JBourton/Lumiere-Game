@@ -476,3 +476,13 @@ function pick_random_path_destination(npc) {
   return filtered[Math.floor(Math.random() * filtered.length)];
 }
 
+// as part of the game reset
+export function remove_all_visitors() {
+  // all visitors are popped off the map queue
+  while (npcs_on_map.length > 0) {
+    npcs_on_map.pop();
+  }
+  Resources.Visitors.set(0);
+  reset_heatmap_counts();  // heatmap is tied to this so I'm calling those functions to clear it
+  update_heatmap_visual();
+}

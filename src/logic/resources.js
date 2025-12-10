@@ -115,5 +115,16 @@ export const Frustration = {
         const NORMALISE_FRUST_INC = 1; // [DEV NOTE] this is a tuneable parameter for balancing game
         this.frustration_lvl = new_frust_lvl * NORMALISE_FRUST_INC;
         this.notify();
+    },
+    map_frust_tier() { // used for calculating rate of magic loss due to frustration
+        if (this.frustration_lvl <= 25) {
+            return 1;
+        } else if (this.frustration_lvl <= 50) {
+            return 2;
+        } else if (this.frustration_lvl <= 75) {
+            return 3;
+        } else {
+            return 4;
+        }
     }
 }

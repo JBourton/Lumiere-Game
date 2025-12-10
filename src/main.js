@@ -6,17 +6,12 @@ import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
 import { initPlacementPreview } from "./logic/placementPreview.js";
-import { spawn_new_visitor, update_npc_system, getnpcs_on_map } from "./logic/visitorLogic/visitors.js";
+import { spawn_new_visitor, update_npc_system, getnpcs_on_map, remove_all_visitors } from "./logic/visitorLogic/visitors.js";
 import { draw_visitor_sprites_onto_map } from "./components/renderVisitors.js";  // I'm separating vistor gameplay (above) from visitor asthetics
 import { draw_on_empty_hmap } from "./components/heatmap.js";  // for the heatmap in top-right
 import { update_congestion_lvl, bootup_congestion_system } from "./logic/visitorLogic/congestion.js"; // for monitioring business of the map -> impacts magic
-import { WIDTH, HEIGHT } from "./config.js"; // fixing circular dependencies
-
-// Then set game constants - this is map size, but to change it you also have to go into styles.css & change the '#grid' repeat values to the same as consts here
-const CONGESTION_UPDATE_INTERVAL = 500;
-const SPAWN_INTERVAL = 1000; // [DEV NOTE]: I'll remove this later but for now it's best to test with freqeunt NPCs coming in
-
-
+import * as config from "./config.js"; // fixing circular dependencies
+import { cleanup_the_map } from "./logic/map.js";
 
 // these let the dev buttons in DOM 'see' the functions below
 window.Magic = Magic;
@@ -54,6 +49,9 @@ function reset_the_game() {
         player.row,
         player.col
     );
+
+    cleanup_the_map();
+    remove_all_visitors();
 
     // restart the gameplay loop cleanly after game over
     requestAnimationFrame(lumiere_gameplay_loop);
@@ -157,7 +155,7 @@ hmapBtn.addEventListener("click", () => {
 
 
 // Start Lumiere Game! Firstly I'm loading in all the assets for a proper setup
-const { map, statics_fixed_on_map, attractions_placed_on_map } = build_grid_map(WIDTH, HEIGHT);
+const { map, statics_fixed_on_map, attractions_placed_on_map } = build_grid_map(config.WIDTH, config.HEIGHT);
 window.currentMap = map; // for the purpose of item placing
 window.currentStatics = statics_fixed_on_map;
 window.placedObjects = attractions_placed_on_map;
@@ -184,6 +182,8 @@ let last_player_col = player.col;
 let curr_time_frame = performance.now()
 let time_since_last_npc_spawn = 0;
 let time_since_last_congestion_update = 0;
+let time_since_last_magic_decrease_from_congestion = 0;
+let time_since_last_visitor_redraw = 0;
 
 function lumiere_gameplay_loop(game_timing_data) {
     const change_in_time = game_timing_data - curr_time_frame; // need to track the timing as game goes along
@@ -191,16 +191,25 @@ function lumiere_gameplay_loop(game_timing_data) {
 
     // update congestion (but not every frame so as to not lag-out game)
     time_since_last_congestion_update += change_in_time;
-    if (time_since_last_congestion_update >= CONGESTION_UPDATE_INTERVAL) {
+    if (time_since_last_congestion_update >= config.CONGESTION_UPDATE_INTERVAL) {
         update_congestion_lvl();
         time_since_last_congestion_update = 0; // timeing resets
     }
 
     // now visitors will spawn, for now on a timer and later in line w/ gameplay rules
     time_since_last_npc_spawn += change_in_time; // using this as a clean way to check how long it's been since npc spawn
-    if (time_since_last_npc_spawn >= SPAWN_INTERVAL) {  // time to spawn npc!
+    if (time_since_last_npc_spawn >= config.SPAWN_INTERVAL) {  // time to spawn npc!
         spawn_new_visitor(14, 10) // [DEV NOTE]: Spawn on a valid path tile (value 1). Row 10, col 14 is a path
         time_since_last_npc_spawn = 0;  
+    }
+
+    // now comes the penalty for having a high level of congestion (and thus visitor frustration)
+    time_since_last_magic_decrease_from_congestion += change_in_time;
+    if (time_since_last_magic_decrease_from_congestion >= config.MAGIC_DEC_INTERVAL) {
+        const frust_tier = Frustration.map_frust_tier() - 1;
+        let magic_loss = config.MAGIC_DECREASE_W_FRUSTR_RATE * frust_tier;
+        Magic.decrease(magic_loss);
+        time_since_last_magic_decrease_from_congestion = 0;
     }
 
     // Now NPC behaviour like movement, selecting a fun attraction to go visit + actually visiting happens
@@ -213,8 +222,12 @@ function lumiere_gameplay_loop(game_timing_data) {
         renderMap(map, statics_fixed_on_map, attractions_placed_on_map, player.row, player.col);
     }
 
-    // Redraw visitor sprites every frame (they move independently of the player)
-    draw_visitor_sprites_onto_map();
+    // Redraw visitor sprites every frame once per second (I tried every frame but when the city gets busy, it gets a tad laggy)
+    time_since_last_visitor_redraw += change_in_time;
+    if (time_since_last_visitor_redraw >= config.VISITOR_REDRAW_INTERVAL) {
+        draw_visitor_sprites_onto_map();
+        time_since_last_visitor_redraw = 0;
+    }
 
     // finally I request the next frame:
     requestAnimationFrame(lumiere_gameplay_loop);

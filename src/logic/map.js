@@ -244,3 +244,36 @@ export function place_static_object(map, baseRow, baseCol, objectDef) {
         }
     }
 }
+
+
+// tied into game reset
+export function cleanup_the_map() {
+        // Clear all placed attractions
+        let attractionsLayer = null;
+        if (window.placedObjects) {
+            attractionsLayer = window.placedObjects;
+        } else if (window.__MAP_STATE__ && window.__MAP_STATE__.attractions_placed_on_map) {
+            attractionsLayer = window.__MAP_STATE__.attractions_placed_on_map;
+        }
+        if (attractionsLayer) {
+            for (let r = 0; r < attractionsLayer.length; r++) {
+                for (let c = 0; c < attractionsLayer[r].length; c++) {
+                    attractionsLayer[r][c] = null;
+                }
+            }
+            window.placedObjects = attractionsLayer;
+            if (window.__MAP_STATE__) {
+                window.__MAP_STATE__.attractions_placed_on_map = attractionsLayer;
+            }
+        }
+        // Re-render the map to reflect changes
+        if (window.currentMap && window.currentStatics && window.placedObjects && window.playerInstance) {
+            renderMap(
+                window.currentMap,
+                window.currentStatics,
+                window.placedObjects,
+                window.playerInstance.row,
+                window.playerInstance.col
+            );
+        }
+}

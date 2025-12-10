@@ -1,6 +1,8 @@
 import { SCALE_DOWN, HMAP_ROWS, HMAP_COLS, get_hmap_grid_for_congestion } from "../../components/heatmap.js";
 import { Frustration } from "../resources.js";  // more congestion == more frustration (Lumiere's too busy, not enough attractions!)
 
+const COLLISION_WEIGHT = 7; // [DEV NOTE]: Tuneable hyperparam for making frustration lvl more sensitive (also have one in resources.js but better to use this to compartmentalise logic)
+
 
 // to grab the locations of npcs from heatmap
 let get_all_npc_positions = null; // p.s. this is storing a function, for clarity of how I'm using it below
@@ -20,7 +22,7 @@ export function update_congestion_lvl() {
     const cong_per_cell = npcs_in_hmap_cell(npc_positions);
 
     // calling a/b collision detection for NPCs in those aggregated cells
-    const global_congetstion_lvl = compute_ab_visitor_collisions(cong_per_cell, hmap);
+    const global_congetstion_lvl = compute_aabb_visitor_collisions(cong_per_cell, hmap);
 
     Frustration.set_frust(global_congetstion_lvl);
 }
@@ -59,7 +61,7 @@ function npcs_in_hmap_cell(npc_positions) {
 
 
 // now for each aggreagated hmap tile, I'm looking at a/b collisions inside it
-function compute_ab_visitor_collisions(npcs_grouped_per_cell, hmap) {
+function compute_aabb_visitor_collisions(npcs_grouped_per_cell, hmap) {
     let global_total_congestion = 0;
 
     // now iterating through the tiles to find matching coords that collide
@@ -98,7 +100,7 @@ function compute_ab_visitor_collisions(npcs_grouped_per_cell, hmap) {
             : 1;
 
         // CORE LOGIC!!!
-        const incr_in_congestion = collisions_on_this_tile * tier_multiplier;
+        const incr_in_congestion = collisions_on_this_tile * tier_multiplier * COLLISION_WEIGHT;
 
         // now add this tile's congestion to global total
         global_total_congestion += incr_in_congestion;
