@@ -112,7 +112,8 @@ export const Frustration = {
         this.notify();
     },
     set_frust(new_frust_lvl) {
-        this.frustration_lvl = new_frust_lvl;
+        const NORMALISE_FRUST_INC = 1; // [DEV NOTE] this is a tuneable parameter for balancing game
+        this.frustration_lvl = new_frust_lvl * NORMALISE_FRUST_INC;
         this.notify();
     }
 }

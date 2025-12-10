@@ -1,21 +1,20 @@
 // this file is responsible for showing the overlay inside the div already created in the html
 // I'm using plotly for this: https://plotly.com/javascript/heatmaps/
 
-import { WIDTH, HEIGHT } from "../main.js"; // so it matches dims
-const SCALE_DOWN = 3; // this allows me to variabley change the resolution of the heatmap, so I can experiment to find what's best visually
-let live_heatmap_vals = null;  // hmap presence confirmation
+import { WIDTH, HEIGHT } from "../config.js"; // so it matches dims
+export const SCALE_DOWN = 3; // this allows me to variabley change the resolution of the heatmap, so I can experiment to find what's best visually
+export const HMAP_ROWS  = Math.ceil(HEIGHT / SCALE_DOWN);
+export const HMAP_COLS = Math.ceil(WIDTH / SCALE_DOWN);
+let live_heatmap_vals = null;  // hmap presence holder
 let plot_initialised = false;  // confirmation plot is there
 
 
 
 // I'm doing this modularly: first the empty heatmap needs to be drawn on
 function setup_the_heatmap() {
-    const hmap_rows = Math.ceil(HEIGHT / SCALE_DOWN);
-    const hmap_cols = Math.ceil(WIDTH / SCALE_DOWN);
-
     const the_map = []; // the scaled-down representation of the actual map
-    for (let hmap_r = 0; hmap_r < hmap_rows; hmap_r++) {// go row by row to construct mimic map
-        const new_hmap_row = new Array(hmap_cols).fill(0); // (as it's only 0s anyway as I'm starting empty)
+    for (let hmap_r = 0; hmap_r < HMAP_ROWS; hmap_r++) {// go row by row to construct mimic map
+        const new_hmap_row = new Array(HMAP_COLS).fill(0); // (as it's only 0s anyway as I'm starting empty)
         the_map.push(new_hmap_row);
     }
     return the_map;
@@ -99,29 +98,18 @@ export function register_visitor_on_heatmap(npcs_map_col, npcs_map_row) {
 
 
 // setup the brown-red scaling
-// setup the brown-red scaling
 function map_counts_to_tiers(all_map_vals) {
-    // Here I'm encoding both:
-    // - the original brown checkerboard for empty tiles
-    // - 5 congestion tiers for tiles with at least 1 npc
-
-    // z-values:
-    //   0 → dark brown base
-    //   1 → light brown base
-    //   2 → tier 1  (1 npc)
-    //   3 → tier 2  (2-3 npcs)
-    //   4 → tier 3  (3-5 npcs)
-    //   5 → tier 4  (6+ npcs)
-    return all_map_vals.map((row, r) =>
-        row.map((count, c) => {
-            if (count === 0) {
+    // Here I'm encoding both the original brown checkerboard for empty tiles & 5 congestion tiers for tiles with at least 1 npc
+    return all_map_vals.map((hmap_row, ro) =>
+        hmap_row.map((num_of_npcs, col_hmap) => {
+            if (num_of_npcs === 0) {
                 // no visitors here – keep the original checkerboard pattern
-                return (r + c) % 2; // 0 or 1
+                return (ro + col_hmap) % 2; // 0 or 1
             }
-            if (count <= 1) return 2;  // tier 1
-            if (count <= 3) return 3;  // tier 2
-            if (count <= 5) return 4;  // tier 3
-            return 5;                  // tier 4 (7+)
+            if (num_of_npcs <= 1) return 2;  // tier 1
+            if (num_of_npcs <= 3) return 3;  // tier 2
+            if (num_of_npcs <= 5) return 4;  // tier 3
+            return 5;                  // tier 4
         })
     );
 }
@@ -132,7 +120,7 @@ function map_counts_to_tiers(all_map_vals) {
 const congestion_colourscale = [
     [0.0,       "rgba(147,115,62,1)"], // tier 0 brown, as base
     [1.0 / 5.0, "rgba(180,145,78,1)"],  // tier 1 brown, but a tad red
-    [2.0 / 5.0, "rgba(220,180,120,1)"], // tier 2 slight red
+    [2.0 / 5.0, "rgba(226, 168, 160, 1)"], // tier 2 slight red
     [3.0 / 5.0, "rgba(200,120,90,1)"], // tier 3 blood red
     [4.0 / 5.0, "rgba(170,80,60,1)"],   // tier 4 (crimson red)
     [5.0 / 5.0, "rgba(150,40,40,1)"]  // tier 4 (crimson red)
@@ -149,4 +137,9 @@ export function update_heatmap_visual() {
         zmax: [5],
         colorscale: [congestion_colourscale]  // now this is actually dynamic
     });
+}
+
+// for congetsion calculations
+export function get_hmap_grid_for_congestion() {
+    return live_heatmap_vals;
 }

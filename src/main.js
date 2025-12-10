@@ -6,13 +6,16 @@ import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
 import { initPlacementPreview } from "./logic/placementPreview.js";
-import { spawn_new_visitor, update_npc_system } from "./logic/visitorLogic/visitors.js";
+import { spawn_new_visitor, update_npc_system, getnpcs_on_map } from "./logic/visitorLogic/visitors.js";
 import { draw_visitor_sprites_onto_map } from "./components/renderVisitors.js";  // I'm separating vistor gameplay (above) from visitor asthetics
 import { draw_on_empty_hmap } from "./components/heatmap.js";  // for the heatmap in top-right
+import { update_congestion_lvl, bootup_congestion_system } from "./logic/visitorLogic/congestion.js"; // for monitioring business of the map -> impacts magic
+import { WIDTH, HEIGHT } from "./config.js"; // fixing circular dependencies
 
 // Then set game constants - this is map size, but to change it you also have to go into styles.css & change the '#grid' repeat values to the same as consts here
-export const WIDTH = 50; // (p.s. I'm also using these in src/components/heatmap.js too for an accurate representation)
-export const HEIGHT = 30;
+const CONGESTION_UPDATE_INTERVAL = 500;
+const SPAWN_INTERVAL = 1000; // [DEV NOTE]: I'll remove this later but for now it's best to test with freqeunt NPCs coming in
+
 
 
 // these let the dev buttons in DOM 'see' the functions below
@@ -168,26 +171,36 @@ enablePlayerMovement(player);
 
 initPlacementPreview(); // allow items to be placed on the grid
 
+// Hook congestion system to the NPC provider so it can read NPC positions
+bootup_congestion_system(getnpcs_on_map);
+
 // Track player position to only re-render when the player moves
 let last_player_row = player.row;
 let last_player_col = player.col;
 
-// ---------- Now: The core gameplay loop begins! --------------- //
+// %%%%%%%%%%%%%% Now: The core gameplay loop begins! %%%%%%%%%%%%%%%%% //
 
 // a. intialise timings to get the game rythm going
 let curr_time_frame = performance.now()
 let time_since_last_npc_spawn = 0;
-const SPAWN_INTERVAL = 15000; // [DEV NOTE]: I'll remove this later but for now it's best to test with freqeunt NPCs coming in
+let time_since_last_congestion_update = 0;
 
 function lumiere_gameplay_loop(game_timing_data) {
     const change_in_time = game_timing_data - curr_time_frame; // need to track the timing as game goes along
     curr_time_frame = game_timing_data; // need later
 
+    // update congestion (but not every frame so as to not lag-out game)
+    time_since_last_congestion_update += change_in_time;
+    if (time_since_last_congestion_update >= CONGESTION_UPDATE_INTERVAL) {
+        update_congestion_lvl();
+        time_since_last_congestion_update = 0; // timeing resets
+    }
+
     // now visitors will spawn, for now on a timer and later in line w/ gameplay rules
     time_since_last_npc_spawn += change_in_time; // using this as a clean way to check how long it's been since npc spawn
     if (time_since_last_npc_spawn >= SPAWN_INTERVAL) {  // time to spawn npc!
         spawn_new_visitor(14, 10) // [DEV NOTE]: Spawn on a valid path tile (value 1). Row 10, col 14 is a path
-        time_since_last_npc_spawn = 0;  // timeing resets
+        time_since_last_npc_spawn = 0;  
     }
 
     // Now NPC behaviour like movement, selecting a fun attraction to go visit + actually visiting happens
