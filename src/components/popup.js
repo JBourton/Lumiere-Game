@@ -27,6 +27,10 @@ export function setupIntroModal(bg_tunes) {
             if (bg_tunes) {
                 bg_tunes.playMusic(); // now fire up the background tunes!
             }
+                // Show the tutorial modal (if setup attached the global helper)
+                if (typeof window.show_the_tutorial_question_popup === 'function') {
+                    window.show_the_tutorial_question_popup();
+                }
         });
 
         // for later debugging; useful for double-checking its working
@@ -92,6 +96,7 @@ export function game_won() {
     the_hidden_gamewon_popup.style.display = "flex"; // annndd activate! player celebration time! :D
 }
 
+
 // now's the function that controls showing the "Congrats, you've unlocked item X" popup
 export function setupUnlockPopup() {
     const unlock_popup = document.getElementById("unlock-popup");
@@ -118,3 +123,42 @@ export function show_the_unlock_popup(item_unlocked) {
     unlock_popup.classList.remove("hidden");
 }
 
+
+
+// %%%%%%%%% from here on out, the popups will contain all the screens needed for the tutorial %%%%%%%%%%
+
+// Firstly comes the actual "Do you want a tutorial" screen
+export function setupTutorialYesOrNoModal() {
+    document.addEventListener("DOMContentLoaded", function () {
+        const start_tutorial_question = document.getElementById("tutorialChoiceModal");
+        const start_tutorial_btn = document.getElementById("tutorialYesBtn");
+        const skip_tutorial_btn = document.getElementById("tutorialNoBtn");
+
+        if (!start_tutorial_question || !start_tutorial_btn || !skip_tutorial_btn) return; // missing DOM -> skip
+
+        // ensure it's hidden on load (CSS should already hide it, but be defensive)
+        start_tutorial_question.style.display = "none";
+
+        // Both buttons simply close the modal for now
+        start_tutorial_btn.addEventListener("click", () => {
+            start_tutorial_question.style.display = "none";
+        });
+
+        skip_tutorial_btn.addEventListener("click", () => {
+            start_tutorial_question.style.display = "none";
+        });
+
+        // Expose a global helper to open the tutorial choice (used after intro)
+        window.show_the_tutorial_question_popup = function show_the_tutorial_question_popup() {
+            const the_tutorial_popup = document.getElementById("tutorialChoiceModal");
+            if (!the_tutorial_popup) return;
+            the_tutorial_popup.style.display = "flex";
+        };
+    });
+}
+
+export function show_the_tutorial_question_popup() {
+    const the_tutorial_popup = document.getElementById("tutorialChoiceModal");
+    if (!the_tutorial_popup) return;
+    the_tutorial_popup.style.display = "flex";
+}

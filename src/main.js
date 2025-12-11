@@ -1,7 +1,7 @@
 // First load in all game componants needed
 import { build_grid_map, renderMap } from "./logic/map.js";
 import { Player, enablePlayerMovement } from "./logic/playerMovement.js";
-import { setupIntroModal, setupGameOverModal, setupUnlockPopup, game_over, setupGameWonModal, game_won } from "./components/popup.js";
+import { setupIntroModal, setupGameOverModal, setupUnlockPopup, setupTutorialYesOrNoModal, game_over, setupGameWonModal, game_won } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
@@ -121,6 +121,8 @@ pause_everything(funky_background_audio);
 
 // now for all the popups, though only intro modal shows for now (others are win/loss conditions)
 setupIntroModal(funky_background_audio);
+// Initialize the tutorial modal handlers (modal is hidden by default)
+setupTutorialYesOrNoModal();
 setupGameOverModal(reset_the_game);  // enabling the game over modal w/ restart logic
 setupGameWonModal(reset_the_game); // & game won
 setupUnlockPopup(); // + also show one each time player unlocks an item

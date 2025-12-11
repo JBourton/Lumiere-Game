@@ -45,7 +45,7 @@ function setup_preview_elem() {  // this helper facillitates re-rending of the m
     preview_el_in_doc.style.visibility = "hidden"; // a pre-step to remove the top-left flash of an attraction when it's placed
 
     main_map.appendChild(preview_el_in_doc);
-    if (curr_item_of_interest) updatePreviewDimensions(); // finally, grab the item image to re-overlay it
+    if (curr_item_of_interest) update_the_preview_dims(); // finally, grab the item image to re-overlay it
     console.debug("[PLACEMENT] setup_preview_elem: preview element appended", preview_el_in_doc);
 }
 
@@ -79,17 +79,19 @@ export function setPlacementItem(item) {
         console.log("[PLACEMENT] preview element missing - creating now");
         setup_preview_elem();
     }
-    updatePreviewDimensions();
+    update_the_preview_dims();
 }
 
 
 // adjust ghost size based on item w/h
-function updatePreviewDimensions() {
-    if (!curr_item_of_interest || !preview_el_in_doc) return;
+function update_the_preview_dims() {
+    if (!curr_item_of_interest || !preview_el_in_doc) return;  // nothign to work with
 
+    // i calculate the h & w of the preview el to overlay it on the map of durham
     preview_el_in_doc.style.width  = `calc(var(--cell-size) * ${curr_item_of_interest.w})`;
     preview_el_in_doc.style.height = `calc(var(--cell-size) * ${curr_item_of_interest.h})`;
 
+    // and then set a bunch of necessary core css components
     preview_el_in_doc.style.backgroundImage = `url(${curr_item_of_interest.img})`;
     preview_el_in_doc.style.backgroundSize  = "100% 100%";
     preview_el_in_doc.style.backgroundRepeat = "no-repeat";
@@ -98,25 +100,26 @@ function updatePreviewDimensions() {
 
 
 // move the preview to the hovered tile
-function handleMouseMove(e) {
+function handleMouseMove(mouse_moved) {
     if (!curr_item_of_interest) return;
 
     preview_el_in_doc.style.visibility = "visible";  // get rid of top-left attraction flash
 
-    const cell = e.target.closest(".cell");
-    if (!cell) return;
+    const map_sq = mouse_moved.target.closest(".cell");
+    if (!map_sq) return;
 
-    const x = parseInt(cell.dataset.x);
-    const y = parseInt(cell.dataset.y);
+    // grab the map sq the mouse is over
+    const x_pos = parseInt(map_sq.dataset.x);
+    const y_pos = parseInt(map_sq.dataset.y);
 
-    if (isNaN(x) || isNaN(y)) return;
+    if (isNaN(x_pos) || isNaN(y_pos)) return;  // i.e. not a valid coord so skip
 
-    // Move the preview sprite (top-left)
-    preview_el_in_doc.style.left = `calc(${x} * var(--cell-size))`;
-    preview_el_in_doc.style.top  = `calc(${y} * var(--cell-size))`;
+    // now the preview sprite gets moved, which is anchored to the top left relative to players mouse
+    preview_el_in_doc.style.left = `calc(${x_pos} * var(--cell-size))`;
+    preview_el_in_doc.style.top  = `calc(${y_pos} * var(--cell-size))`;
 
-    // highlight the whole footprint
-    highlightFootprint(x, y);
+    // and finally the whole area of the placemnt preview gets highlighted
+    highlight_whole_preview_area(x_pos, y_pos);
 }
 
 function try_to_place_an_item(item_to_place) {  // this is the 2nd event listener for the initplacementpreview() function, designed to permit the player to place (overlay) and object where its permissible
@@ -129,7 +132,7 @@ function try_to_place_an_item(item_to_place) {  // this is the 2nd event listene
     const y = parseInt(cell.dataset.y);
 
     // this checks that its a valid placement preview prior to actually commiting to it
-    if (!checkPlacementValidity(x, y, curr_item_of_interest.w, curr_item_of_interest.h)) {
+    if (!check_placement_is_valid(x, y, curr_item_of_interest.w, curr_item_of_interest.h)) {
         console.log("[DEBUG MSG]: Player tried to place an item here; it's invalid.");
         return;
     }
@@ -139,7 +142,7 @@ function try_to_place_an_item(item_to_place) {  // this is the 2nd event listene
 
 
 // the intention here is to paint over the grid w/ a rectangular footprint
-function highlightFootprint(x, y) {
+function highlight_whole_preview_area(x, y) {
     if (!curr_item_of_interest) return;
 
     clearFootprintTiles();
@@ -147,16 +150,16 @@ function highlightFootprint(x, y) {
     const w = curr_item_of_interest.w;
     const h = curr_item_of_interest.h;
 
-    const isValidPlacement = checkPlacementValidity(x, y, w, h);
+    const isValidPlacement = check_placement_is_valid(x, y, w, h);
 
-    for (let dy = 0; dy < h; dy++) {
-        for (let dx = 0; dx < w; dx++) {
+    for (let y_change = 0; y_change < h; y_change++) {
+        for (let x_change = 0; x_change < w; x_change++) {
 
             const cell = main_map.querySelector(
-                `.cell[data-x="${x + dx}"][data-y="${y + dy}"]`
+                `.cell[data-x="${x + x_change}"][data-y="${y + y_change}"]`
             );
 
-            console.log("TRY CELL", x + dx, y + dy, cell); 
+            console.log("TRY CELL", x + x_change, y + y_change, cell); 
 
             if (cell) {
                 cell.classList.add("placement-preview-tile");
@@ -169,43 +172,43 @@ function highlightFootprint(x, y) {
 }
 
 
-function checkPlacementValidity(itemx, itemy, w, h) {
+function check_placement_is_valid(itemx, itemy, w, h) {
     // Don't allow placement beyond edges
     if (itemy + h > main_map.dataset.rows) return false;
     if (itemx + w > main_map.dataset.cols) return false;
 
     // this adjacency matrix is checking pos of attraction relative to player, so you can only place if it's close by
-    let adjacent = false;
-    for (let dy = 0; dy < h; dy++) {
-        for (let dx = 0; dx < w; dx++) {
-            if (checkIsAdjacentToPlayer(itemx + dx, itemy + dy)) {
-                adjacent = true;
+    let is_adj = false;
+    for (let y_change = 0; y_change < h; y_change++) {
+        for (let x_change = 0; x_change < w; x_change++) {
+            if (checkIsAdjacentToPlayer(itemx + x_change, itemy + y_change)) {
+                is_adj = true;
                 break;
             }
         }
-        if (adjacent) break;
+        if (is_adj) break;
     }
 
     // this little adjacency check is restricting the permissible bounds to place an object to immediately around a player
-    if (!adjacent) {
+    if (!is_adj) {
         return false;
     }
 
     // Only grass & pavement for now is allowed for placing attractions down (mymapping: 2=grass, 3=pavement)
-    for (let dy = 0; dy < h; dy++) {
-        for (let dx = 0; dx < w; dx++) {
-            const mapTile = window.currentMap?.[itemy + dy]?.[itemx + dx];
+    for (let y_change = 0; y_change < h; y_change++) {
+        for (let x_change = 0; x_change < w; x_change++) {
+            const mapTile = window.currentMap?.[itemy + y_change]?.[itemx + x_change];
 
             if (!(mapTile === 2 || mapTile === 3)) {
                 return false;
             }
             // and this bit is responsible for checking if a placement preview overlaps w/ static objects
-            if (window.currentStatics?.[itemy + dy]?.[itemx + dx]) {
+            if (window.currentStatics?.[itemy + y_change]?.[itemx + x_change]) {
                 return false; 
             }
             
             // also need to prevent attractions overlapping w/ other attractions
-            if (window.placedObjects?.[itemy + dy]?.[itemx + dx]) {
+            if (window.placedObjects?.[itemy + y_change]?.[itemx + x_change]) {
                 return false; 
             }
 
@@ -227,14 +230,14 @@ function clearFootprintTiles() {
 
 // Above handled the preview; now comes the logic for placing the item on the map
 function place_item_on_map(x, y, item) {
-    for (let dy = 0; dy < item.h; dy++) {
-        for (let dx = 0; dx < item.w; dx++) {
+    for (let y_change = 0; y_change < item.h; y_change++) {
+        for (let x_change = 0; x_change < item.w; x_change++) {
             // ensure rows/cols exist
-            if (!window.placedObjects[y + dy]) window.placedObjects[y + dy] = [];
-            window.placedObjects[y + dy][x + dx] = {
+            if (!window.placedObjects[y + y_change]) window.placedObjects[y + y_change] = [];
+            window.placedObjects[y + y_change][x + x_change] = {
                 id: item.id,  // the id of the attraction placed
-                anchor: (dx === 0 && dy === 0),  // I'm using the top-left tile as the anchor for it
-                currentVisitors: (dx === 0 && dy === 0) ? 0 : undefined // seting npc logic
+                anchor: (x_change === 0 && y_change === 0),  // I'm using the top-left tile as the anchor for it
+                currentVisitors: (x_change === 0 && y_change === 0) ? 0 : undefined // seting npc logic
             };
         }
     }
