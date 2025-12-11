@@ -7,7 +7,16 @@ export class AudioManager {
         this.bgMusic = new Audio("./assets/audio/land_of_snow.mp3");
         this.bgMusic.loop = true;
         this.bgMusic.volume = 0.3;
-        this.isMuted = false;} // in case autoplay isn't working, the start btn can fix it
+        this.isMuted = false;
+    } // in case autoplay isn't working, the start btn can fix it
+
+    pauseMusic() {
+        try { this.bgMusic.pause(); } catch (e) {}
+    }
+
+    resumeMusic() {
+        this.playMusic();
+    }
 
     playMusic() {
         this.bgMusic.play().catch(() => {});// in case browser blocks autoplay, start btn can call playMusic again

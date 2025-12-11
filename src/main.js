@@ -20,6 +20,14 @@ window.Staff = Staff;
 window.Visitors = Visitors;
 window.Frustration = Frustration;
 
+// Global pause flag for play/pause functionality
+window.gamePaused = false;
+
+function toggleGamePaused() {
+    window.gamePaused = !window.gamePaused;
+    return window.gamePaused;
+}
+
 
 // this function resets everything back to how it was at game start
 function reset_the_game() {
@@ -190,6 +198,12 @@ let time_since_last_food_penalty = 0;
 
 function lumiere_gameplay_loop(game_timing_data) {
     const change_in_time = game_timing_data - curr_time_frame; // need to track the timing as game goes along
+    // If paused, reset current frame time to avoid spike on resume and skip updates
+    if (window.gamePaused) {
+        curr_time_frame = game_timing_data;
+        requestAnimationFrame(lumiere_gameplay_loop);
+        return;
+    }
     curr_time_frame = game_timing_data; // need later
 
     // update congestion (but not every frame so as to not lag-out game)
@@ -201,9 +215,20 @@ function lumiere_gameplay_loop(game_timing_data) {
 
     // now visitors will spawn, for now on a timer and later in line w/ gameplay rules
     time_since_last_npc_spawn += change_in_time; // using this as a clean way to check how long it's been since npc spawn
-    if (time_since_last_npc_spawn >= config.SPAWN_INTERVAL) {  // time to spawn npc!
+    if (time_since_last_npc_spawn >= config.SPAWN_INTERVAL && getnpcs_on_map().length < config.VISITOR_CAP) {  // time to spawn npc!
         spawn_new_visitor(14, 10) // [DEV NOTE]: Spawn on a valid path tile (value 1). Row 10, col 14 is a path
         time_since_last_npc_spawn = 0;  
+    }
+
+    // now, award staff proportional to visitors (relation set in config.js):
+    // desired_total_awarded = base_awarded + floor(visitorCount / VISITOR_STAFF_RELATION)
+    const numVisitors = (typeof Visitors.get === 'function') ? Visitors.get() : getnpcs_on_map().length;
+    const extraFromVisitors = Math.floor(numVisitors / config.VISITOR_STAFF_RELATION);
+    const base = (typeof Staff.get_base_awarded === 'function') ? Staff.get_base_awarded() : (Staff.base_awarded ?? 1);
+    const desiredTotalAwarded = base + extraFromVisitors;
+    const totalAwarded = (typeof Staff.get_total_awarded === 'function') ? Staff.get_total_awarded() : Staff.get();
+    if (desiredTotalAwarded > totalAwarded) {
+        Staff.add(desiredTotalAwarded - totalAwarded);
     }
 
     // now comes the penalty for having a high level of congestion (and thus visitor frustration)
@@ -216,7 +241,7 @@ function lumiere_gameplay_loop(game_timing_data) {
     }
 
     // Now NPC behaviour like movement, selecting a fun attraction to go visit + actually visiting happens
-    update_npc_system(change_in_time)
+    update_npc_system(change_in_time);
 
     // now check if any npcs are visiting a attractions without food coverage, and penalise magic if so
     time_since_last_food_penalty += change_in_time;
@@ -255,3 +280,14 @@ function lumiere_gameplay_loop(game_timing_data) {
 
 // For this I use the predefined fucntion, details found at: https://developer.mozilla.org/en-US/docs/Web/API/Window/requestAnimationFrame
 requestAnimationFrame(lumiere_gameplay_loop)
+
+// this allows the player to activley pause / resume the gameplay
+const btn_to_pause = document.getElementById("pause-button");
+if (btn_to_pause) {
+    btn_to_pause.addEventListener("click", () => {
+        const paused = toggleGamePaused();
+        btn_to_pause.textContent = paused ? "Resume" : "Pause";
+        if (paused) funky_background_audio.pauseMusic();
+        else funky_background_audio.resumeMusic();
+    });
+}

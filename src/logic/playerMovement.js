@@ -16,6 +16,7 @@ export class Player {
     }
 
     move(change_in_row, change_in_col) {
+        if (window.gamePaused) return; // prevent movement while paused
         if (!this.canMove) return; // immediantly cancel the attempt at moving if the player's going too fast
 
         this.canMove = false; // put the movement block on for a while (i.e. moveDelay seconds)

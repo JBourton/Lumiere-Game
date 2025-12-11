@@ -82,6 +82,26 @@ body {
 }
 
 
+/* Pause button style - match other top-left control buttons and position to right of heatmap */
+#pause-button {
+    position: fixed;
+    top: 10px;
+    left: 230px; /* placed just right of heatmap toggle (left:70px + ~60px width) */
+    font-size: 22px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: none;
+    padding: 8px 12px;
+    cursor: pointer;
+    z-index: 9999;
+    border-radius: 6px;
+}
+
+#pause-button:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+
 
 #game-title {
     font-size: clamp(12px, 2.5vw, 24px);

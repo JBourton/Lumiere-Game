@@ -35,28 +35,42 @@ export const Magic = {
 
 /* Constant 2: Staff count. Here we're tracking how many staff the player has to run their attractions */
 export const Staff = {
-    staff_cnt: 1,  // the user's starting off with only 1 staff to place the most basic attraction, kind of like a demo of how to play
+    // my rule: spending staff (placing attractions) reduces 'available' but not 'total_awarded'
+    base_awarded: 1,  // starting val of staff for player to start off w/
+    available: 1,  // num staff for player to "spend" running attrations
+    total_awarded: 1, // amnt staff granted by gameplay (proportional to visitors)
     listeners: [],
 
-    // another listner set up for staff cnt specifically
-    addListener(fn) {this.listeners.push(fn);},
-    notify() {this.listeners.forEach(fn => fn(this.staff_cnt));},
+    addListener(fn) { this.listeners.push(fn); },
+    notify() { this.listeners.forEach(fn => fn(this.available)); },
 
-    // fetch num of staff
-    get() {return this.staff_cnt;},
+    // fetch num of available staff (what UI and placement logic should read)
+    get() { return this.available; },
 
+    // fetch total staff awarded by the game (used when deciding to award more staff based on visitors)
+    get_total_awarded() { return this.total_awarded; },
+
+    // fetch the baseline starting staff count used in visitor ratio calculation
+    get_base_awarded() { return this.base_awarded; },
+
+    // "hiring" new staff
     add(amount) {
-        this.staff_cnt += amount;  // notice how there's no upper limit on staff here; that's because the feedback loops mean that more staff --> busier streets --> harder to control
+        this.available += amount;
+        this.total_awarded += amount;
         this.notify();
     },
 
+    // remove (spend) staff from the available pool when placing attractions.
     remove(amount) {
-        this.staff_cnt = Math.max(0, this.staff_cnt - amount);  // but obviously there's a lower limit as the player can't have -ve staff
+        this.available = Math.max(0, this.available - amount);
         this.notify();
     },
 
+    // set currently available staff
     set_stf(new_stf_cnt) {
-        this.staff_cnt = new_stf_cnt;
+        this.available = new_stf_cnt;
+        this.total_awarded = new_stf_cnt;
+        this.base_awarded = new_stf_cnt;
         this.notify();
     }
 }
