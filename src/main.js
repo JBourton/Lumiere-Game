@@ -1,7 +1,7 @@
 // First load in all game componants needed
 import { build_grid_map, renderMap } from "./logic/map.js";
 import { Player, enablePlayerMovement } from "./logic/playerMovement.js";
-import { setupIntroModal, setupGameOverModal, game_over, setupGameWonModal, game_won } from "./components/popup.js";
+import { setupIntroModal, setupGameOverModal, setupUnlockPopup, game_over, setupGameWonModal, game_won } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
@@ -14,6 +14,8 @@ import * as config from "./config.js"; // fixing circular dependencies
 import { cleanup_the_map } from "./logic/map.js";
 import { FoodCoverage } from "./logic/foodCoverage.js";
 import { pause_everything } from "./logic/pause.js";
+import { check_unlocks, reset_unlocks } from "./logic/unlock.js";
+import { reset_game_impl } from "./restart.js";
 
 // these let the dev buttons in DOM 'see' the functions below
 window.Magic = Magic;
@@ -26,40 +28,15 @@ window.Frustration = Frustration;
 
 
 // this function resets everything back to how it was at game start
-function reset_the_game() {
-    // back to how it all was at 1st time
-    Magic.set_mgc(10);
-    Staff.set_stf(1);
-    Visitors.set_vstrs(0);
-    Frustration.set_frust(0);
-
-    // git rid of all npcs
-    if (window.clear_all_npcs) window.clear_all_npcs();
-
-    // reset player back to initial pos used at launch
-    player.row = 10;
-    player.col = 0;
-    last_player_row = player.row;
-    last_player_col = player.col;
-
-    // reset timers for npc spawn & animation frame
-    curr_time_frame = performance.now();
-    time_since_last_npc_spawn = 0;
-
-    // redraw map & player as theres now a clean slate
-    renderMap(
-        window.currentMap,
-        window.currentStatics,
-        window.placedObjects,
-        player.row,
-        player.col
-    );
-
-    cleanup_the_map();
-    remove_all_visitors();
-
-    // restart the gameplay loop cleanly after game over
-    requestAnimationFrame(lumiere_gameplay_loop);
+function reset_the_game() {     // I've just delegated it all to another file to abstract logic - check restart.js for details
+    reset_game_impl({Magic, Staff, Visitors, Frustration,
+        clear_all_npcs: window.clear_all_npcs,
+        setPlayerPos: (r, c) => { player.row = r; player.col = c; }, setLastPlayerPos: (r, c) => { last_player_row = r; last_player_col = c; }, setCurrTimeFrame: (v) => { curr_time_frame = v; }, setTimeSinceLastNpcSpawn: (v) => { time_since_last_npc_spawn = v; },
+        renderMap,
+        currentMap: window.currentMap, currentStatics: window.currentStatics, placedObjects: window.placedObjects,
+        cleanup_the_map, remove_all_visitors, reset_unlocks, requestAnimationFrame, gameplayLoop: lumiere_gameplay_loop,
+        clear_food_coverage: () => {FoodCoverage.redraw_all_food_coverage([]); FoodCoverage._coverageMask = null; window.foodStallAnchors = [];} // clear dom overlays for green food coverage sqs
+    });
 }
 
 
@@ -98,8 +75,8 @@ document.addEventListener("DOMContentLoaded", () => {
     });
 
 
-    // & then this updates the counter for total num of visitors
-    Visitors.addListener(visCnt => {visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${visCnt}`;})
+    // & then this updates the counter for total num of visitors & sees if player should unlock any more attractions
+    Visitors.addListener(visCnt => {visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${visCnt}`; check_unlocks(visCnt);})
 
     // finally (and most complex) is the dynamic frustration bar adjusting
     Frustration.addListener(frustrationlvl => {
@@ -146,6 +123,7 @@ pause_everything(funky_background_audio);
 setupIntroModal(funky_background_audio);
 setupGameOverModal(reset_the_game);  // enabling the game over modal w/ restart logic
 setupGameWonModal(reset_the_game); // & game won
+setupUnlockPopup(); // + also show one each time player unlocks an item
 
 const muteBtn = document.getElementById("mute-button"); // this event lisnter tracks the mute/unmute button on the top left
 muteBtn.textContent = "🔇"; // [Dev note 2] also comment out this line to start on the unmuted emoji

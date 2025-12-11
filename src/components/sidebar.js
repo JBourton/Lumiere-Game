@@ -103,15 +103,22 @@ export function setupSidebar() {
     }
 
 
-
-
-
     // ensure rows respond on initial load
     attachItemListeners();
 
-    window.refreshSidebarAffordability = () => {  // this is needed so that the staff cost can be updated as staff cnt varies
+
+    window.refreshSidebarAffordability = () => { // this is needed so that the staff cost can be updated as staff cnt varies
+        // current tab's contents have to be re-rendered
+        const active_tab = document.querySelector('#sidebar-tabs .tab.active');
+        const name_of_tab = active_tab ? active_tab.textContent.trim() : ATTRACTION_TYPES.LIGHTS;
+
+        const panel = panels[name_of_tab];
+        content.innerHTML = typeof panel === "function" ? panel() : panel;
+
+        // now the dom got rebuilt, I stick the item listners back in place
         attachItemListeners();
     };
+
 
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {

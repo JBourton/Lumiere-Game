@@ -91,3 +91,30 @@ export function game_won() {
     }
     the_hidden_gamewon_popup.style.display = "flex"; // annndd activate! player celebration time! :D
 }
+
+// now's the function that controls showing the "Congrats, you've unlocked item X" popup
+export function setupUnlockPopup() {
+    const unlock_popup = document.getElementById("unlock-popup");
+    const close_unlock_popup_btn = document.getElementById("unlock-close-btn");
+
+    close_unlock_popup_btn.addEventListener("click", () => {
+        unlock_popup.classList.add("hidden");  // it starts invisible just like the rest of the popups, only shows when player unlocks a new attraction
+    });
+
+    // it has to be globally exposed so it can be seen/interacting w/
+    window.show_the_unlock_popup = show_the_unlock_popup;
+}
+
+export function show_the_unlock_popup(item_unlocked) {
+    const unlock_popup = document.getElementById("unlock-popup");
+    const img_of_item_unlocked = document.getElementById("unlock-img");
+    const unlocked_name = document.getElementById("unlock-text");
+
+    // set the item-specific img & name
+    img_of_item_unlocked.src = item_unlocked.img;
+    unlocked_name.textContent = `Unlocked: ${item_unlocked.name}`;
+
+    // now show it!
+    unlock_popup.classList.remove("hidden");
+}
+

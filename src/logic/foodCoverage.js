@@ -124,5 +124,15 @@ export const FoodCoverage = {
         if (overall_magic_loss_from_hunger > 0) {
             Magic.decrease(overall_magic_loss_from_hunger);
         }
+    },
+
+    // I need this to ensure that the coverage tiles get wiped on game reset
+    clear_all_coverage_overlays() {
+        document.querySelectorAll('.food-coverage-tile').forEach(t => t.remove());
+        this._coverageMask = null;
     }
 };
+
+
+
+

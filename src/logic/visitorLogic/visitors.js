@@ -183,9 +183,9 @@ function npc_central_controller(npc, time_change) {
 
         if (!next_target_attr) {
             // No attractions available → wander to a random path tile on the entire map
-            const randomTarget = pick_random_path_destination(npc);
+            const next_target_to_walk_too = pick_random_path_destination(npc);
 
-            if (!randomTarget) {
+            if (!next_target_to_walk_too) {
             npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
             return;
             }
@@ -193,8 +193,8 @@ function npc_central_controller(npc, time_change) {
             const path = Pathfinding.run_full_Astar(
             npc.vis_col,
             npc.vis_row,
-            randomTarget.col,
-            randomTarget.row
+            next_target_to_walk_too.col,
+            next_target_to_walk_too.row
             );
 
             if (!path || path.length === 0) {
@@ -204,8 +204,8 @@ function npc_central_controller(npc, time_change) {
 
             npc.path = path;
             npc.pathIndex = 0;
-            npc.goalCol = randomTarget.col;
-            npc.goalRow = randomTarget.row;
+            npc.goalCol = next_target_to_walk_too.col;
+            npc.goalRow = next_target_to_walk_too.row;
             npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
 
             return;  
@@ -217,21 +217,16 @@ function npc_central_controller(npc, time_change) {
         // the next step is to select a path (I segmented this logic into pathfinding.js, and I'm calling it here)
         const walkable_spots = Pathfinding.finding_nearest_path_walkable(next_target_attr.col, next_target_attr.row);
         if (walkable_spots.length === 0) {
-            // No adjacent walkable tiles found - try a random destination instead
-            console.warn(`[NPC] Could not find walkable tiles adjacent to attraction at (${next_target_attr.col},${next_target_attr.row}). Attempting to wander instead.`);
-            const randomTarget = pick_random_path_destination(npc);
+            // here there's no valid tiles adjacant to the npc that they can actually go to, so I setup a random destination search
+            const next_target_to_walk_too = pick_random_path_destination(npc);
 
-            if (!randomTarget) {
+            if (!next_target_to_walk_too) {
                 npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
                 return;
             }
 
-            const path = Pathfinding.run_full_Astar(
-                npc.vis_col,
-                npc.vis_row,
-                randomTarget.col,
-                randomTarget.row
-            );
+            // get the path, whether that's random or an actual destination
+            const path = Pathfinding.run_full_Astar(npc.vis_col,npc.vis_row, next_target_to_walk_too.col, next_target_to_walk_too.row);
 
             if (!path || path.length === 0) {
                 npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
@@ -240,8 +235,8 @@ function npc_central_controller(npc, time_change) {
 
             npc.path = path;
             npc.pathIndex = 0;
-            npc.goalCol = randomTarget.col;
-            npc.goalRow = randomTarget.row;
+            npc.goalCol = next_target_to_walk_too.col;
+            npc.goalRow = next_target_to_walk_too.row;
             npc.targetId = null; // clear target since we're wandering
             npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
             return;
@@ -277,9 +272,9 @@ function npc_central_controller(npc, time_change) {
         if (!reachable_target) {
             // None of the adjacent walkable tiles are reachable - try a random destination instead
             console.warn(`[NPC] Could not find reachable path to attraction at (${next_target_attr.col},${next_target_attr.row}). Attempting to wander instead.`);
-            const randomTarget = pick_random_path_destination(npc);
+            const next_target_to_walk_too = pick_random_path_destination(npc);
 
-            if (!randomTarget) {
+            if (!next_target_to_walk_too) {
                 npc.STATE_OF_NPC = STATE_OF_NPC.IDLE;
                 return;
             }
@@ -287,8 +282,8 @@ function npc_central_controller(npc, time_change) {
             const path = Pathfinding.run_full_Astar(
                 npc.vis_col,
                 npc.vis_row,
-                randomTarget.col,
-                randomTarget.row
+                next_target_to_walk_too.col,
+                next_target_to_walk_too.row
             );
 
             if (!path || path.length === 0) {
@@ -298,8 +293,8 @@ function npc_central_controller(npc, time_change) {
 
             npc.path = path;
             npc.pathIndex = 0;
-            npc.goalCol = randomTarget.col;
-            npc.goalRow = randomTarget.row;
+            npc.goalCol = next_target_to_walk_too.col;
+            npc.goalRow = next_target_to_walk_too.row;
             npc.targetId = null; // clear target since we're wandering
             npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
             return;
