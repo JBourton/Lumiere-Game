@@ -13,6 +13,7 @@ import { update_congestion_lvl, bootup_congestion_system } from "./logic/visitor
 import * as config from "./config.js"; // fixing circular dependencies
 import { cleanup_the_map } from "./logic/map.js";
 import { FoodCoverage } from "./logic/foodCoverage.js";
+import { pause_everything } from "./logic/pause.js";
 
 // these let the dev buttons in DOM 'see' the functions below
 window.Magic = Magic;
@@ -21,47 +22,7 @@ window.Visitors = Visitors;
 window.Frustration = Frustration;
 
 // Global pause flag for play/pause functionality
-window.gamePaused = false;
-// manual pause flag tracks whether the user (or code) explicitly requested pause
-window._manualPause = false;
 
-// basically whenever a modal (popup screen) is present, I want the game paused
-function check_if_any_modal_visible() {
-    try {
-        const modals = Array.from(document.querySelectorAll('.modal'));
-        return modals.some(m => {
-            const s = getComputedStyle(m);
-            return s.display !== 'none' && s.visibility !== 'hidden' && parseFloat(s.opacity || '1') > 0;
-        });
-    } catch (e) {
-        return false;
-    }
-}
-
-// a modular/api-inspired way of setting pause/play state
-function get_pause_state() {
-    const is_modal_visible = check_if_any_modal_visible();
-    const fresh_pause = !!(window._manualPause || is_modal_visible);
-    if (fresh_pause === window.gamePaused) return;  // if it's already paused, no need to do anything
-    window.gamePaused = fresh_pause;
-
-    // now I need to make sure both the ui and audio are updated to be aware of this
-    const btn = document.getElementById('pause-button');
-    if (btn) btn.textContent = window.gamePaused ? 'Resume' : 'Pause';
-    if (window.gamePaused) funky_background_audio.pauseMusic();
-    else funky_background_audio.resumeMusic();
-}
-
-function toggleManualPause() {
-    window._manualPause = !window._manualPause;
-    get_pause_state();
-    return window.gamePaused;
-}
-
-// now I can play/pause from any function, so its extended to be max lvl of modularlity
-window.toggleGamePaused = () => toggleManualPause();
-window.pauseGame = () => { window._manualPause = true; get_pause_state(); };
-window.resumeGame = () => { window._manualPause = false; get_pause_state(); };
 
 
 // this function resets everything back to how it was at game start
@@ -177,6 +138,9 @@ document.addEventListener("DOMContentLoaded", () => {
 const funky_background_audio = new AudioManager(); // turning on the tunes!
 
 funky_background_audio.toggleMute();  // [Dev note] Starting on muted because it's annoying when developing, but usually it'll start on unmuted for standard player
+
+// now play/pause system initialised w/ audio too
+pause_everything(funky_background_audio);
 
 // now for all the popups, though only intro modal shows for now (others are win/loss conditions)
 setupIntroModal(funky_background_audio);
@@ -322,22 +286,9 @@ if (btn_to_pause) {
     btn_to_pause.addEventListener("click", () => {
         // Toggle manual pause (this will preserve modal-driven pausing)
         const paused = window.toggleGamePaused();
-        btn_to_pause.textContent = paused ? "Resume" : "Pause";
+        btn_to_pause.textContent = paused ? "▶️" : "⏸️";
         // audio state handled by get_pause_state();
     });
 }
 
-// Watch for modal visibility changes and auto-pause/resume the game
-document.addEventListener('DOMContentLoaded', () => {
-    // run once on load to pick up any modal that might be visible
-    get_pause_state();
 
-    // Observe DOM changes (class/style changes or subtree mutations) and update pause state
-    try {
-        const observer = new MutationObserver(() => get_pause_state());
-        observer.observe(document.body, { attributes: true, childList: true, subtree: true, attributeFilter: ['style', 'class'] });
-    } catch (e) {
-        // fallback: simple interval checker if MutationObserver isn't available
-        setInterval(get_pause_state, 500);
-    }
-});
