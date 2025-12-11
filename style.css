@@ -106,16 +106,17 @@ body {
 #game-title {
     font-size: clamp(12px, 2.5vw, 24px);
     color: #f3e7b3;
-    margin: 12px 0;
+    margin: 5px 0;
 }
 
 
 
 /* Defining map, inc. cells in it and player sprite */
 #map-display {
+    /*border: 1px solid red;*/
     position: relative;
     margin-top: 12px;
-    padding: 13px;
+    padding: 15px 13px 13px 13px;
     border-radius: 10px;
     text-align: center;
     box-shadow: 0 6px 24px rgba(0,0,0,0.12);

@@ -60,13 +60,44 @@ function get_all_attractions_on_map() {
 }
 
 // Now I define a function that creates the npc
-export function spawn_new_visitor(vis_col, vis_row) {
+export function spawn_new_visitor() {
   // ensure visitor spawns on a valid path, not attraction/undefined square
   const curr_map = window.currentMap;
-  if (!curr_map || !curr_map[vis_row] || curr_map[vis_row][vis_col] !== 1) {
-    console.error(`[SPAWN MSG] an invaild spawn pos (${vis_col}, ${vis_row}) - curr tile val == ${curr_map?.[vis_row]?.[vis_col] ?? 'til_val_unknown'}, not 1 (which is path code).`); //because npcs can only spawn on paths, otherwise they're stuck
+  if (!curr_map) { // no map avaialbe to work with (should never be the case)
     return null;
   }
+
+  const height_of_map = curr_map.length;
+  const width_of_map = curr_map[0].length;
+  const all_valid_border_spawn_sqs = []; // i'm tracking each valid map square on the outskirts of the map
+
+  // compile the list of valid map squares for a visitor to enter the map on
+  for (let map_col = 0; map_col < width_of_map; map_col++) {// start w/ top & bottom rows
+    if (curr_map[0][map_col] === 1) {
+      all_valid_border_spawn_sqs.push({row:0,col:[map_col]});
+    }
+    if (curr_map[height_of_map -1][map_col] ===1) {
+      all_valid_border_spawn_sqs.push({ row: height_of_map -1, col: map_col});
+    }
+  }
+  for (let map_row =1; map_row< height_of_map; map_row++) { // now left & right cols w/out corners (to avoid duplicating above)
+    if (curr_map[map_row][0] ===1) {
+      all_valid_border_spawn_sqs.push({ row:map_row, col:0});
+    }
+    if (curr_map[map_row][width_of_map -1] ===1) {
+      all_valid_border_spawn_sqs.push({row:map_row, col:width_of_map-1});
+    }
+  }
+
+  // %%% now i have all of the valid spawn sqs, i pick a random one %%%
+
+  if (all_valid_border_spawn_sqs.length ===0) {
+    return null; // this'll only trigger if the map is setup wrong though; as I've set it up, this is never needed as there are plenty of valid spawn points
+  }
+
+  const the_random_spawn_point = all_valid_border_spawn_sqs[Math.floor(Math.random() * all_valid_border_spawn_sqs.length)];
+  const vis_row = the_random_spawn_point.row;
+  const vis_col = the_random_spawn_point.col;
 
   const npc = {
     id: crypto.randomUUID(), // set a random id
