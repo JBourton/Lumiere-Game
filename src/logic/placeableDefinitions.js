@@ -20,7 +20,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,  // Only items that the player is able to place will have this set to True; this evolves throughout the game as the player reaches higher magic lvls
         staff_cost: 1,
         capacity: 1,
-        visitTime: 7000,
+        visitTime: 10500,
         magicGain: 0.1,
     },
 
@@ -33,7 +33,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,
         staff_cost: 2,
         capacity: 2,
-        visitTime: 10000,
+        visitTime: 15000,
         magicGain: 0.3,
     },
 
@@ -46,7 +46,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,
         staff_cost: 3,
         capacity: 4,
-        visitTime: 13000,
+        visitTime: 19500,
         magicGain: 0.4,
     },
 
@@ -59,7 +59,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,
         staff_cost: 5,
         capacity: 5,
-        visitTime: 15000,
+        visitTime: 22500,
         magicGain: 0.5
     },
 
@@ -72,7 +72,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,
         staff_cost: 8,
         capacity: 6,
-        visitTime: 18000,
+        visitTime: 27000,
         magicGain: 0.7
     },
 
@@ -87,7 +87,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,
         staff_cost: 3,
         capacity: 10,
-        visitTime: 20000,
+        visitTime: 30000,
         magicGain: 0.1,
     },
 
@@ -100,7 +100,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,
         staff_cost: 6,
         capacity: 15,
-        visitTime: 25000,
+        visitTime: 37500,
         magicGain: 0.15
     },
 
@@ -113,7 +113,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,
         staff_cost: 8,
         capacity: 20,
-        visitTime: 30000,
+        visitTime: 45000,
         magicGain: 0.2
     },
 

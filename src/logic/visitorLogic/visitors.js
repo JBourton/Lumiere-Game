@@ -6,12 +6,10 @@ import * as Resources from '../resources.js'      // I need this as visistors in
 import * as Pathfinding from './pathfinding.js'    // this is linking the npc with its movement logic
 //import { get_all_attractions_on_map } from '../map.js'  // [TO BE IMPLEMENTED]
 import { reset_heatmap_counts, register_visitor_on_heatmap, update_heatmap_visual } from '../../components/heatmap.js';
+import { VISTOR_MOVE_SPEED } from '../../config.js';
 
 // Here I'm taking a layered strucured by treating the npc logic as 3 seperate layered: funadmental design, current STATE_OF_NPC and attraction selection logic
 // I can then make the architecture nicely decoupled from the main game logic
-
-// First the metadata: how fast visitor can go around durham
-let VISTOR_MOVE_SPEED = 1000; // (ms)
 
 
 // Second, I define the actual data structure for the npcs_on_map

@@ -1,5 +1,6 @@
 import { renderMap } from "./map.js";
 import { draw_visitor_sprites_onto_map } from "../components/renderVisitors.js";
+import { PLAYER_MOVE_SPEED } from "../config.js";
 
 
 // Handles the player logic – just keeping it all together here compartmentalised away from rest of the repo
@@ -12,7 +13,7 @@ export class Player {
         this.attractions_placed_on_map = attractions_placed_on_map; // and this too so that the player can actually place attractions down (whole point of game)
         // [Dev note] change this to a MUCH lower value (like, 30ms) if you want the player to zoom around and quickly reach areas
         this.canMove = true;  // this is a shackle on the user's movements (so they don't go too fast around durham)
-        this.moveDelay = 150; // and this is the movement delay in ms (when it expires, it unlocks above)
+        this.moveDelay = PLAYER_MOVE_SPEED; // and this is the movement delay in ms (when it expires, it unlocks above)
     }
 
     move(change_in_row, change_in_col) {
