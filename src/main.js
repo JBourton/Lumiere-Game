@@ -186,6 +186,7 @@ let time_since_last_npc_spawn = 0;
 let time_since_last_congestion_update = 0;
 let time_since_last_magic_decrease_from_congestion = 0;
 let time_since_last_visitor_redraw = 0;
+let time_since_last_food_penalty = 0;
 
 function lumiere_gameplay_loop(game_timing_data) {
     const change_in_time = game_timing_data - curr_time_frame; // need to track the timing as game goes along
@@ -207,7 +208,7 @@ function lumiere_gameplay_loop(game_timing_data) {
 
     // now comes the penalty for having a high level of congestion (and thus visitor frustration)
     time_since_last_magic_decrease_from_congestion += change_in_time;
-    if (time_since_last_magic_decrease_from_congestion >= config.MAGIC_DEC_INTERVAL) {
+    if (time_since_last_magic_decrease_from_congestion >= config.MAGIC_DEC_INTERVAL_CONGESTION) {
         const frust_tier = Frustration.map_frust_tier() - 1;
         let magic_loss = config.MAGIC_DECREASE_W_FRUSTR_RATE * frust_tier;
         Magic.decrease(magic_loss);
@@ -216,6 +217,13 @@ function lumiere_gameplay_loop(game_timing_data) {
 
     // Now NPC behaviour like movement, selecting a fun attraction to go visit + actually visiting happens
     update_npc_system(change_in_time)
+
+    // now check if any npcs are visiting a attractions without food coverage, and penalise magic if so
+    time_since_last_food_penalty += change_in_time;
+    if (time_since_last_food_penalty >= config.FOOD_PENALTY_INTERVAL) { // i'm applying penalty once per second
+        FoodCoverage.calculate_magic_loss_from_lack_of_foodstalls(getnpcs_on_map());
+        time_since_last_food_penalty = 0;
+    }
 
     // now re-render the map iff the player actually moved
     if (player.row !== last_player_row || player.col !== last_player_col) {

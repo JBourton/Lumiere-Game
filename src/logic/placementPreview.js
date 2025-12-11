@@ -4,7 +4,7 @@
 import { renderMap } from "./map.js";
 import { Staff } from "./resources.js";  // so that staff cnt can be decremented
 import { draw_visitor_sprites_onto_map } from "../components/renderVisitors.js";  // I'm separating vistor gameplay (above) from visitor asthetics
-import * as FoodCoverage from "./foodCoverage.js";
+import { FoodCoverage } from "./foodCoverage.js";
 import { ATTRACTION_TYPES } from "./placeableDefinitions.js";
 
 let preview_el_in_doc = null;
@@ -249,12 +249,20 @@ function place_item_on_map(x, y, item) {
             effect_h: item.effect_h
         });
     }
+    // now update logic (above was just visual)
+    FoodCoverage.update_mask_of_fstall_coverage(window.foodStallAnchors,window.currentMap);
 
-    Staff.remove(item.staff_cost);
+    // Decrement staff - add defensive check to ensure staff_cost exists
+    if (item.staff_cost !== undefined && item.staff_cost !== null) {
+        Staff.remove(item.staff_cost);
+        console.debug("[PLACEMENT] Staff decremented by", item.staff_cost, "Current staff:", Staff.get());
+    } else {
+        console.warn("[PLACEMENT] Item missing staff_cost property:", item.id, item);
+    }
 
     turn_off_the_placement_preview();  // get rid of the placement preview once the item's been placed
 
-    // Re-render map so the overlay loads
+    // Re-render map immediately so overlay shows right away
     renderMap(
         window.currentMap,
         window.currentStatics,
@@ -263,6 +271,9 @@ function place_item_on_map(x, y, item) {
         window.playerInstance.col
     );
 
+    // Draw all the layers on top
+    draw_visitor_sprites_onto_map();
+    
     // now render the coverage area for each food stall
     if (window.foodStallAnchors?.length) {
         FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
@@ -270,7 +281,6 @@ function place_item_on_map(x, y, item) {
 
     // Rebuild preview after map refresh (map.js also calls this, but this is safe)
     if (window.__rebuildPreviewEl) window.__rebuildPreviewEl();
-    draw_visitor_sprites_onto_map();
 }
 
 
