@@ -108,3 +108,4 @@ function compute_aabb_visitor_collisions(npcs_grouped_per_cell, hmap) {
     console.log(`Global total congestion increase: ${global_total_congestion}`);
     return global_total_congestion;
 }
+

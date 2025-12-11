@@ -213,8 +213,9 @@ function lumiere_gameplay_loop(game_timing_data) {
     }
 
     // now visitors will spawn, for now on a timer and later in line w/ gameplay rules
+    const dynamic_visitor_spawn_time = config.get_spawn_interval_from_frustration();
     time_since_last_npc_spawn += change_in_time; // using this as a clean way to check how long it's been since npc spawn
-    if (time_since_last_npc_spawn >= config.SPAWN_INTERVAL && getnpcs_on_map().length < config.VISITOR_CAP) {  // time to spawn npc!
+    if (time_since_last_npc_spawn >= dynamic_visitor_spawn_time && dynamic_visitor_spawn_time !== Infinity && getnpcs_on_map().length < config.VISITOR_CAP) {  // time to spawn npc!
         spawn_new_visitor(14, 10) // [DEV NOTE]: Spawn on a valid path tile (value 1). Row 10, col 14 is a path
         time_since_last_npc_spawn = 0;  
     }
