@@ -2,8 +2,10 @@
 window.gamePaused = false;
 // manual pause flag tracks whether it was player who wanted pause, not function
 window._manualPause = false;
+// and also, this is making sure the user actually sticks to the tutorial
+window._tutorialForcedPause = false;
 
-let funky_background_audio = null;
+let funky_background_audio = null; // [DEV NOTE]: actually sounds a bit jarring pausing the music too, so maybe I should remove that?
 
 // basically whenever a modal (popup screen) is present, I want the game paused
 function check_if_any_modal_visible() {
@@ -23,7 +25,7 @@ function check_if_any_modal_visible() {
 // a modular/api-inspired way of setting pause/play state
 function get_pause_state() {
 	const is_modal_visible = check_if_any_modal_visible();
-	const fresh_pause = !!(window._manualPause || is_modal_visible);
+	const fresh_pause = !!(window._manualPause || is_modal_visible  || window._tutorialForcedPause);
 	if (fresh_pause === window.gamePaused) return;  // if it's already paused, no need to do anything
 	window.gamePaused = fresh_pause;
 
@@ -44,6 +46,7 @@ function toggle_the_pause_button() {
 window.toggleGamePaused = () => toggle_the_pause_button();
 window.pauseGame = () => { window._manualPause = true; get_pause_state(); };
 window.resumeGame = () => { window._manualPause = false; get_pause_state(); };
+window.refreshPauseState = () => get_pause_state();
 
 export function pause_everything(audioManager) {
 	funky_background_audio = audioManager;

@@ -16,6 +16,7 @@ import { FoodCoverage } from "./logic/foodCoverage.js";
 import { pause_everything } from "./logic/pause.js";
 import { check_unlocks, reset_unlocks } from "./logic/unlock.js";
 import { reset_game_impl } from "./restart.js";
+import { kickoff_tutorial } from "./components/tutorial.js";
 
 // these let the dev buttons in DOM 'see' the functions below
 window.Magic = Magic;
@@ -126,6 +127,7 @@ setupTutorialYesOrNoModal();
 setupGameOverModal(reset_the_game);  // enabling the game over modal w/ restart logic
 setupGameWonModal(reset_the_game); // & game won
 setupUnlockPopup(); // + also show one each time player unlocks an item
+kickoff_tutorial();
 
 const muteBtn = document.getElementById("mute-button"); // this event lisnter tracks the mute/unmute button on the top left
 muteBtn.textContent = "🔇"; // [Dev note 2] also comment out this line to start on the unmuted emoji

@@ -142,6 +142,9 @@ export function setupTutorialYesOrNoModal() {
         // Both buttons simply close the modal for now
         start_tutorial_btn.addEventListener("click", () => {
             start_tutorial_question.style.display = "none";
+            if (typeof window.startTutorial === 'function') {
+                window.startTutorial(); // tutorial time!
+            }
         });
 
         skip_tutorial_btn.addEventListener("click", () => {
@@ -157,6 +160,7 @@ export function setupTutorialYesOrNoModal() {
     });
 }
 
+// same logic as above, just for showing the "start tutorial" popup, which'll kickoff tooltips if requested so by player
 export function show_the_tutorial_question_popup() {
     const the_tutorial_popup = document.getElementById("tutorialChoiceModal");
     if (!the_tutorial_popup) return;

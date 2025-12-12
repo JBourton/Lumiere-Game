@@ -16,8 +16,7 @@ export function initPlacementPreview() {
     main_map = document.getElementById("grid");
 
     if (!main_map) {
-        console.error("Grid element (#grid) not found");
-        return;
+        return; // because no map present, so game broken (should never occur though)
     }
 
     // this is the function responsible for creating the actual preview element part
@@ -26,7 +25,6 @@ export function initPlacementPreview() {
     // now this event listener is possible, that picks up on the mouse moving round the grid squares
     main_map.addEventListener("mousemove", handleMouseMove);
     main_map.addEventListener("click", try_to_place_an_item);
-    console.debug("[PLACEMENT] initPlacementPreview: listeners attached");
 }
 
 function setup_preview_elem() {  // this helper facillitates re-rending of the map to allow for overlay of attraction imgs with each map refresh
@@ -70,13 +68,10 @@ function checkIsAdjacentToPlayer(item_pos_on_x, item_pos_on_y) {
 
 
 // called whenever the user selects an item from the sidebar
-export function setPlacementItem(item) {
+export function set_placement_item(item) {
     curr_item_of_interest = item;
-    console.debug("[PLACEMENT] setPlacementItem: item set", item, "previewElExists=", !!preview_el_in_doc);
-    console.log("[PLACEMENT] setPlacementItem: item set", item);
     // Ensure the preview element exists (in case init wasn't run or was torn down)
     if (!preview_el_in_doc) {
-        console.log("[PLACEMENT] preview element missing - creating now");
         setup_preview_elem();
     }
     update_the_preview_dims();

@@ -1,5 +1,5 @@
 // This file is responsible for the coding of the sidebar, including the button switching and the drag-drop behaviour
-import { setPlacementItem } from "../logic/placementPreview.js";  // this is needed for setting up the interaction w/ the sidebar and the placement preview
+import { set_placement_item } from "../logic/placementPreview.js";  // this is needed for setting up the interaction w/ the sidebar and the placement preview
 import { ATTRACTION_TYPES, ALL_ATTRACTIONS_PLACEABLE_ON_MAP } from "../logic/placeableDefinitions.js";
 import { Staff } from "../logic/resources.js";  // have to know about current staff available so whether or not it can be afforded can be displayed in the sidebar w/ colour red
 
@@ -95,9 +95,7 @@ export function setupSidebar() {
 
                 // lookup attraction id in dict (check placeableDefinitions for more details of this though)
                 const item = ALL_ATTRACTIONS_PLACEABLE_ON_MAP[selectedId];
-                console.log("[DEBUG] Item Selected:", selectedId);
-
-                setPlacementItem(item);
+                set_placement_item(item);
             });
         });
     }
