@@ -2,6 +2,7 @@
 // relevant game elements in the tutorial will be highlighted red for each tutorial popup
 
 // I coded this to be modularised and only interact w/ DOM using standard selectors
+import { turn_off_the_placement_preview } from "../logic/placementPreview.js";
 let is_tutorial_active = false;
 let curr_step_idx = -1;
 let the_tooltip_el = null;
@@ -10,6 +11,7 @@ let activated_cleanup_click = null;
 let tutorial_overlay_el = null;
 let tutorial_final_overlay_el = null;
 let final_tooltip_click = null;
+let _restore_lights_after_next = false;
 
 
 // first, a quick check to make sure there is actually a tooltip present
@@ -46,18 +48,33 @@ function clearup_highlight_area() {
                 el_highlighted_on_DOM.style.zIndex = el_highlighted_on_DOM.dataset._tutorial_origZ || '';
                 delete el_highlighted_on_DOM.dataset._tutorial_origZ;
             }
-        } catch (e) { /* ignore restore errors */ }
+        } catch (issue_w_fetching_dom_item) {
+            // prevent a crash just incase
+        }
         el_highlighted_on_DOM = null;
     }
 
     // remove overlay that blocked interactions
     if (tutorial_overlay_el) {
-        try { document.body.removeChild(tutorial_overlay_el); } catch (e) { /* ignore */ }
+        try { delete tutorial_overlay_el.dataset.allowAnyClick; 
+
+        } catch (issue_w_clicking_on_overlay) {
+            // just being safe again
+        }
+        try { document.body.removeChild(tutorial_overlay_el); 
+
+        } catch (issue_removing__standard_tutorial_tt) {
+            // same here too
+        }
         tutorial_overlay_el = null;
     }
     // remove final overlay if present
     if (tutorial_final_overlay_el) {
-        try { document.body.removeChild(tutorial_final_overlay_el); } catch (e) { /* ignore */ }
+        try { document.body.removeChild(tutorial_final_overlay_el); 
+
+        } catch (issue_removing_final_tutorial_tt) {
+            //and here
+        }
         tutorial_final_overlay_el = null;
     }
 }
@@ -157,12 +174,7 @@ function place_tooltip_near_target(item_highlit_red, my_preffered_side = 'right'
 
 // self explanatory, this one's findings matching DOM element for a given css selector as param input
 function find_matching_dom_elem(selecting_val) {
-    try { 
-        return document.querySelector(selecting_val); 
-    }//find matching dom el.
-    catch { 
-        return null; 
-    } // safe catch
+    return document.querySelector(selecting_val); // pull elem from dom w/ param value
 }
 
 
@@ -214,9 +226,9 @@ function connect_tutorial_item_w_advance(tut_item, advancing) {
         }, 0);
     };
 
-    // not put that event listner on the red-highlit tutorial item
-    tut_item.addEventListener('click', handler_for_tut, { capture: true });
-    return () => tut_item.removeEventListener('click', handler_for_tut, { capture: true });
+    // now put that event listner on the red-highlit tutorial item
+    tut_item.addEventListener('click', handler_for_tut, { capture: false });
+    return () => tut_item.removeEventListener('click', handler_for_tut, { capture: false });
 }
 
 
@@ -239,9 +251,10 @@ const TUTORIAL_STEPS = [
         side: "right"
     },
     {
-        text: "Stages have a much bigger visitor capacity. They do still up the city's magic level, but at a slower rate than lights. Use these when crowd capacity is getting a bit too big to handle with just lights.",
-        selector: "#tab-stages",
-        side: "right"
+        text: "Stages have a much bigger visitor capacity. They do still increase the city's magic level, but at a slower rate than lights. Use these when crowd capacity is getting a bit too big to handle with just lights.",
+        selector: ".item-row[data-item-id=\"balloon_stage\"]",
+        side: "right",
+        clickAnywhere: true
     },
     {
         text: "Now Food Stalls. Click the Food Stalls tab.",
@@ -249,7 +262,12 @@ const TUTORIAL_STEPS = [
         side: "right"
     },
     {
-        text: "This is the map grid. You’ll move around and place things on tiles. Click the grid.",
+        text: "Food stalls are 🔑; they don't generate any magic, but without them, your visitors will be HUNGRY and magic will drain from the city quicker than it's gained from visiting lights and stages! 😨 Make sure food stalls are always placed near any attractions being visited to feed Durham's greedy visitors!",
+        selector: ".item-row[data-item-id=\"popcorn_stand\"]",
+        side: "right",
+    },
+    {
+        text: "This... this is Durham. Your home. And also your hell for the duration of the festival. You'll be placing all those lights, stages and food stalls on it. Click on it.",
         selector: "#grid",
         side: "left"
     },
@@ -259,7 +277,7 @@ const TUTORIAL_STEPS = [
         side: "bottom"
     },
     {
-        text: "This is pause. Handy if things get hectic. Click it to finish the tutorial.",
+        text: "This is pause. Handy if things get hectic (which they will). Click it to wrap up your extensive intern education.",
         selector: "#pause-button",
         side: "bottom"
     }
@@ -276,6 +294,19 @@ function show_step(step_idx) {
     // get rid of red border around last tutorial item
     clearup_highlight_area();
 
+    // restoring back to default state after tutorial messes around w/ it
+    if (_restore_lights_after_next && next_tut_step && next_tut_step.selector === '#toggle-heatmap-button') {
+        setTimeout(() => {
+            const grab_lights_tab = document.querySelector('#tab-lights');
+            if (grab_lights_tab) {
+                grab_lights_tab.click();
+            }
+            // also clear any currently selected sidebar placement item
+            turn_off_the_placement_preview();
+        _restore_lights_after_next = false;
+        }, 0);
+    }
+
     // highlight part I'm teaching the player about
     const tut_elem_to_highlight = find_matching_dom_elem(next_tut_step.selector);
     if (!tut_elem_to_highlight) {// if missing from dom, just skip on instead of breaking/ending tutorial
@@ -288,21 +319,30 @@ function show_step(step_idx) {
     if (!tutorial_overlay_el) {
         tutorial_overlay_el = document.createElement('div');
         tutorial_overlay_el.className = 'tutorial-overlay';
-        // prevent clicks on overlay from reaching the page
-        tutorial_overlay_el.addEventListener('click', (e) => { e.stopPropagation(); }, true);
+        // I had a bug where non-clickable rows preventing tutorial from progressing, so I've allowed clicking anywhere for these instances to progress it
+        const permit_clicking_anywhere = (click_inst) => {
+            try {
+                if (tutorial_overlay_el && tutorial_overlay_el.dataset && tutorial_overlay_el.dataset.allowAnyClick === 'true') {
+                    return; // allow click to proceed to bubble listeners
+                }
+            } catch (issue_w_click_anywehre) {
+                //just prevent crash, nothing more
+            }
+            click_inst.stopPropagation();
+        };
+        tutorial_overlay_el.addEventListener('click', permit_clicking_anywhere, true);
         document.body.appendChild(tutorial_overlay_el);
     }
 
-    // raise the highlighted element above the overlay so it is the only interactable element
     // store original inline styles to restore later
     if (el_highlighted_on_DOM) {
-        el_highlighted_on_DOM.dataset._tutorial_origPosition = el_highlighted_on_DOM.style.position || '';
+        el_highlighted_on_DOM.dataset._tutorial_origPosition = el_highlighted_on_DOM.style.position || '';  // highlight elem gets put above overlay so only its interactable
         el_highlighted_on_DOM.dataset._tutorial_origZ = el_highlighted_on_DOM.style.zIndex || '';
-        const _computed = window.getComputedStyle(el_highlighted_on_DOM);
-        if (_computed.position === 'static') {
+        const the_els_style = window.getComputedStyle(el_highlighted_on_DOM);
+        if (the_els_style.position === 'static') {
             el_highlighted_on_DOM.style.position = 'relative';
         }
-        el_highlighted_on_DOM.style.zIndex = 10001;
+        el_highlighted_on_DOM.style.zIndex = 10001; // has to be above other els on page to be interactable
     }
 
     // now grab the tooltip to go alongside it, & put the info text inside it
@@ -311,10 +351,33 @@ function show_step(step_idx) {
     place_tooltip_near_target(tut_elem_to_highlight, next_tut_step.side || 'right');
 
     // when the relevant tutorial item clicked, move onto next one
-    activated_cleanup_click = connect_tutorial_item_w_advance(tut_elem_to_highlight, () => {
-        curr_step_idx += 1;
-        show_step(curr_step_idx);
-    });
+    if (next_tut_step && next_tut_step.clickAnywhere) {
+        const move_to_next_tut_tt = () => {
+            curr_step_idx += 1;
+            show_step(curr_step_idx);
+        };
+
+        // prefer attaching to the tutorial overlay so clicks anywhere outside the highlighted element advance
+        if (tutorial_overlay_el) {
+            // temporarily allow the overlay to pass clicks through to bubble listeners
+            tutorial_overlay_el.dataset.allowAnyClick = 'true';
+            const overlayHandler = () => move_to_next_tut_tt();
+            tutorial_overlay_el.addEventListener('click', overlayHandler, false);
+            activated_cleanup_click = () => {
+                tutorial_overlay_el.removeEventListener('click', overlayHandler, false);
+                tutorial_overlay_el.dataset.allowAnyClick = 'false';
+            }
+        } 
+    } else {
+        activated_cleanup_click = connect_tutorial_item_w_advance(tut_elem_to_highlight, () => {
+            curr_step_idx += 1;
+            show_step(curr_step_idx);
+            // restore what tutorial messes w/ again
+            if (next_tut_step && next_tut_step.selector === '#tab-food') {
+                _restore_lights_after_next = true;
+            }
+        });
+    }
 }
 
 
@@ -345,13 +408,14 @@ function terminate_the_tutorial() {
     // reset global logic trackers
     is_tutorial_active = false;
     curr_step_idx = -1;
+    _restore_lights_after_next = false;
 
     // ...get rid of all the tutorial styling
     clearup_highlight_area();
     dissapear_tooltip();
     // now remove the restriction i put on making tooltips unclickable, as just on this one the player can click anywhere to end tutorial
     if (final_tooltip_click && the_tooltip_el) {
-        try { the_tooltip_el.removeEventListener('click', final_tooltip_click); } catch (e) { /* ignore */ }
+        the_tooltip_el.removeEventListener('click', final_tooltip_click);
         final_tooltip_click = null;
     }
     

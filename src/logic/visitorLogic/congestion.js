@@ -1,5 +1,6 @@
 import { SCALE_DOWN, HMAP_ROWS, HMAP_COLS, get_hmap_grid_for_congestion } from "../../components/heatmap.js";
 import { Frustration } from "../resources.js";  // more congestion == more frustration (Lumiere's too busy, not enough attractions!)
+import { STATE_OF_NPC } from "./visitors.js";
 
 const COLLISION_WEIGHT = 7; // [DEV NOTE]: Tuneable hyperparam for making frustration lvl more sensitive (also have one in resources.js but better to use this to compartmentalise logic)
 
@@ -34,6 +35,8 @@ function npcs_in_hmap_cell(npc_positions) {
 
     // looking individually at each npc to identify instances of collisions in its proximity
     npc_positions.forEach(npcs_pos => {
+        // don't count visitors who are actively VISITING an attraction (don't think that's fair for gameplay)
+        if (npcs_pos && npcs_pos.STATE_OF_NPC === STATE_OF_NPC.VISITING) return;
         // to seperate workload, i'm mirroring the heatmap system to place npcs in their hmap 'bucket'
         const group_hmap_x = Math.floor(npcs_pos.vis_col / SCALE_DOWN);
         const group_hmap_y = Math.floor(npcs_pos.vis_row / SCALE_DOWN);
