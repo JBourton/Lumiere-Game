@@ -26,14 +26,26 @@ function check_if_any_modal_visible() {
 function get_pause_state() {
 	const is_modal_visible = check_if_any_modal_visible();
 	const fresh_pause = !!(window._manualPause || is_modal_visible  || window._tutorialForcedPause);
-	if (fresh_pause === window.gamePaused) return;  // if it's already paused, no need to do anything
+	// If pause state didn't change, still ensure audio reflects the manual pause toggle
+	if (fresh_pause === window.gamePaused) {
+		// now ensure audio follows the manual pause flag ONLY (do not auto-pause when modals appear)
+		if (funky_background_audio) {
+			if (window._manualPause) funky_background_audio.pauseMusic();
+			else funky_background_audio.resumeMusic();
+		}
+		return;  // if it's already paused, no further UI changes needed
+	}
 	window.gamePaused = fresh_pause;
 
-	// now I need to make sure both the ui and audio are updated to be aware of this
+	// now I need to make sure the ui is updated to be aware of this
 	const btn = document.getElementById('pause-button');
 	if (btn) btn.textContent = window.gamePaused ? '▶️' : '⏸️';
-	if (window.gamePaused) funky_background_audio?.pauseMusic();
-	else funky_background_audio?.resumeMusic();
+
+	// i changed my mind about pausing audio when popups appear, so now it only looks at pause flag logic, nothing more
+	if (funky_background_audio) {
+		if (window._manualPause) funky_background_audio.pauseMusic();
+		else funky_background_audio.resumeMusic();
+	}
 }
 
 function toggle_the_pause_button() {
