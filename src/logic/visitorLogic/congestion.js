@@ -112,3 +112,35 @@ function compute_aabb_visitor_collisions(npcs_grouped_per_cell, hmap) {
     return global_total_congestion;
 }
 
+
+// I wrote this only after my congestion system was fully implemented, in order to introduce a little bias for movement to get visitors off tiles that are locally quite congested
+// it's inspired by the moore-reduction technique, as I thought that was simplest & most appropriate for the task
+export function repel_from_busy_areas(curr_map_col, curr_map_row) {
+    const the_map = get_hmap_grid_for_congestion();
+    const hmap_col = Math.floor(curr_map_col / SCALE_DOWN);
+    const hmap_row = Math.floor(curr_map_row / SCALE_DOWN);
+
+    // this peice of logic looks at the closeby neighbors
+    let bias_on_x = 0, bias_on_y = 0;
+    // these are all the tiles immediantly around the visitor
+    const closeby_neighbors = [{change_col:-1, change_row:0}, {change_col:1,change_row:0}, {change_col:0,change_row:-1}, {change_col:0,change_row:1}];
+    for (const each_neighbor of closeby_neighbors) { // check all tiles around to find best option to hop too
+        const nearest_on_col = hmap_col + each_neighbor.change_col;
+        const nearest_on_row = hmap_row + each_neighbor.change_row;
+
+        const val = the_map[nearest_on_row]?.[nearest_on_col];
+        if (typeof val_to_steer_by === 'number' && val > 0) {
+            // i found that the resolution has to be scaled and capped so as not to impact the game mechanics disproproationalty
+            const capped = Math.min(val_to_steer_by, 4);
+            const bias_wieght = 0.5;  // this can be changed to impact how significant the avoidance of busy areas is
+            const little_bias = capped * bias_wieght;
+
+            bias_on_x -= each_neighbor.change_col * little_bias;
+            bias_on_y -= each_neighbor.change_row * little_bias;
+        }
+    }
+
+    // now this little bias discourages (but not blocks) a visitor from going onto a hmap cell w/ high congestion
+    return { bias_on_x, bias_on_y };
+
+}

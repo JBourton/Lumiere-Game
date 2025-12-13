@@ -7,6 +7,7 @@ import * as Pathfinding from './pathfinding.js'    // this is linking the npc wi
 //import { get_all_attractions_on_map } from '../map.js'  // [TO BE IMPLEMENTED]
 import { reset_heatmap_counts, register_visitor_on_heatmap, update_heatmap_visual } from '../../components/heatmap.js';
 import { VISTOR_MOVE_SPEED } from '../../config.js';
+import { repel_from_busy_areas } from './congestion.js'; // for that bit of congestion bias to stop visitors clumping together in same cell en-route to attractions
 
 // Here I'm taking a layered strucured by treating the npc logic as 3 seperate layered: funadmental design, current STATE_OF_NPC and attraction selection logic
 // I can then make the architecture nicely decoupled from the main game logic
@@ -74,7 +75,7 @@ export function spawn_new_visitor() {
   // compile the list of valid map squares for a visitor to enter the map on
   for (let map_col = 0; map_col < width_of_map; map_col++) {// start w/ top & bottom rows
     if (curr_map[0][map_col] === 1) {
-      all_valid_border_spawn_sqs.push({row:0,col:[map_col]});
+      all_valid_border_spawn_sqs.push({row:0,col:map_col});
     }
     if (curr_map[height_of_map -1][map_col] ===1) {
       all_valid_border_spawn_sqs.push({ row: height_of_map -1, col: map_col});
@@ -361,9 +362,43 @@ function npc_central_controller(npc, time_change) {
       if (npc.visitor_move_cooldown > 0) break; // it's not their time to move yet!
 
       // otherwise, keep on moving this round
-      const next = npc.path[npc.pathIndex]
-      npc.vis_col = next.col
-      npc.vis_row = next.row
+      // I determine default next step from the visitors current path
+      let npcs_next_path = npc.path[npc.pathIndex];
+
+      // firstly, i try to repel visitors if they're congested in the same space
+      const { bias_on_x, bias_on_y } = repel_from_busy_areas(npc.vis_col, npc.vis_row);
+
+      // but i only apply steering if theres actually meaningful congestion; otherwise no point
+      if (bias_on_x !== 0 || bias_on_y !== 0) {
+          // so looking at immediate path + 1 step ahead
+          const valid_next_step_list = [npcs_next_path];
+          if (npc.path[npc.pathIndex + 1]) {
+              valid_next_step_list.push(npc.path[npc.pathIndex + 1]);
+          }
+
+          // now I'm picking the next valid step alining w/ my seperation bias function (see congestion.js for it)
+          let the_best_path = npcs_next_path;
+          let best_score = -Infinity;
+
+          for (const candidate of valid_next_step_list) {
+              const change_over_x = candidate.col - npc.vis_col;
+              const change_over_y = candidate.row - npc.vis_row;
+
+              // i construct a metric to pick the best path based on offset from busy areas
+              const appropriateness_of_directional_shift = change_over_x * bias_on_x + change_over_y * bias_on_y;
+
+              // see if this iteration is actually a better path
+              if (appropriateness_of_directional_shift > best_score) {
+                  best_score = appropriateness_of_directional_shift;
+                  the_best_path = candidate;
+              }
+          }
+
+          npcs_next_path = the_best_path;
+      }
+
+      npc.vis_col = npcs_next_path.col
+      npc.vis_row = npcs_next_path.row
       npc.pathIndex++
       npc.visitor_move_cooldown = VISTOR_MOVE_SPEED  // this is the inverval they wait per move
       break
