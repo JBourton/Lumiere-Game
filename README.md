@@ -49,7 +49,6 @@ Behind the scenes the map is a clean grid system, manually designed to (vaguely)
 
 So my game is both manageable for development and easily adaptable to a wide player-base, the design was intentionally modular. UX and accessibility features were kept seperate from the logical gameplay layers in the following way:
 
-```
 ### src/logic
 
 This directory contains all my core simulation systems and gameplay logic and is designed to support future extensibility.
@@ -80,8 +79,6 @@ This directory contains the js systems responsible for visualisation, feedback &
 - **renderVisitors.js** – Draws visitor sprites onto the map independently of NPC behaviour logic.  
 - **audio.js** – Manages background audio and sound effects with explicit user-controlled toggles.  
 - **colourblindMode.js** – Provides an optional colour-blind-friendly visual mode limited strictly to UI styling and colour palettes (this one's ai-generated).
-```
-
 
 ---
 
