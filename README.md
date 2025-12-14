@@ -7,7 +7,7 @@ The premise is simple:
 Build the festival. Keep visitors happy, create a "magic" atmosphere. Avoid turning the streets of Durham into absolute carnage. Easy right? Well...😅
 
 The reality is *slightly* less simple:  
-As you decorate Durham, more visitors come to the city to see what the fuss is all about. More visitors means busier streets, which can get preeettyy frustrating for those already at the festival and cause the city's "magic" level to decrease. What's more, you'll be managing staff to run your attractions, so you'll need to strike the right balance in what you place down to ensure Lumiere's visitors are both well-fed and well-entertained!
+As you decorate Durham, more visitors come to the city to see what the fuss is all about. More visitors means busier streets, which can get preeettyy frustrating for those already at the festival and cause the city's "magic" level to decrease. What's more, you'll be managing staff to run your attractions, so you'll need to strike the right balance in your chosen attraction placements to ensure Lumiere's visitors are both well-fed AND well-entertained!
 
 Your job is to balance it all without letting the whole event collapse like an overworked student in summative season. Good work experience for an intern eh!?
 
@@ -134,3 +134,5 @@ I used OpenAI's GPT 5.1 Codex (Preview) model inside CoPilot VS Code extension t
 
 Specifically, the prompt used was:
 *"I want a new file in src/components that activates a "colour blind mode". Help me to try this out. The only change that should happen is that there's a button positioned to the right of the current row of control buttons in index.html that says "Colourblind mode: " with on/off symbols. When the user clicks it, it should modify the game's styles to be suitable to colourblind people, including highlighting the paths in a colour-blind-accessible style. I want this to be as minimal on the rest of the codebase as possible, but should still be added to necessary files like game restart and other appropriate areas of the codebase, with minimal modifications to those files other than to prevent bugs. You'll need to scan the whole repo to see where the other buttons are incoporated and use them in a similar context. Use your knowledge of colourblind colours to do this, putting almost all of the logic (as much as possible) in a new file called colourblind.js in src/components. Credit yourslef (inc. model name) in every part where you apply changes.*
+
+Additionally, all the images in the game were custom-generated using Chat GPT 5.1, including the path, pavement and grass images.

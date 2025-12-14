@@ -43,7 +43,7 @@ export function draw_visitor_sprites_onto_map() {
         new_sprite_rep.src = npc.sprite;  // w/ random img from above
         new_sprite_rep.classList.add("npc-sprite");  // now adding to the list of overall npcs
 
-        new_sprite_rep.style.position = "absolute";
+        new_sprite_rep.style.position = "absolute"; // i put core css here so it can be easily modified without having to jump into the css file
         new_sprite_rep.style.left = `calc(${npc.vis_col} * var(--cell-size))`;
         new_sprite_rep.style.top  = `calc(${npc.vis_row} * var(--cell-size))`;
         new_sprite_rep.style.width = `var(--cell-size)`;

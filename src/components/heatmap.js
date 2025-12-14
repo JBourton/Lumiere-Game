@@ -100,12 +100,12 @@ export function register_visitor_on_heatmap(npcs_map_col, npcs_map_row) {
 
 // setup the brown-red scaling
 function map_counts_to_tiers(all_map_vals) {
-    // Here I'm encoding both the original brown checkerboard for empty tiles & 5 congestion tiers for tiles with at least 1 npc
+    // here I'm encoding both the original brown checkerboard for empty tiles & 5 congestion tiers for tiles with at least 1 npc
     return all_map_vals.map((hmap_row, ro) =>
         hmap_row.map((num_of_npcs, col_hmap) => {
             if (num_of_npcs === 0) {
                 // no visitors here – keep the original checkerboard pattern
-                return (ro + col_hmap) % 2; // 0 or 1
+                return (ro + col_hmap) % 2; // i.e. a 0 or 1
             }
             if (num_of_npcs <= 1) return 2;  // tier 1
             if (num_of_npcs <= 3) return 3;  // tier 2
@@ -116,7 +116,7 @@ function map_counts_to_tiers(all_map_vals) {
 }
 
 
-// I start out at brown, as its map colour, then fade onto red depending on num of npcs in that aggregated block. 
+// I start out at brown, as its the actual map colour, then i fade onto red depending on num of npcs in that aggregated block. 
 // // Here, tier 0 == low (light brown) & tier 4 ==high (reddy-brown colour)
 const congestion_colourscale = [
     [0.0,       "rgba(147,115,62,1)"], // tier 0 brown, as base
@@ -127,6 +127,7 @@ const congestion_colourscale = [
     [5.0 / 5.0, "rgba(150,40,40,1)"]  // tier 4 (crimson red)
 ];
 
+// genai-implemented function that looked at my styles.css & wrote the logic (in colourblind.js) to enable colourblind mode
 function current_colourscale() {
     try {
         return getHeatmapPalette();

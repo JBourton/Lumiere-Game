@@ -139,13 +139,11 @@ function try_to_place_an_item(item_to_place) {  // this is the 2nd event listene
 // the intention here is to paint over the grid w/ a rectangular footprint
 function highlight_whole_preview_area(x, y) {
     if (!curr_item_of_interest) return;
-
     clearFootprintTiles();
 
     const w = curr_item_of_interest.w;
     const h = curr_item_of_interest.h;
-
-    const isValidPlacement = check_placement_is_valid(x, y, w, h);
+    const is_a_valid_placment_move = check_placement_is_valid(x, y, w, h);
 
     for (let y_change = 0; y_change < h; y_change++) {
         for (let x_change = 0; x_change < w; x_change++) {
@@ -154,11 +152,9 @@ function highlight_whole_preview_area(x, y) {
                 `.cell[data-x="${x + x_change}"][data-y="${y + y_change}"]`
             );
 
-            console.log("TRY CELL", x + x_change, y + y_change, cell); 
-
             if (cell) {
                 cell.classList.add("placement-preview-tile");
-                if (!isValidPlacement) {
+                if (!is_a_valid_placment_move) {
                     cell.classList.add("invalid");
                 }
             }
@@ -241,19 +237,16 @@ function place_item_on_map(x, y, item) {
     if (item.type === ATTRACTION_TYPES.FOOD) {
         if (!window.foodStallAnchors) window.foodStallAnchors = [];
         window.foodStallAnchors.push({
-            x,
-            y,
-            effect_w: item.effect_w,
-            effect_h: item.effect_h
+            x, y,
+            effect_w: item.effect_w, effect_h: item.effect_h
         });
     }
     // now update logic (above was just visual)
     FoodCoverage.update_mask_of_fstall_coverage(window.foodStallAnchors,window.currentMap);
 
-    // Decrement staff - add defensive check to ensure staff_cost exists
+    // Decrement staff - w/ defensive check to ensure staff_cost exists
     if (item.staff_cost !== undefined && item.staff_cost !== null) {
         Staff.remove(item.staff_cost);
-        console.debug("[PLACEMENT] Staff decremented by", item.staff_cost, "Current staff:", Staff.get());
     } else {
         console.warn("[PLACEMENT] Item missing staff_cost property:", item.id, item);
     }
@@ -285,6 +278,7 @@ function place_item_on_map(x, y, item) {
 // this function turns off the placement preview; this activates either when the player places the selected item or presses esc
 export function turn_off_the_placement_preview() {
     curr_item_of_interest = null;
+    clearFootprintTiles();
     if (preview_el_in_doc) {
         preview_el_in_doc.style.backgroundImage = "";
         preview_el_in_doc.style.opacity = "0";

@@ -49,49 +49,48 @@ export function setupSidebar() {
     content.innerHTML = panels[ATTRACTION_TYPES.LIGHTS]();  // this just loads all the attractions into the sidebar ready for game-start
 
 
-    // post-render, this function attatches listners onto the clickable items
-    function attachItemListeners() {  // no need for args as I'm referencing global vals like Staff from resources.js
-        const rows = document.querySelectorAll('.item-row');
+    // after page renders, this function attatches listners onto the clickable items
+    function set_sidebar_item_listners() {  // no need for args as I'm referencing global vals like Staff from resources.js
+        const rows_on_sidebar = document.querySelectorAll('.item-row');
 
-        rows.forEach(row => {
+        rows_on_sidebar.forEach(sidebar_row => {
 
-            const itemId = row.dataset.itemId;
+            const itemId = sidebar_row.dataset.itemId;
             const item = ALL_ATTRACTIONS_PLACEABLE_ON_MAP[itemId];
 
-            // fetch the staff-cost label (needed so only the text becomes red)
-            const costLabel = row.querySelector(".staff-cost");
-
-            if (row.classList.contains('locked')) {
-                row.style.pointerEvents = "none";  // cannot click locked items
+            // fetch the staff-cost label (needed so only the text becomes red, indicating player is too broke to buy it)
+            const visual_staff_cost = sidebar_row.querySelector(".staff-cost");
+            if (sidebar_row.classList.contains('locked')) {
+                sidebar_row.style.pointerEvents = "none";  // player cant interact w/ locked items
                 return;
             }
 
-            const canAfford = (Staff.get() >= item.staff_cost);  // have to ensure the player can actually afford the staff cost to placing an attraction 1st
+            const check_player_can_afford = (Staff.get() >= item.staff_cost);  // have to ensure the player can actually afford the staff cost to placing an attraction 1st
 
-            // NEW: apply affordability to ONLY the cost label
-            if (costLabel) {
-                if (!canAfford) {
-                    costLabel.classList.add("cannot-afford");
+            // now actually set that affordability on the cost label
+            if (visual_staff_cost) {
+                if (!check_player_can_afford) {
+                    visual_staff_cost.classList.add("cannot-afford");
                 } else {
-                    costLabel.classList.remove("cannot-afford");
+                    visual_staff_cost.classList.remove("cannot-afford");
                 }
             }
 
-            // control clickability (original logic preserved)
-            if (!canAfford) {
-                row.style.pointerEvents = "none";   // disable it
+            // now check if players allowed to click on it
+            if (!check_player_can_afford) {
+                sidebar_row.style.pointerEvents = "none"; // no? disable it
             } else {
-                row.style.pointerEvents = "auto";   // enable it
+                sidebar_row.style.pointerEvents = "auto";   // yeah? enable it
             }
 
-            row.addEventListener('click', () => {
-                if (!canAfford) return;  // do absoltutley nothing if the player can't afford to place the attraction 
+            sidebar_row.addEventListener('click', () => {
+            if (!check_player_can_afford) return;  // do absoltutley nothing if the player can't afford to place the attraction 
                 // Play the little 8bit soundbite for clicking on an item
                 clickSound.currentTime = 0;  // this is to account for v fast player clicks
                 clickSound.play().catch(err => console.warn("Audio blocked:", err));
 
                 // fetch correct id
-                const selectedId = row.dataset.itemId;
+                const selectedId = sidebar_row.dataset.itemId;
 
                 // lookup attraction id in dict (check placeableDefinitions for more details of this though)
                 const item = ALL_ATTRACTIONS_PLACEABLE_ON_MAP[selectedId];
@@ -100,9 +99,8 @@ export function setupSidebar() {
         });
     }
 
-
-    // ensure rows respond on initial load
-    attachItemListeners();
+    // now put those rows onto the initial sidebar load
+    set_sidebar_item_listners();
 
 
     window.refreshSidebarAffordability = () => { // this is needed so that the staff cost can be updated as staff cnt varies
@@ -114,7 +112,7 @@ export function setupSidebar() {
         content.innerHTML = typeof panel === "function" ? panel() : panel;
 
         // now the dom got rebuilt, I stick the item listners back in place
-        attachItemListeners();
+        set_sidebar_item_listners();
     };
 
 
@@ -133,7 +131,7 @@ export function setupSidebar() {
             content.innerHTML = typeof panel === "function" ? panel() : panel || `<p>No content yet.</p>`;
 
             // NEW: reattach listeners because the DOM has re-rendered
-            attachItemListeners();
+            set_sidebar_item_listners();
         });
     });
 }  // these nested functions actually encapsulte the logic pretty well for main.js, so it's a deliberate design choice on my end

@@ -1,9 +1,10 @@
-// Minimal extracted restart logic. This module exposes a single function
-// that performs the same state resets as previously in `main.js` but
-// operates using the callbacks/objects passed in so we avoid touching
-// main.js internals directly.
-export function reset_game_impl(game_restart_options) {
-    // back to how it all was at 1st time
+// this files purpose is to encapsulate all the restart logic into a module that's exposed to main
+// it operates using passed-in callbacks that intentionally don't mess w/ main
+
+
+// the one function exposed to main
+export function reset_game_impl(game_restart_options) { // (note: I'm one-line type-checking for functions to try to meet the extensibility requirement of the coursework, but the game restart should still work without them)
+    // setting resources back to how it all was at game-start
     game_restart_options.Magic.set_mgc(10);
     game_restart_options.Staff.set_stf(1);
     game_restart_options.Visitors.set_vstrs(0);
@@ -44,7 +45,7 @@ export function reset_game_impl(game_restart_options) {
         game_restart_options.clear_food_coverage();
     }
 
-    // reapply accessibility/theme toggles (e.g., colour-blind mode) after a restart
+    // re-apply colour-blind mode after restart
     if (typeof game_restart_options.apply_accessibility_settings === 'function') {
         game_restart_options.apply_accessibility_settings(); // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
     }

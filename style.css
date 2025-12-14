@@ -1,15 +1,4 @@
-/* Food coverage overlay for food stalls */
-.food-coverage-tile {
-    position: absolute;
-    inset: 0;
-    background: rgba(98, 153, 66, 0.4); 
-    border: 2px solid rgba(9, 61, 16, 0.7);
-    pointer-events: none;
-    z-index: 10;
-    box-sizing: border-box;
-}
-
-/* this font will give the video-game-esque style needed to spruce up the personality a bit */
+/* I thought this font has a good video-game-esque style to spruce up the personality a bit */
 @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
 
 html, body {
@@ -20,6 +9,7 @@ html, body {
     overflow: hidden;
 }
 
+/* styling the map of durham dynamically */
 * { box-sizing: border-box; }
 :root {
     --max-cols: 50;
@@ -45,6 +35,9 @@ body {
         background-repeat: no-repeat;
 }
 
+
+/* %%% accessiblity stuff %%%% */
+
 /* for the audio I added this little mute button in top left in case it gets annoying to the player */
 #mute-button {
     position: fixed;
@@ -59,10 +52,11 @@ body {
     z-index: 9999;
     border-radius: 6px;
 }
-
 #mute-button:hover {
     background: rgba(0, 0, 0, 0.6);
 }
+
+/* Similar kind of styling for the heatmap too */
 #toggle-heatmap-button {
     position: fixed;
     top: 10px;
@@ -76,13 +70,12 @@ body {
     z-index: 9999;
     border-radius: 6px;
 }
-
 #toggle-heatmap-button:hover {
     background: rgba(0, 0, 0, 0.6);
 }
 
 
-/* Pause button is on the right of the other settings toggles */
+/* Pause button is on the right of the other setting's toggles */
 #pause-button {
     position: fixed;
     top: 10px;
@@ -96,7 +89,6 @@ body {
     z-index: 9999;
     border-radius: 6px;
 }
-
 #pause-button:hover {
     background: rgba(0, 0, 0, 0.6);
 }
@@ -105,7 +97,7 @@ body {
 #colourblind-button {
     position: fixed;
     top: 10px;
-    left: 390px;
+    left: 300px;
     font-size: 18px;
     background: rgba(0, 0, 0, 0.4);
     color: #fff;
@@ -114,13 +106,10 @@ body {
     cursor: pointer;
     z-index: 9999;
     border-radius: 6px;
-}
-
+} /* Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)). */
 #colourblind-button:hover {
     background: rgba(0, 0, 0, 0.6);
-}
-/* Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)). */
-
+} /* Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)). */
 
 
 #game-title {
@@ -130,10 +119,9 @@ body {
 }
 
 
-
 /* Defining map, inc. cells in it and player sprite */
 #map-display {
-    /*border: 1px solid red;*/
+    /*border: 1px solid red;*/ /* (for debugging) */
     position: relative;
     margin-top: 12px;
     padding: 15px 13px 13px 13px;
@@ -171,7 +159,6 @@ body {
     box-shadow: 0 4px 12px rgba(0,0,0,0.3);
     z-index: 100;
 }
-
 #heatmapMini {
     width: 100%;
     height: 100%;
@@ -233,7 +220,7 @@ body {
     color: #eee;
     font-size: 12px;
 }
-#item-list {
+#item-list { /* these items are the ones inside the sidebar */
     display: flex;
     flex-direction: column;
     gap: 8px;
@@ -297,7 +284,7 @@ body {
     align-self: flex-start;
     flex: 0 0 auto;
 }
-/* [Dev note]: toggle between border style & border: none here to experiment w/ what looks best*/
+/* [Dev note]: toggle between a good-looking border style & the default 'border: none' here to experiment w/ what looks best*/
 .cell {
     width: var(--cell-size);
     height: var(--cell-size);
@@ -361,7 +348,7 @@ body {
     z-index: 1000;
 }
 
-/* Keep the tutorial choice hidden by default; it will be shown programmatically after the intro */
+/* Keep the tutorial choice hidden by default; it will be shown just after the intro modal is */
 #tutorialChoiceModal {
     display: none;
 }
@@ -420,9 +407,17 @@ body {
     transition: transform 60ms linear, filter 60ms linear;
     image-rendering: pixelated;
 }
-#tutorialChoiceModal .modal-content button:hover { filter: brightness(1.06); }
-#tutorialChoiceModal .modal-content button:active { transform: translateY(6px); box-shadow: 0 0 0 #111, inset 0 6px 0 rgba(255,255,255,0.06); }
-#tutorialChoiceModal .modal-content button:focus { outline: none; box-shadow: 0 6px 0 #111, 0 0 0 6px rgba(255,200,70,0.12); }
+#tutorialChoiceModal .modal-content button:hover {
+    filter: brightness(1.06);
+}
+#tutorialChoiceModal .modal-content button:active {
+    transform: translateY(6px);
+    box-shadow: 0 0 0 #111, inset 0 6px 0 rgba(255,255,255,0.06);
+}
+#tutorialChoiceModal .modal-content button:focus {
+    outline: none;
+    box-shadow: 0 6px 0 #111, 0 0 0 6px rgba(255,200,70,0.12);
+}
 
 .gameover-modal-content,
 .gamewon-modal-content {
@@ -514,7 +509,9 @@ body {
     z-index: 5000;
 }
 
-#unlock-popup:not(.hidden) { display: flex; }
+#unlock-popup:not(.hidden) { 
+    display: flex; 
+}
 #unlock-popup .modal-content {
     max-width: min(600px, 85vw);
     width: 90%;
@@ -533,7 +530,6 @@ body {
     align-items: center;
     gap: 12px;
 }
-
 #unlock-popup #unlock-text { 
     font-family: 'Press Start 2P',monospace; 
     font-size: clamp(12px, 1.8vw, 18px); 
@@ -541,7 +537,6 @@ body {
     text-shadow: 0px 1px 1px rgba(0,0,0,0.15); 
     margin-top: 50px;
 }
-
 #unlock-popup #unlock-img { 
     width: clamp(64px, 20vw, 128px); 
     height: auto; 
@@ -569,9 +564,17 @@ body {
     transition: transform 60ms linear, filter 60ms linear;
     image-rendering: pixelated;
 }
-#unlock-close-btn:hover { filter: brightness(1.06); }
-#unlock-close-btn:active { transform: translateY(6px); box-shadow: 0 0 0 #111, inset 0 6px 0 rgba(255,255,255,0.06); }
-#unlock-close-btn:focus { outline: none; box-shadow: 0 6px 0 #111, 0 0 0 6px rgba(255,200,70,0.12); }
+#unlock-close-btn:hover { 
+    filter: brightness(1.06); 
+}
+#unlock-close-btn:active { 
+    transform: translateY(6px); 
+    box-shadow: 0 0 0 #111, inset 0 6px 0 rgba(255,255,255,0.06); 
+}
+#unlock-close-btn:focus { 
+    outline: none; 
+    box-shadow: 0 6px 0 #111, 0 0 0 6px rgba(255,200,70,0.12); 
+}
 
 .unlock-icon { width: 96px; height: auto; margin-bottom: 10px; }
 
@@ -592,11 +595,9 @@ body {
     text-transform: none;
     pointer-events: none; /* here i'm ensuring that clicks go to the elements that've been highlighted, not the tooltip itself */
 }
-
 .tutorial-tooltip.hidden {
     display: none;
 }
-
 .tutorial-highlight {
     outline: 4px solid #ff2e2e;
     outline-offset: 3px;
@@ -604,7 +605,6 @@ body {
     position: relative;
     z-index: 8999;
 }
-
 .tutorial-highlight-pulse {
     animation: tutorialPulse 0.95s infinite alternate ease-in-out;
 }
@@ -612,7 +612,6 @@ body {
     from { box-shadow: 0 0 0 4px rgba(255, 46, 46, 0.20); }
     to   { box-shadow: 0 0 0 6px rgba(255, 46, 46, 0.45); }
 }
-
 .tutorial-overlay {
     position: fixed;
     top: 0;
@@ -623,7 +622,6 @@ body {
     background: transparent;
     pointer-events: auto;
 }
-
 .tutorial-final-overlay {
     position: fixed;
     top: 0;
@@ -634,7 +632,6 @@ body {
     background: transparent;
     cursor: pointer;
 }
-
 .tutorial-tooltip.final {
     pointer-events: auto;
     left: 50%;
@@ -649,7 +646,8 @@ body {
 
 
 
-/* Now I define how the UI displaying key resources (from the machinations diagrams) are displayed: */
+
+/* Now I define how the UI displaying key resources (from my machinations diagrams) are displayed: */
 #resource-ui {
     display: flex;
     flex-direction: row;
@@ -670,19 +668,16 @@ body {
     border-radius: 4px;
     overflow: hidden;
 }
-
 #magic-bar {
     height: 100%;
     width: 50%; 
     background: #4aa3ff;
     transition: width 0.25s ease;
 }
-
 #magic-text {
     font-size: clamp(10px, 1.6vw, 18px);
     color: white;
 }
-
 
 
 #staff-container, #visitor-container {
@@ -737,7 +732,6 @@ body {
     flex-direction: column;
     justify-content: flex-end;
 }
-
 #frustration-bar {
     width: 100%;
     height: 0%; 
@@ -746,7 +740,6 @@ body {
     align-self: stretch;
     box-shadow: inset 0 6px 12px rgba(0,0,0,0.06);
 }
-
 #frustration-label {
     font-size: clamp(10px, 1.6vw, 14px);
     font-weight: 700;
@@ -761,7 +754,7 @@ body {
     background-repeat: no-repeat;
     pointer-events: none; /* prevents blocking player clicks */
 }
-/* All of the following structure artwork was generated with ChatGPT v5.1 by OpenAI. */
+/* All of the following artwork images were generated with ChatGPT v5.1 (by OpenAI). */
 .gala {
     background-image: url("assets/imgs/Gala\ 8bit\ -\ Generated\ by\ ChatGPT.png");  /* NOTE TO SELF: HEX CODE #001e3a WAS USED ON THIS PNG TO GET THE BACKGROUND COLOUR MATCHING THE OUTSIDE IMG */
 }
@@ -819,6 +812,18 @@ body {
     outline: 2px solid rgba(255, 80, 80, 0.85);
     background-color: rgba(255, 0, 0, 0.20);
 } /* and this one invalid */
+
+
+/* this is the food coverage overlay styling for food stalls (green area when player clicks on a stall to place) */
+.food-coverage-tile {
+    position: absolute;
+    inset: 0;
+    background: rgba(98, 153, 66, 0.4); 
+    border: 2px solid rgba(9, 61, 16, 0.7);
+    pointer-events: none;
+    z-index: 10;
+    box-sizing: border-box;
+}
 
 
 /* now when the placment is valid and the player clicks to place, the attractions needs to be overlayed on top of the tile */

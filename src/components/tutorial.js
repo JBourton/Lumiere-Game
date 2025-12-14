@@ -174,24 +174,24 @@ function place_tooltip_near_target(item_highlit_red, my_preffered_side = 'right'
 
 // self explanatory, this one's findings matching DOM element for a given css selector as param input
 function find_matching_dom_elem(selecting_val) {
-    return document.querySelector(selecting_val); // pull elem from dom w/ param value
+    return document.querySelector(selecting_val); // i pull elem from dom w/ param value
 }
 
 
-// IMPORTANT LOGIC: this sticks a click event onto the highlit tutorial item, so player has to click to interact & thus progress
+// important logic here: this sticks a click event onto the highlit tutorial item so player has to click to interact & thus progress
 function connect_tutorial_item_w_advance(tut_item, advancing) {
-    // capture some element-specific original states so we can revert after advancing
-    let _orig_heatmap_on = null;
-    let _orig_manual_pause = null;
+    // 1st capture the element-specific original states so game state can go back to how it was before on the next tutorial step
+    let orig_hmap_on = null;
+    let orig_manual_pause = null;
 
     // I found a bug; when the player interacts with both hmap and play/pause btn, game starts w/ hmap off game paused, so have to account for it here to undo the player's action
     try {
         if (tut_item && tut_item.id === 'toggle-heatmap-button') {
             const hmap_btn_from_dom = document.getElementById('toggle-heatmap-button');
-            _orig_heatmap_on = hmap_btn_from_dom ? (hmap_btn_from_dom.textContent === 'Heatmap: On') : null;
+            orig_hmap_on = hmap_btn_from_dom ? (hmap_btn_from_dom.textContent === 'Heatmap: On') : null;
         }
         if (tut_item && tut_item.id === 'pause-button') {
-            _orig_manual_pause = !!window._manualPause;
+            orig_manual_pause = !!window._manualPause;
         }
     } catch (issue_w_hmap_or_pause_btn) {
         //just prevent crash, nothing more's needed really
@@ -203,19 +203,19 @@ function connect_tutorial_item_w_advance(tut_item, advancing) {
         // now after this patch, when the palyer moves onto next tutorial step, toggles just go back to how they were before (rather than instant, which might frustrate player)
         setTimeout(() => {
             try {
-                if (_orig_heatmap_on !== null) {
+                if (orig_hmap_on !== null) {
                     const hmap_btn_from_dom = document.getElementById('toggle-heatmap-button');
                     const heatmapMini = document.getElementById('heatmapMiniContainer');
                     if (hmap_btn_from_dom) {
-                        hmap_btn_from_dom.textContent = _orig_heatmap_on ? 'Heatmap: On' : 'Heatmap: Off';
+                        hmap_btn_from_dom.textContent = orig_hmap_on ? 'Heatmap: On' : 'Heatmap: Off';
                     }
                     if (heatmapMini) {
-                        heatmapMini.style.display = _orig_heatmap_on ? 'block' : 'none';
+                        heatmapMini.style.display = orig_hmap_on ? 'block' : 'none';
                     }
                 }
-                if (_orig_manual_pause !== null) {
+                if (orig_manual_pause !== null) {
                     // have to restore my flags back to how they were for audio syncing and the like
-                    window._manualPause = !!_orig_manual_pause;
+                    window._manualPause = !!orig_manual_pause;
                     if (typeof window.refreshPauseState === 'function') {
                         window.refreshPauseState();
                     }
@@ -232,7 +232,7 @@ function connect_tutorial_item_w_advance(tut_item, advancing) {
 }
 
 
-// OTHER IMPORTANT LOGIC: This is the flow I chose for my tutorial, so each tooltip will appear in this order
+// other important game logic: This is the flow I chose for my tutorial, so each tooltip will appear in this order
 const TUTORIAL_STEPS = [
     {
         text: `This is your sidebar. All Lumiere's attractions, stages and foodstalls are located here. Each placeable lumiere item has a staff cost (these things don't run themselves you know!). As you progress,
@@ -357,14 +357,14 @@ function show_step(step_idx) {
             show_step(curr_step_idx);
         };
 
-        // prefer attaching to the tutorial overlay so clicks anywhere outside the highlighted element advance
+        // for this instance i let clicks anywhere outside of the highlit area advance too
         if (tutorial_overlay_el) {
-            // temporarily allow the overlay to pass clicks through to bubble listeners
+            // for popup too
             tutorial_overlay_el.dataset.allowAnyClick = 'true';
-            const overlayHandler = () => move_to_next_tut_tt();
-            tutorial_overlay_el.addEventListener('click', overlayHandler, false);
+            const click_through_overlay = () => move_to_next_tut_tt();
+            tutorial_overlay_el.addEventListener('click', click_through_overlay, false);
             activated_cleanup_click = () => {
-                tutorial_overlay_el.removeEventListener('click', overlayHandler, false);
+                tutorial_overlay_el.removeEventListener('click', click_through_overlay, false);
                 tutorial_overlay_el.dataset.allowAnyClick = 'false';
             }
         } 
@@ -388,19 +388,15 @@ function commence_the_tutorial() {
     }
     is_tutorial_active = true;
     curr_step_idx = 0;
-
-    // setup tutorial tooltip
-    ensure_tooltip_present();
+    ensure_tooltip_present(); // 1st, setup tutorial tooltip
 
     // here, i've set it up so the game is always paused throughout the tutorial, even if player tries to mess around w/ play/pause btn
     window._tutorialForcedPause = true; 
-    if (typeof window.refreshPauseState === 'function') {
-        window.refreshPauseState(); // (as game is always paused in tutorial)
-    }
+    window.refreshPauseState(); // (as game is always paused in tutorial)
 
     // now tutorial tooltips show 1 by 1 as the player goes about interacting w/ it
     show_step(curr_step_idx);
-}
+}//note that this isn't taking away from expressing themes through game design, but is placed on the visual layer to step-teach the player
 
 
 // tutorial over, time to start running lumiere!
@@ -413,6 +409,8 @@ function terminate_the_tutorial() {
     // ...get rid of all the tutorial styling
     clearup_highlight_area();
     dissapear_tooltip();
+    // also get rid of placement previews from sidebar selections
+    turn_off_the_placement_preview();
     // now remove the restriction i put on making tooltips unclickable, as just on this one the player can click anywhere to end tutorial
     if (final_tooltip_click && the_tooltip_el) {
         the_tooltip_el.removeEventListener('click', final_tooltip_click);

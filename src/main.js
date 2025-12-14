@@ -1,7 +1,7 @@
 // First load in all game componants needed
 import { build_grid_map, renderMap } from "./logic/map.js";
 import { Player, enablePlayerMovement } from "./logic/playerMovement.js";
-import { setupIntroModal, setupGameOverModal, setupUnlockPopup, setupTutorialYesOrNoModal, game_over, setupGameWonModal, game_won } from "./components/popup.js";
+import { loadup_intro_modal, fireup_gameover_popup, fireup_unlock_popup, fireup_tutorial_yesorno_popup, game_over, fireup_gamewon_modal, game_won } from "./components/popup.js";
 import { Magic, Staff, Visitors, Frustration } from "./logic/resources.js";
 import { AudioManager } from "./components/audio.js";
 import { setupSidebar } from "./components/sidebar.js";
@@ -24,8 +24,6 @@ window.Magic = Magic;
 window.Staff = Staff;
 window.Visitors = Visitors;
 window.Frustration = Frustration;
-
-// Global pause flag for play/pause functionality
 
 
 
@@ -126,12 +124,11 @@ funky_background_audio.toggleMute();  // [Dev note] Starting on muted because it
 pause_everything(funky_background_audio);
 
 // now for all the popups, though only intro modal shows for now (others are win/loss conditions)
-setupIntroModal(funky_background_audio);
-// Initialize the tutorial modal handlers (modal is hidden by default)
-setupTutorialYesOrNoModal();
-setupGameOverModal(reset_the_game);  // enabling the game over modal w/ restart logic
-setupGameWonModal(reset_the_game); // & game won
-setupUnlockPopup(); // + also show one each time player unlocks an item
+loadup_intro_modal(funky_background_audio);
+fireup_tutorial_yesorno_popup();  // then ask user if they want to do the tutorial or not
+fireup_gameover_popup(reset_the_game);  // enabling the game over modal w/ restart logic
+fireup_gamewon_modal(reset_the_game); // & game won
+fireup_unlock_popup(); // + also show one each time player unlocks an item
 kickoff_tutorial();
 
 const muteBtn = document.getElementById("mute-button"); // this event lisnter tracks the mute/unmute button on the top left

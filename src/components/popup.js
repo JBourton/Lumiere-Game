@@ -1,29 +1,32 @@
-// This sets up the modal that appears on first visit (per session)
-export function setupIntroModal(bg_tunes) {
+// This file's purpose is to hold all the logic relating to modals (popups) which inform the user about key game events
+
+
+// This sets up the modal that appears on first visit (i.e. only once/session)
+export function loadup_intro_modal(bg_tunes) {
     document.addEventListener("DOMContentLoaded", function () {
         // grabbing modal and start button from the DOM
-        const introModal = document.getElementById("introModal");
-        const beginButton = document.getElementById("startButton"); // renamed to feel more conversational
+        const intro_screen = document.getElementById("introModal");
+        const start_game_btn = document.getElementById("startButton");
 
-        // check the element does actually exist - obviously can't do anythign w/out the modal
-        if (!introModal || !beginButton) {
-            console.warn("Missing modal or start button – skipping intro setup");
+        // check the element does actually exist - obviously can't do anythign w/out the modal and the dom sometimes loads weird
+        if (!intro_screen || !start_game_btn) {
+            console.warn("check the intro screen modal or start btn hasn't been accidently deleted");
             return;
         }
 
-        // this is to make sure that it's seen by user once per SESSION (i.e. page reload will render it again)
+        // this is to make sure that it's seen by user once per SESSION (i.e. page reloading will render it again)
         const has_intro_occured_yet = sessionStorage.getItem("introSeen");
 
         if (!has_intro_occured_yet) {
-            // displaying modal (default styling 'none' in CSS)
-            introModal.style.display = "flex";  // [Note]: could always use a class toggle here instead
+            // displaying modal (i set default styling 'none' in CSS)
+            intro_screenl.style.display = "flex";  // [Note]: could always use a class toggle here instead
             sessionStorage.setItem("introSeen", "true"); // now mark as seen to prevent a later reapperance (once per session ONLY otherwise player's getting annoyed)
         }
 
         // this will trigger the modal to disappear once 'start game' btn clicked
-        beginButton.addEventListener("click", function () {
+        start_game_btn.addEventListener("click", function () {
             // [Note]: This could actually be animated in the future to be cooler
-            introModal.style.display = "none";
+            intro_screen.style.display = "none";
             if (bg_tunes) {
                 bg_tunes.playMusic(); // now fire up the background tunes!
             }
@@ -40,7 +43,7 @@ export function setupIntroModal(bg_tunes) {
 
 
 // this function is the "Game Over" screen, which will preceed the resetting of the whole game w/ systems back to nil
-export function setupGameOverModal(game_restart_logic) {
+export function fireup_gameover_popup(game_restart_logic) {
     document.addEventListener("DOMContentLoaded", function () {
         const popup_for_gameover = document.getElementById("gameoverModal");
         const restart_the_game = document.getElementById("gameOverButton");  // fetch the restart buttons id
@@ -68,25 +71,21 @@ export function game_over() {
 
 
 // and now for the winning popup - just as important ofc!!
-export function setupGameWonModal(game_restart_logic) {
+export function fireup_gamewon_modal(game_restart_logic) {
     document.addEventListener("DOMContentLoaded", function () {
-        const popup_for_gamewon = document.getElementById("gamewonModal"); // find the win modal
-        const restart_after_win = document.getElementById("gameWonButton"); // fetch the restart btn id
+        const popup_for_gamewon = document.getElementById("gamewonModal"); // 1st find the win modal
+        const restart_after_win = document.getElementById("gameWonButton"); // 2nd find restart btn
 
-        if (!popup_for_gamewon || !restart_after_win) {
-            return;  // debugging only, just in case either element is missing
-        }
-
-        // setup the restart btn so that it closes this win popup + runs the restart logic
+        // now i setup the restart btn so it closes this win popup + runs the restart logic in same go
         restart_after_win.addEventListener("click", function () {
             popup_for_gamewon.style.display = "none";  // (close it)
-            if (typeof game_restart_logic === "function") game_restart_logic(); // same restart logic as game over
+            if (typeof game_restart_logic === "function") game_restart_logic(); // this is just same restart logic as game over
         });
     });
 }
 
 
-// activating the "game won" condition (player did an excellent job 🎉)
+// the player won! here's the logic that shows that to them w/ a little "congrats" msg
 export function game_won() {
     // fetch the hidden game-won popup + activate it
     const the_hidden_gamewon_popup = document.getElementById("gamewonModal");
@@ -98,7 +97,7 @@ export function game_won() {
 
 
 // now's the function that controls showing the "Congrats, you've unlocked item X" popup
-export function setupUnlockPopup() {
+export function fireup_unlock_popup() {
     const unlock_popup = document.getElementById("unlock-popup");
     const close_unlock_popup_btn = document.getElementById("unlock-close-btn");
 
@@ -111,9 +110,9 @@ export function setupUnlockPopup() {
 }
 
 export function show_the_unlock_popup(item_unlocked) {
-    const unlock_popup = document.getElementById("unlock-popup");
+    const unlock_popup = document.getElementById("unlock-popup"); // now grabbing all the dom elems relating to the unlock popup, which is always there in the background but not visible
     const img_of_item_unlocked = document.getElementById("unlock-img");
-    const unlocked_name = document.getElementById("unlock-text");
+    const unlocked_name = document.getElementById("unlock-text"); // i use that one popup as a rewriteable slate rather than cramming the dom with a bunch of popups
 
     // set the item-specific img & name
     img_of_item_unlocked.src = item_unlocked.img;
@@ -125,21 +124,18 @@ export function show_the_unlock_popup(item_unlocked) {
 
 
 
-// %%%%%%%%% from here on out, the popups will contain all the screens needed for the tutorial %%%%%%%%%%
+// %%%%%%%%% from here down, all these popups will contain all the screens needed for the tutorial %%%%%%%%%%
 
-// Firstly comes the actual "Do you want a tutorial" screen
-export function setupTutorialYesOrNoModal() {
+
+// Firstly (and most important!) comes the actual "Do you want a tutorial" screen - if yes, the others are triggered (checkout tutorial.js for that logic though as I compartmentalised it)
+export function fireup_tutorial_yesorno_popup() {
     document.addEventListener("DOMContentLoaded", function () {
-        const start_tutorial_question = document.getElementById("tutorialChoiceModal");
+        const start_tutorial_question = document.getElementById("tutorialChoiceModal"); //now all the dom elems repsonsible for starting/skipping tutorial
         const start_tutorial_btn = document.getElementById("tutorialYesBtn");
         const skip_tutorial_btn = document.getElementById("tutorialNoBtn");
-
-        if (!start_tutorial_question || !start_tutorial_btn || !skip_tutorial_btn) return; // missing DOM -> skip
-
-        // ensure it's hidden on load (CSS should already hide it, but be defensive)
         start_tutorial_question.style.display = "none";
 
-        // Both buttons simply close the modal for now
+        // 2 btns that start/skip tutorial
         start_tutorial_btn.addEventListener("click", () => {
             start_tutorial_question.style.display = "none";
             if (typeof window.startTutorial === 'function') {
@@ -148,13 +144,12 @@ export function setupTutorialYesOrNoModal() {
         });
 
         skip_tutorial_btn.addEventListener("click", () => {
-            start_tutorial_question.style.display = "none";
+            start_tutorial_question.style.display = "none"; // player reckons they're a pro already ;)
         });
 
-        // Expose a global helper to open the tutorial choice (used after intro)
+        // now the tutorial logic is opened up globally
         window.show_the_tutorial_question_popup = function show_the_tutorial_question_popup() {
             const the_tutorial_popup = document.getElementById("tutorialChoiceModal");
-            if (!the_tutorial_popup) return;
             the_tutorial_popup.style.display = "flex";
         };
     });
