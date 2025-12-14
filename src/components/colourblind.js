@@ -82,6 +82,20 @@ function ensureInjectedStyles() {
         body.colourblind-mode .placement-preview { background-color: rgba(0,120,200,0.2); }
         body.colourblind-mode .placement-preview-tile { outline-color: rgba(0,120,200,0.85); background-color: rgba(0,120,200,0.25); }
         body.colourblind-mode .placement-preview-tile.invalid { outline-color: rgba(230, 132, 34, 0.9); background-color: rgba(230, 132, 34, 0.25); }
+        /* Accessibility: highlight existing path tiles without changing gameplay (Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).) */
+        body.colourblind-mode .path { position: relative; outline: 2px solid #fefae0; box-shadow: 0 0 0 2px rgba(0,0,0,0.6) inset, 0 0 6px 2px rgba(255,255,255,0.35); }
+        body.colourblind-mode .path::after {
+            content: "";
+            position: absolute;
+            inset: 3px;
+            pointer-events: none;
+            display: block;
+            background: repeating-linear-gradient(45deg, rgba(255,255,255,0.32) 0 6px, rgba(0,0,0,0.22) 6px 12px);
+            border-radius: 3px;
+            opacity: 1;
+            z-index: 2;
+            mix-blend-mode: normal;
+        }
     `;
     document.head.appendChild(styleEl);
 }
