@@ -17,6 +17,7 @@ import { pause_everything } from "./logic/pause.js";
 import { check_unlocks, reset_unlocks } from "./logic/unlock.js";
 import { reset_game_impl } from "./restart.js";
 import { kickoff_tutorial } from "./components/tutorial.js";
+import { initColourblindMode, refreshColourblindStyles } from "./components/colourblind.js"; // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
 
 // these let the dev buttons in DOM 'see' the functions below
 window.Magic = Magic;
@@ -36,7 +37,8 @@ function reset_the_game() {     // I've just delegated it all to another file to
         renderMap,
         currentMap: window.currentMap, currentStatics: window.currentStatics, placedObjects: window.placedObjects,
         cleanup_the_map, remove_all_visitors, reset_unlocks, requestAnimationFrame, gameplayLoop: lumiere_gameplay_loop,
-        clear_food_coverage: () => {FoodCoverage.redraw_all_food_coverage([]); FoodCoverage._coverageMask = null; window.foodStallAnchors = [];} // clear dom overlays for green food coverage sqs
+        clear_food_coverage: () => {FoodCoverage.redraw_all_food_coverage([]); FoodCoverage._coverageMask = null; window.foodStallAnchors = [];}, // clear dom overlays for green food coverage sqs
+        apply_accessibility_settings: refreshColourblindStyles // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
     });
 }
 
@@ -104,6 +106,9 @@ document.addEventListener("DOMContentLoaded", () => {
     staffDisplay.textContent = `👷 Staff: ${Staff.get()}`;
     visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${Visitors.get()}`;
     frustrationBar.style.height = Frustration.get() + "%"; // dynamic adjusting of hieght lets the palyer view live updates of visitor frustation
+
+    // initialise accessibility toggle once controls are in the DOM
+    initColourblindMode(); // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
 });
 
 

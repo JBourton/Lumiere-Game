@@ -44,6 +44,11 @@ export function reset_game_impl(game_restart_options) {
         game_restart_options.clear_food_coverage();
     }
 
+    // reapply accessibility/theme toggles (e.g., colour-blind mode) after a restart
+    if (typeof game_restart_options.apply_accessibility_settings === 'function') {
+        game_restart_options.apply_accessibility_settings(); // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
+    }
+
     // finally, restart the gameplay loop cleanly after game over
     if (typeof game_restart_options.requestAnimationFrame === 'function' && game_restart_options.gameplayLoop) {
         game_restart_options.requestAnimationFrame(game_restart_options.gameplayLoop);

@@ -101,6 +101,26 @@ body {
     background: rgba(0, 0, 0, 0.6);
 }
 
+/* Accessibility toggle sits to the right of the existing controls */
+#colourblind-button {
+    position: fixed;
+    top: 10px;
+    left: 390px;
+    font-size: 18px;
+    background: rgba(0, 0, 0, 0.4);
+    color: #fff;
+    border: none;
+    padding: 10px 12px;
+    cursor: pointer;
+    z-index: 9999;
+    border-radius: 6px;
+}
+
+#colourblind-button:hover {
+    background: rgba(0, 0, 0, 0.6);
+}
+/* Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)). */
+
 
 
 #game-title {

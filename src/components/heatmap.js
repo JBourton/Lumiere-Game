@@ -2,6 +2,7 @@
 // I'm using plotly for this: https://plotly.com/javascript/heatmaps/
 
 import { WIDTH, HEIGHT } from "../config.js"; // so it matches dims
+import { getHeatmapPalette } from "./colourblind.js"; // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
 export const SCALE_DOWN = 3; // this allows me to variabley change the resolution of the heatmap, so I can experiment to find what's best visually
 export const HMAP_ROWS  = Math.ceil(HEIGHT / SCALE_DOWN);
 export const HMAP_COLS = Math.ceil(WIDTH / SCALE_DOWN);
@@ -43,7 +44,7 @@ export function draw_on_empty_hmap() {
     // get hmaps data
     //const empty_vals= setup_the_heatmap();  // (for non-checkered hmap layout, but I'm not using it at present)
     const empty_vals = initial_vals.map((row, r) => row.map((v, c) => (r + c) % 2)); 
-    const the_maps_data = [{z: empty_vals, type:"heatmap", showscale: false, zsmooth: false, colorscale: congestion_colourscale, zmin: 0, zmax: 5}]; // checkered brown w/ red heatmap vals
+    const the_maps_data = [{z: empty_vals, type:"heatmap", showscale: false, zsmooth: false, colorscale: current_colourscale(), zmin: 0, zmax: 5}]; // checkered brown w/ red heatmap vals (Updated by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).)
 
     // & setup it's layout
     const hmap_layout = {
@@ -126,6 +127,14 @@ const congestion_colourscale = [
     [5.0 / 5.0, "rgba(150,40,40,1)"]  // tier 4 (crimson red)
 ];
 
+function current_colourscale() {
+    try {
+        return getHeatmapPalette();
+    } catch (err) {
+        return congestion_colourscale; // fallback if anything goes wrong
+    }
+} // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
+
 // now hand over all the logic to plotly
 export function update_heatmap_visual() {
     if (!plot_initialised || !live_heatmap_vals) return;  // but only if heatmap is present and populated!
@@ -135,9 +144,14 @@ export function update_heatmap_visual() {
         z: [hmap_lvld_layers],
         zmin: [0],
         zmax: [5],
-        colorscale: [congestion_colourscale]  // now this is actually dynamic
+        colorscale: [current_colourscale()]  // now this is actually dynamic (Updated by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).)
     });
 }
+
+// refresh palette when accessibility mode changes
+document.addEventListener("colourblindmodechange", () => {
+    update_heatmap_visual(); // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
+});
 
 // for congetsion calculations
 export function get_hmap_grid_for_congestion() {
