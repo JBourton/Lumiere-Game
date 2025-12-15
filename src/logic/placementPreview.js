@@ -223,12 +223,12 @@ function clearFootprintTiles() {
 function place_item_on_map(x, y, item) {
     for (let y_change = 0; y_change < item.h; y_change++) {
         for (let x_change = 0; x_change < item.w; x_change++) {
-            // ensure rows/cols exist
+            // i ensure rows/cols exist first before setting the window's new attr values
             if (!window.placedObjects[y + y_change]) window.placedObjects[y + y_change] = [];
             window.placedObjects[y + y_change][x + x_change] = {
                 id: item.id,  // the id of the attraction placed
                 anchor: (x_change === 0 && y_change === 0),  // I'm using the top-left tile as the anchor for it
-                currentVisitors: (x_change === 0 && y_change === 0) ? 0 : undefined // seting npc logic
+                currentVisitors: (x_change === 0 && y_change === 0) ? 0 : undefined // seting npc logic here
             };
         }
     }
@@ -244,11 +244,9 @@ function place_item_on_map(x, y, item) {
     // now update logic (above was just visual)
     FoodCoverage.update_mask_of_fstall_coverage(window.foodStallAnchors,window.currentMap);
 
-    // Decrement staff - w/ defensive check to ensure staff_cost exists
+    // Decrement staff
     if (item.staff_cost !== undefined && item.staff_cost !== null) {
         Staff.remove(item.staff_cost);
-    } else {
-        console.warn("[PLACEMENT] Item missing staff_cost property:", item.id, item);
     }
 
     turn_off_the_placement_preview();  // get rid of the placement preview once the item's been placed

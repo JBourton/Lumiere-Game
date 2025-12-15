@@ -22,20 +22,20 @@ function check_if_any_modal_visible() {
 	}
 }
 
-// a modular/api-inspired way of setting pause/play state
+// these lets audio state be managed internally in just this file rather than exposing to main & using there
 function get_pause_state() {
 	const is_modal_visible = check_if_any_modal_visible();
-	const fresh_pause = !!(window._manualPause || is_modal_visible  || window._tutorialForcedPause);
+	const is_fresh_pause = !!(window._manualPause || is_modal_visible  || window._tutorialForcedPause); // check that no popups are visible, nor the player-triggered version of pause
 	// If pause state didn't change, still ensure audio reflects the manual pause toggle
-	if (fresh_pause === window.gamePaused) {
-		// now ensure audio follows the manual pause flag ONLY (do not auto-pause when modals appear)
+	if (is_fresh_pause === window.gamePaused) {
+		// now i ensure audio follows the manual pause flag ONLY (so not auto-pauseing when modals/tooltips appear)
 		if (funky_background_audio) {
 			if (window._manualPause) funky_background_audio.pauseMusic();
 			else funky_background_audio.resumeMusic();
 		}
-		return;  // if it's already paused, no further UI changes needed
+		return;  // and if it's already paused, no further UI changes needed!!
 	}
-	window.gamePaused = fresh_pause;
+	window.gamePaused = is_fresh_pause;
 
 	// now I need to make sure the ui is updated to be aware of this
 	const btn = document.getElementById('pause-button');
@@ -48,6 +48,7 @@ function get_pause_state() {
 	}
 }
 
+// a little helper function for changing window state of the pause feature
 function toggle_the_pause_button() {
 	window._manualPause = !window._manualPause;
 	get_pause_state();

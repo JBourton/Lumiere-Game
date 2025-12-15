@@ -198,18 +198,29 @@ function lumiere_gameplay_loop(game_timing_data) {
 
     // now visitors will spawn, for now on a timer and later in line w/ gameplay rules
     const dynamic_visitor_spawn_time = config.get_spawn_interval_from_frustration();
-    time_since_last_npc_spawn += change_in_time; // using this as a clean way to check how long it's been since npc spawn
-    if (time_since_last_npc_spawn >= dynamic_visitor_spawn_time && dynamic_visitor_spawn_time !== Infinity && getnpcs_on_map().length < config.VISITOR_CAP) {  // time to spawn npc!
-        spawn_new_visitor() // [DEV NOTE]: Spawn on a valid path tile (value 1). Row 10, col 14 is a path
-        time_since_last_npc_spawn = 0;  
+    const num_of_npcs = getnpcs_on_map().length;
+    const check_if_npc_can_spawn = dynamic_visitor_spawn_time !== Infinity && num_of_npcs < config.VISITOR_CAP;
+
+    if (check_if_npc_can_spawn && num_of_npcs === 0) {
+        // i added this so theres an intial visitor on spawn (otherwise the first few seconds are boring, and these are usually the most important for player engagement)
+        spawn_new_visitor();
+        time_since_last_npc_spawn = 0;
+    } else if (check_if_npc_can_spawn) {
+        time_since_last_npc_spawn += change_in_time; // using this as a clean way to check how long it's been since npc spawn
+        if (time_since_last_npc_spawn >= dynamic_visitor_spawn_time) {  // time to spawn npc!
+            spawn_new_visitor(); // [DEV NOTE]: Spawn on a valid path tile, now setup dynamically
+            time_since_last_npc_spawn = 0;  
+        }
+    } else {
+        time_since_last_npc_spawn = 0;
     }
 
     // now, award staff proportional to visitors (relation set in config.js):
     // desired_total_awarded = base_awarded + floor(visitorCount / VISITOR_STAFF_RELATION)
     const numVisitors = (typeof Visitors.get === 'function') ? Visitors.get() : getnpcs_on_map().length;
     const extraFromVisitors = Math.floor(numVisitors / config.VISITOR_STAFF_RELATION);
-    const base = (typeof Staff.get_base_awarded === 'function') ? Staff.get_base_awarded() : (Staff.base_awarded ?? 1);
-    const desiredTotalAwarded = base + extraFromVisitors;
+    const players_base_resources = (typeof Staff.get_base_awarded === 'function') ? Staff.get_base_awarded() : (Staff.base_awarded ?? 1); // find out how many staff the player starts off w/ in this version of the game
+    const desiredTotalAwarded = players_base_resources + extraFromVisitors;
     const totalAwarded = (typeof Staff.get_total_awarded === 'function') ? Staff.get_total_awarded() : Staff.get();
     if (desiredTotalAwarded > totalAwarded) {
         Staff.add(desiredTotalAwarded - totalAwarded);
@@ -272,7 +283,7 @@ if (btn_to_pause) {
         // Toggle manual pause (this will preserve modal-driven pausing)
         const paused = window.toggleGamePaused();
         btn_to_pause.textContent = paused ? "▶️" : "⏸️";
-        // audio state handled by get_pause_state();
+        // p.s. the audio state is handled by get_pause_state();
     });
 }
 

@@ -19,7 +19,7 @@ export function loadup_intro_modal(bg_tunes) {
 
         if (!has_intro_occured_yet) {
             // displaying modal (i set default styling 'none' in CSS)
-            intro_screenl.style.display = "flex";  // [Note]: could always use a class toggle here instead
+            intro_screen.style.display = "flex";  // [Note]: could always use a class toggle here instead
             sessionStorage.setItem("introSeen", "true"); // now mark as seen to prevent a later reapperance (once per session ONLY otherwise player's getting annoyed)
         }
 

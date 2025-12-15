@@ -4,7 +4,6 @@
 import { ALL_ATTRACTIONS_PLACEABLE_ON_MAP as placeableDefinitions } from '../placeableDefinitions.js'
 import * as Resources from '../resources.js'      // I need this as visistors interacting w/ attractions impacts magic useage
 import * as Pathfinding from './pathfinding.js'    // this is linking the npc with its movement logic
-//import { get_all_attractions_on_map } from '../map.js'  // [TO BE IMPLEMENTED]
 import { reset_heatmap_counts, register_visitor_on_heatmap, update_heatmap_visual } from '../../components/heatmap.js';
 import { VISTOR_MOVE_SPEED } from '../../config.js';
 import { repel_from_busy_areas } from './congestion.js'; // for that bit of congestion bias to stop visitors clumping together in same cell en-route to attractions
@@ -26,32 +25,27 @@ export const STATE_OF_NPC = {  // i.e. a visitor npc can be doing one of these 4
 // it scans anchor cells in attractions_placed_on_map & pairs them w/ their definitions
 function get_all_attractions_on_map() {
   const attr_layer = window.placedObjects  // this is holding the 3rd map layer, i.e. the one with the attraction locations (I defined it in main.js)
-  if (!attr_layer) {
-    return []  // edge case here; if no attractions placed theres no need to do next logic
-  } 
+  if (!attr_layer) return [];  // edge case here; if no attractions placed theres no need to do next logic
 
   const attractions_on_map = []
 
-  for (let row = 0; row < attr_layer.length; row++) {  // go through each row/col of layer 3 to look for the anchor cell's id
-    for (let col = 0; col < attr_layer[row].length; col++) {
-      const map_sq = attr_layer[row][col]  // i.e. one of the squares on the grid-based map (that I'm using as the anchor)
-      if (!map_sq || !map_sq.anchor) continue
+  for (let map_row = 0; map_row < attr_layer.length; map_row++) {  // go through each row/col of layer 3 to look for the anchor cell's id
+    for (let map_col = 0; map_col < attr_layer[map_row].length; map_col++) {
+      const map_sq = attr_layer[map_row][map_col]  // i.e. one of the squares on the grid-based map (that I'm using as the anchor)
 
+      if (!map_sq || !map_sq.id) continue; //needed because some of my map sqs are undefined (with 0 value, namely the static imgs of durham locations)
       const obj_on_the_map = placeableDefinitions[map_sq.id]
-      if (!obj_on_the_map) {  // need to check if there's actually anythign to go to
+      if (!obj_on_the_map) {  // need to check if there's actually anythign to go towards
         continue
       }
 
       attractions_on_map.push({
         defId: map_sq.id,  // I'm pulling the id from the actual map of durham here
         // position (anchor tile on the attr_layer)
-        col: col,
-        row: row,
-        // I fetch the runtime state from the map square
-        capacity: obj_on_the_map.capacity ?? 0,
-        visitTime: obj_on_the_map.visitTime ?? 0,
-        magicGain: obj_on_the_map.magicGain ?? 0,
-        currentVisitors: map_sq.currentVisitors || 0,
+        col: map_col, row: map_row,
+        // here I fetch the runtime state from the map square
+        capacity: obj_on_the_map.capacity ?? 0, visitTime: obj_on_the_map.visitTime ?? 0, magicGain: obj_on_the_map.magicGain ?? 0, // these ones are all defined in placeableDefinitions
+        currentVisitors: map_sq.currentVisitors || 0, // each attraction has a "currently visiting" amount of npcs, which is used in placementPreview too
         cellRef: map_sq
       })
     }
@@ -64,7 +58,7 @@ function get_all_attractions_on_map() {
 export function spawn_new_visitor() {
   // ensure visitor spawns on a valid path, not attraction/undefined square
   const curr_map = window.currentMap;
-  if (!curr_map) { // no map avaialbe to work with (should never be the case)
+  if (!curr_map) { // no map avaialbe to work with (should actually never be the case though)
     return null;
   }
 
@@ -72,7 +66,7 @@ export function spawn_new_visitor() {
   const width_of_map = curr_map[0].length;
   const all_valid_border_spawn_sqs = []; // i'm tracking each valid map square on the outskirts of the map
 
-  // compile the list of valid map squares for a visitor to enter the map on
+  // now I compile the list of valid map squares for a visitor to enter the map on
   for (let map_col = 0; map_col < width_of_map; map_col++) {// start w/ top & bottom rows
     if (curr_map[0][map_col] === 1) {
       all_valid_border_spawn_sqs.push({row:0,col:map_col});

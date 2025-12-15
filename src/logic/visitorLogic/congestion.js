@@ -1,9 +1,7 @@
 import { SCALE_DOWN, HMAP_ROWS, HMAP_COLS, get_hmap_grid_for_congestion } from "../../components/heatmap.js";
 import { Frustration } from "../resources.js";  // more congestion == more frustration (Lumiere's too busy, not enough attractions!)
 import { STATE_OF_NPC } from "./visitors.js";
-
-const COLLISION_WEIGHT = 7; // [DEV NOTE]: Tuneable hyperparam for making frustration lvl more sensitive (also have one in resources.js but better to use this to compartmentalise logic)
-
+import { COLLISION_WEIGHT } from "../../config.js";
 
 // to grab the locations of npcs from heatmap
 let get_all_npc_positions = null; // p.s. this is storing a function, for clarity of how I'm using it below
@@ -64,6 +62,8 @@ function npcs_in_hmap_cell(npc_positions) {
 
 
 // now for each aggreagated hmap tile, I'm looking at a/b collisions inside it
+// note: I recognise this isn't strictly AABB collision detection; instead, its an axis-aligned spatial aggragation thats 
+// approximating crowd congestion instead of looking at exact physical overlap. This is more computationaly efficient and aligned w/ the game's tile-based logic.
 function compute_aabb_visitor_collisions(npcs_grouped_per_cell, hmap) {
     let global_total_congestion = 0;
 
@@ -100,7 +100,7 @@ function compute_aabb_visitor_collisions(npcs_grouped_per_cell, hmap) {
         // now I read the heatmap multiplier for this tile
         const tier_multiplier = (hmap[group_hmap_y] && typeof hmap[group_hmap_y][group_hmap_x] !== 'undefined')
             ? hmap[group_hmap_y][group_hmap_x]
-            : 1;
+            : 1; //(defualt)
 
         // CORE LOGIC!!!
         const incr_in_congestion = collisions_on_this_tile * tier_multiplier * COLLISION_WEIGHT;
@@ -108,7 +108,6 @@ function compute_aabb_visitor_collisions(npcs_grouped_per_cell, hmap) {
         // now add this tile's congestion to global total
         global_total_congestion += incr_in_congestion;
     }
-    console.log(`Global total congestion increase: ${global_total_congestion}`);
     return global_total_congestion;
 }
 

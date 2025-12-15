@@ -50,17 +50,17 @@ export const Staff = {
     // fetch total staff awarded by the game (used when deciding to award more staff based on visitors)
     get_total_awarded() { return this.total_awarded; },
 
-    // fetch the baseline starting staff count used in visitor ratio calculation
+    // this is the starting staff amnt, added here to be used in main.js's logic
     get_base_awarded() { return this.base_awarded; },
 
-    // "hiring" new staff
+    // this represents "hiring" new staff
     add(amount) {
         this.available += amount;
         this.total_awarded += amount;
         this.notify();
     },
 
-    // remove (spend) staff from the available pool when placing attractions.
+    // remove (spend) staff from the available staff cnt when placing attractions.
     remove(amount) {
         this.available = Math.max(0, this.available - amount);
         this.notify();
