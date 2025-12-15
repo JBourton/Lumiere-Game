@@ -7,6 +7,7 @@ import * as Pathfinding from './pathfinding.js'    // this is linking the npc wi
 import { reset_heatmap_counts, register_visitor_on_heatmap, update_heatmap_visual } from '../../components/heatmap.js';
 import { VISTOR_MOVE_SPEED } from '../../config.js';
 import { repel_from_busy_areas } from './congestion.js'; // for that bit of congestion bias to stop visitors clumping together in same cell en-route to attractions
+import { RECENTLY_VISITED_DEFINITION } from '../../config.js';
 
 // Here I'm taking a layered strucured by treating the npc logic as 3 seperate layered: funadmental design, current STATE_OF_NPC and attraction selection logic
 // I can then make the architecture nicely decoupled from the main game logic
@@ -119,8 +120,6 @@ function select_next_attraction(npc_to_move, attractions_on_map) {
   let best_attr_score = 0;  // each attraction will be assigned a score determining how good of a fit it is for natural pathfinding
   let best_attr_to_visit = null;  // this holds the most valid attraction object
   const time_right_now = performance.now()  // this is a browser api responsible for timing and I use it in to check how recently an attraction was visited
-
-  const RECENTLY_VISITED_DEFINITION = 30000; // i.e. how long has to pass (in ms) for an attraction to no longer be classed as "recently visited"
 
   // here I'm looping through all attractions
   for (const att of attractions_on_map) {

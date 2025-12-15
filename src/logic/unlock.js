@@ -5,20 +5,24 @@ import { ALL_ATTRACTIONS_PLACEABLE_ON_MAP } from "./placeableDefinitions.js";
 // these are the thresholds of visitors to unlock each attraction type
 export const UNLOCK_RULES = [  // [DEV NOTE] Could move these to config.js later?
     // my attractions
-    { visitors: 5, id: "kaleidoscope" },
-    { visitors: 15, id: "mythical_screen" },
-    { visitors: 25, id: "luminescent_webs" },
-    { visitors: 40, id: "light_forest"},
+    { visitors: 12, id: "kaleidoscope" },
+    { visitors: 28, id: "mythical_screen" },
+    { visitors: 48, id: "luminescent_webs" },
+    { visitors: 70, id: "holographic_bunny" },
+    { visitors: 110, id: "light_forest"},
 
     // ... and stages
-    { visitors: 15, id: "balloon_stage"},
-    { visitors: 20, id: "clown_stage" },
-    { visitors: 35, id: "music_stage"},
+    { visitors: 25, id: "music_stage"},
+    { visitors: 35, id: "magician_stage"},
+    { visitors: 55, id: "singer_stage"},
+    { visitors: 85, id: "balloon_stage"},
+    { visitors: 120, id: "clown_stage" },
 
     // and then food stalls
-    { visitors: 10, id: "hotdog_stand" },
-    { visitors: 25, id: "cotton_candy_stand" },
+    { visitors: 14, id: "hotdog_stand" },
+    { visitors: 26, id: "cotton_candy_stand" },
     { visitors: 45, id: "gyros_stand" },
+    { visitors: 72, id: "mulled_wine_stall" },
 ];
 
 let all_players_unlocked_attractions = new Set();

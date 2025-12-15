@@ -840,6 +840,9 @@ body {
 .placed-overlay.mythical_screen {
     background-image: url("assets/imgs/attractions/Magical%20Mirror%208bit%20-%20Generated%20by%20ChatGPT.png");
 }
+.placed-overlay.holographic_bunny {
+    background-image: url("assets/imgs/attractions/Holographic\ Bunny\ -\ Generated\ by\ ChatGPT.png");
+}
 .placed-overlay.luminescent_webs {
     background-image: url("assets/imgs/attractions/Spider%20Lights%208bit-%20Generated%20by%20ChatGPT.png");
     background-repeat: no-repeat;
@@ -860,6 +863,12 @@ body {
 .placed-overlay.music_stage {
     background-image: url("assets/imgs/stages/Music\ Stage\ -\ Generated\ by\ ChatGPT.png");
 }
+.placed-overlay.magician_stage {
+    background-image: url("assets/imgs/stages/Magician\ on\ stage\ -\ Generated\ by\ ChatGPT.png");
+}
+.placed-overlay.singer_stage {
+    background-image: url("assets/imgs/stages/Singer\ on\ stage\ -\ Generated\ by\ ChatGPT.png");
+}
 .placed-overlay.popcorn_stand {
     background-image: url("assets/imgs/foodstalls/Popcorn\ Stand\ -\ Generated\ by\ ChatGPT.png");
 }
@@ -871,6 +880,9 @@ body {
 }
 .placed-overlay.gyros_stand {
     background-image: url("assets/imgs/foodstalls/Gyros\ Stand\ -\ Generated\ by\ ChatGPT.png");
+}
+.placed-overlay.mulled_wine_stall {
+    background-image: url("assets/imgs/foodstalls/Mulled\ Wine\ Stall\ -\ Generated\ by\ ChatGPT.png");
 }
 
 

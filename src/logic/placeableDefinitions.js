@@ -20,7 +20,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: false,  // Only items that the player is able to place will have this set to True; this evolves throughout the game as the player reaches higher magic lvls
         staff_cost: 1,
         capacity: 1,
-        visitTime: 10500,
+        visitTime: 12000,
         magicGain: 0.1,
     },
 
@@ -33,8 +33,8 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: true,
         staff_cost: 2,
         capacity: 2,
-        visitTime: 15000,
-        magicGain: 0.3,
+        visitTime: 18000,
+        magicGain: 0.28,
     },
 
     mythical_screen: {
@@ -45,9 +45,22 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 4, h: 4,
         locked: true,
         staff_cost: 3,
-        capacity: 4,
-        visitTime: 19500,
-        magicGain: 0.4,
+        capacity: 3,
+        visitTime: 24000,
+        magicGain: 0.34,
+    },
+
+    holographic_bunny: {
+        id: "holographic_bunny",
+        name: "Holographic Bunny",
+        type: ATTRACTION_TYPES.LIGHTS,
+        img: "assets/imgs/attractions/Holographic%20Bunny%20-%20Generated%20by%20ChatGPT.png",
+        w: 2, h: 2,
+        locked: true,
+        staff_cost: 4,
+        capacity: 3,
+        visitTime: 21000,
+        magicGain: 0.3,
     },
 
     luminescent_webs: {
@@ -58,9 +71,9 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         w: 6, h: 2,
         locked: true,
         staff_cost: 5,
-        capacity: 5,
-        visitTime: 22500,
-        magicGain: 0.5
+        capacity: 4,
+        visitTime: 26000,
+        magicGain: 0.42
     },
 
     light_forest: {
@@ -72,12 +85,38 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: true,
         staff_cost: 8,
         capacity: 6,
-        visitTime: 27000,
-        magicGain: 0.7
+        visitTime: 32000,
+        magicGain: 0.6
     },
 
 
     // then the stages
+        magician_stage: {
+        id: "magician_stage",
+        name: "Magician Stage",
+        type: ATTRACTION_TYPES.STAGES,
+        img: "assets/imgs/stages/Magician%20on%20stage%20-%20Generated%20by%20ChatGPT.png",
+        w: 2, h: 2,
+        locked: true,
+        staff_cost: 10,
+        capacity: 22,
+        visitTime: 60000,
+        magicGain: 0.22,
+    },
+
+    singer_stage: {
+        id: "singer_stage",
+        name: "Singer Stage",
+        type: ATTRACTION_TYPES.STAGES,
+        img: "assets/imgs/stages/Singer%20on%20stage%20-%20Generated%20by%20ChatGPT.png",
+        w: 2, h: 2,
+        locked: true,
+        staff_cost: 16,
+        capacity: 25,
+        visitTime: 65000,
+        magicGain: 0.24,
+    },
+
     balloon_stage: {
         id: "balloon_stage",
         name: "Balloon Stage",
@@ -85,10 +124,10 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Balloon%20Stage%20-%20Generated%20by%20ChatGPT.png",
         w: 3, h: 3,
         locked: true,
-        staff_cost: 3,
+        staff_cost: 22,
         capacity: 10,
-        visitTime: 30000,
-        magicGain: 0.1,
+        visitTime: 42000,
+        magicGain: 0.11,
     },
 
     clown_stage: {
@@ -98,9 +137,9 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Clown%20Stage%20-%20Generated%20by%20ChatGPT.png",
         w: 3, h: 3,
         locked: true,
-        staff_cost: 6,
-        capacity: 15,
-        visitTime: 37500,
+        staff_cost: 12,
+        capacity: 22,
+        visitTime: 48000,
         magicGain: 0.15
     },
 
@@ -111,12 +150,11 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Music%20Stage%20-%20Generated%20by%20ChatGPT.png",
         w: 3, h: 3,
         locked: true,
-        staff_cost: 8,
-        capacity: 20,
-        visitTime: 45000,
+        staff_cost: 36,
+        capacity: 28,
+        visitTime: 52000,
         magicGain: 0.2
     },
-
 
     // and finally the food stalls
     popcorn_stand: {
@@ -161,6 +199,17 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         locked: true,
         staff_cost: 4,
         effect_w: 9, effect_h: 9,
+    },
+
+    mulled_wine_stall: {
+        id: "mulled_wine_stall",
+        name: "Mulled Wine Stall",
+        type: ATTRACTION_TYPES.FOOD,
+        img: "assets/imgs/foodstalls/Mulled%20Wine%20Stall%20-%20Generated%20by%20ChatGPT.png",
+        w: 1, h: 1,
+        locked: true,
+        staff_cost: 5,
+        effect_w: 11, effect_h: 11,
     },
 
 
