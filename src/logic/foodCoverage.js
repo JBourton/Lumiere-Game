@@ -98,11 +98,13 @@ export const FoodCoverage = {
     
     // now this calculates how much magic is lost, which is propotional to how many visitors are interacting with an attratcion outside of any foodstall coverage
     calculate_magic_loss_from_lack_of_foodstalls(all_visitors) {
-        if (!this._coverageMask) return;
-
         let overall_magic_loss_from_hunger = 0;
+        let hungry_penalty_active = false;
 
         for (const npc of all_visitors) {
+            // reset per-frame hunger bubble flag; only set when actually hungry
+            npc.isHungryForFood = false;
+
             // Important line! I'm ONLY penalising visitors that are actually visiting an attraction, as part of the core gameplay loop
             // if a visitor's just wandering or standing still, no dramas -magic stays the same. If they're visiting an attraction for a long time without food around though, they're gonna drain magic VERY fast, particualrly if there's lots of them
             if (npc.STATE_OF_NPC !== STATE_OF_NPC.VISITING) continue;
@@ -115,8 +117,10 @@ export const FoodCoverage = {
             if (!is_path_tile) continue;
 
             // IMPORTANT: THIS NEED TO ONLY PENALISE VISITORS THAT ARE INTERACTING WITH ATTRACTIONS
-            const is_path_tile_covered = this.is_in_foodstall_range(npcs_col, npcs_row);
+            const is_path_tile_covered = this._coverageMask ? this.is_in_foodstall_range(npcs_col, npcs_row) : false; // if no food stalls, nowhere is covered
             if (!is_path_tile_covered) {
+                hungry_penalty_active = true;
+                npc.isHungryForFood = true;
                 overall_magic_loss_from_hunger += MAGIC_DEC_FROM_HUNGRINESS; // [DEV NOTE] tune in config.js
             }
         }
@@ -124,6 +128,8 @@ export const FoodCoverage = {
         if (overall_magic_loss_from_hunger > 0) {
             Magic.decrease(overall_magic_loss_from_hunger);
         }
+
+        return hungry_penalty_active;
     },
 
     // I need this to ensure that the coverage tiles get wiped on game reset

@@ -8,7 +8,7 @@ export const HEIGHT = 30;
 
 
 // Variables relating to: Visitor spawning
-export const VISTOR_MOVE_SPEED = 2600; //how fast visitor can go around durham
+export const VISTOR_MOVE_SPEED = 1500; //how fast visitor can go around durham
 export const VISITOR_REDRAW_INTERVAL = 100; // (not currently used but useful for improving framerate @ high visitor cnt)
 export const VISITOR_CAP = 65; // the most visitors possible for a game (so as not to crash it)
 export const RECENTLY_VISITED_DEFINITION = 30000; // i.e. how long has to pass (in ms) for an attraction to no longer be classed as "recently visited"
