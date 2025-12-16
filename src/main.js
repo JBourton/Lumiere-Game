@@ -25,6 +25,23 @@ window.Staff = Staff;
 window.Visitors = Visitors;
 window.Frustration = Frustration;
 
+let timerDisplay = null;
+let time_remaining_ms = config.TIME_LIMIT_MS;
+let last_timer_display_seconds = Math.floor(config.TIME_LIMIT_MS / 1000);
+let is_player_out_of_time = false;
+
+function format_timer_text(ms) {
+    const totalSeconds = Math.max(0, Math.floor(ms / 1000));
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = totalSeconds % 60;
+    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+}
+
+function update_timer_display() {
+    if (!timerDisplay) return;
+    timerDisplay.textContent = `⏱️ ${format_timer_text(time_remaining_ms)}`;
+}
+
 
 
 // this function resets everything back to how it was at game start
@@ -38,6 +55,11 @@ function reset_the_game() {     // I've just delegated it all to another file to
         clear_food_coverage: () => {FoodCoverage.redraw_all_food_coverage([]); FoodCoverage._coverageMask = null; window.foodStallAnchors = [];}, // clear dom overlays for green food coverage sqs
         apply_accessibility_settings: refreshColourblindStyles // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
     });
+
+    time_remaining_ms = config.TIME_LIMIT_MS;
+    last_timer_display_seconds = Math.floor(config.TIME_LIMIT_MS / 1000);
+    is_player_out_of_time = false;
+    update_timer_display();
 }
 
 
@@ -48,6 +70,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const magicBar = document.getElementById("magic-bar"); // fetch the magic bar to start updating it throught game
     const magicText = document.getElementById("magic-text"); // fetch the magic text to keep it in sync
+    timerDisplay = document.getElementById("timer-display");
     const staffDisplay = document.getElementById("staff-display"); // same w/ staff but as a counter not a bar
     const visitorDisplay = document.getElementById("visitor-display");
     const frustrationBar = document.getElementById("frustration-bar");
@@ -115,6 +138,7 @@ document.addEventListener("DOMContentLoaded", () => {
     visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${Visitors.get()}`;
     frustrationBar.style.height = Frustration.get() + "%"; // dynamic adjusting of hieght lets the palyer view live updates of visitor frustation
     check_unlocks(Magic.get());
+    update_timer_display();
 
     // initialise accessibility toggle once controls are in the DOM
     initColourblindMode(); // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).
@@ -199,6 +223,21 @@ function lumiere_gameplay_loop(game_timing_data) {
         return;
     }
     curr_time_frame = game_timing_data; // need later
+
+    // now check if the game can go on, or if the player's out of time
+    if (!is_player_out_of_time) {
+        time_remaining_ms = Math.max(0, time_remaining_ms - change_in_time);
+        const seconds_player_has_left = Math.floor(time_remaining_ms / 1000);
+        if (seconds_player_has_left !== last_timer_display_seconds) {
+            last_timer_display_seconds = seconds_player_has_left;
+            update_timer_display();
+        } // all good, the game can go on
+        if (time_remaining_ms <= 0) { // out of time!! looserrrrr!!
+            is_player_out_of_time = true;
+            update_timer_display();
+            game_over();
+        }
+    }
 
     // update congestion (but not every frame so as to not lag-out game)
     time_since_last_congestion_update += change_in_time;

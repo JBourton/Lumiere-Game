@@ -43,3 +43,6 @@ export const FOOD_PENALTY_INTERVAL = 1000;
 
 // Variables relating to: Staff count
 export const VISITOR_STAFF_RELATION = 2.5; // the multiplier of how many staff the player gets to work with, proprotional to visitor cnt, i.e. x visitors per 1 staff
+
+// and this is responsible for setting how long the player has to reach max magic
+export const TIME_LIMIT_MS = 10 * 60 * 1000;

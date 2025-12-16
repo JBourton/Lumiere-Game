@@ -4,7 +4,7 @@ Also it's tied in VERY closely with machinations diagram 01: this should make it
 
 /* Constant 1 (most important, as its vital to gameplay): MAGIC meter! */
 export const Magic = {
-    mgc_value: 10, // I've decided to set the magic at 10%; that way, the player has movement to increase or decrease magic from the get-go
+    mgc_value: 56, // I've decided to set the magic at 10%; that way, the player has movement to increase or decrease magic from the get-go
     listeners: [],
 
     // there's a listner set up just for magic
@@ -36,7 +36,7 @@ export const Magic = {
 /* Constant 2: Staff count. Here we're tracking how many staff the player has to run their attractions */
 export const Staff = {
     // my rule: spending staff (placing attractions) reduces 'available' but not 'total_awarded'
-    base_awarded: 1,  // starting val of staff for player to start off w/
+    base_awarded: 30,  // starting val of staff for player to start off w/
     available: 1,  // num staff for player to "spend" running attrations
     total_awarded: 1, // amnt staff granted by gameplay (proportional to visitors)
     listeners: [],

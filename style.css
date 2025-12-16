@@ -656,12 +656,25 @@ body {
 #resource-ui {
     display: flex;
     flex-direction: row;
-    justify-content: center; 
+    justify-content: flex-start;
     align-items: center;
     gap: clamp(8px, 1.5vw, 20px);
     width: 100%;
     color: white;   
     margin-top: 10px;
+    padding: 0 clamp(12px, 2vw, 24px);
+    padding-right: calc(clamp(12px, 2vw, 24px) + 180px);
+}
+
+#timer-display {
+    font-size: clamp(10px, 1.6vw, 18px);
+    color: white;
+    background: rgba(0, 0, 0, 0.35);
+    padding: 4px 8px;
+    border: 2px solid white;
+    border-radius: 4px;
+    min-width: 96px;
+    text-align: center;
 }
 
 
