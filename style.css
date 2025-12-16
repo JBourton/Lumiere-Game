@@ -462,6 +462,13 @@ body {
     width: calc(100% - 20px);
     margin: 0 auto 10px auto;
 }
+.gameover-modal-content > p {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(10px, 1.4vw, 15px);
+    text-transform: none;
+    letter-spacing: normal;
+    line-height: 1.5;
+}
 
 /* Base styling as fallback + the specific styles */
 #startButton,
@@ -658,6 +665,7 @@ body {
     flex-direction: row;
     justify-content: flex-start;
     align-items: center;
+    flex-wrap: nowrap;
     gap: clamp(8px, 1.5vw, 20px);
     width: 100%;
     color: white;   
@@ -717,9 +725,18 @@ body {
 
 
 #staff-container, #visitor-container {
-    font-size: clamp(10px, 1.6vw, 18px);
+    font-size: clamp(9px, 1.2vw, 14px);
     font-weight: bold;
     color: white;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-align: left;
+}
+#staff-container {
+    width: clamp(120px, 16vw, 160px);
+}
+#visitor-container {
+    width: clamp(150px, 20vw, 200px);
 }
 
 

@@ -21,7 +21,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         staff_cost: 1,
         capacity: 1,
         visitTime: 12000,
-        magicGain: 0.1,
+        magicGain: 0.15,
     },
 
     kaleidoscope: {
@@ -34,7 +34,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         staff_cost: 2,
         capacity: 2,
         visitTime: 18000,
-        magicGain: 0.28,
+        magicGain: 0.3,
     },
 
     mythical_screen: {
@@ -47,7 +47,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         staff_cost: 3,
         capacity: 3,
         visitTime: 24000,
-        magicGain: 0.34,
+        magicGain: 0.45,
     },
 
     holographic_bunny: {
@@ -60,7 +60,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         staff_cost: 4,
         capacity: 3,
         visitTime: 21000,
-        magicGain: 0.3,
+        magicGain: 0.6,
     },
 
     luminescent_webs: {
@@ -73,7 +73,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         staff_cost: 5,
         capacity: 4,
         visitTime: 26000,
-        magicGain: 0.42
+        magicGain: 0.8
     },
 
     light_forest: {
@@ -86,7 +86,7 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         staff_cost: 8,
         capacity: 6,
         visitTime: 32000,
-        magicGain: 0.6
+        magicGain: 1
     },
 
 
@@ -98,8 +98,8 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Magician%20on%20stage%20-%20Generated%20by%20ChatGPT.png",
         w: 2, h: 2,
         locked: true,
-        staff_cost: 10,
-        capacity: 22,
+        staff_cost: 6,
+        capacity: 5,
         visitTime: 60000,
         magicGain: 0.22,
     },
@@ -111,8 +111,8 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Singer%20on%20stage%20-%20Generated%20by%20ChatGPT.png",
         w: 2, h: 2,
         locked: true,
-        staff_cost: 16,
-        capacity: 25,
+        staff_cost: 8,
+        capacity: 8,
         visitTime: 65000,
         magicGain: 0.24,
     },
@@ -124,10 +124,10 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Balloon%20Stage%20-%20Generated%20by%20ChatGPT.png",
         w: 3, h: 3,
         locked: true,
-        staff_cost: 22,
-        capacity: 10,
+        staff_cost: 12,
+        capacity: 14,
         visitTime: 42000,
-        magicGain: 0.11,
+        magicGain: 0.45,
     },
 
     clown_stage: {
@@ -137,10 +137,10 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Clown%20Stage%20-%20Generated%20by%20ChatGPT.png",
         w: 3, h: 3,
         locked: true,
-        staff_cost: 12,
+        staff_cost: 15,
         capacity: 22,
         visitTime: 48000,
-        magicGain: 0.15
+        magicGain: 0.6
     },
 
     music_stage: {
@@ -150,10 +150,10 @@ export const ALL_ATTRACTIONS_PLACEABLE_ON_MAP = {
         img: "assets/imgs/stages/Music%20Stage%20-%20Generated%20by%20ChatGPT.png",
         w: 3, h: 3,
         locked: true,
-        staff_cost: 36,
-        capacity: 28,
+        staff_cost: 20,
+        capacity: 30,
         visitTime: 52000,
-        magicGain: 0.2
+        magicGain: 0.75
     },
 
     // and finally the food stalls

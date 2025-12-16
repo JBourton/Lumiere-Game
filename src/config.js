@@ -8,7 +8,7 @@ export const HEIGHT = 30;
 
 
 // Variables relating to: Visitor spawning
-export const VISTOR_MOVE_SPEED = 1500; //how fast visitor can go around durham
+export const VISTOR_MOVE_SPEED = 1000; //how fast visitor can go around durham
 export const VISITOR_REDRAW_INTERVAL = 100; // (not currently used but useful for improving framerate @ high visitor cnt)
 export const VISITOR_CAP = 65; // the most visitors possible for a game (so as not to crash it)
 export const RECENTLY_VISITED_DEFINITION = 30000; // i.e. how long has to pass (in ms) for an attraction to no longer be classed as "recently visited"
@@ -18,7 +18,7 @@ export function get_spawn_interval_from_frustration() {
     const tier_of_frust = Frustration.map_frust_tier();
 
     // busier streets = bad reviews! bad reviews = less visitors coming to Durham - word of mouth is a powerful thing! ;)
-    if (tier_of_frust === 1) return 12000;   // i.e. every 12s
+    if (tier_of_frust === 1) return 10000;   // i.e. every 12s
     if (tier_of_frust === 2) return 22000;   // and every 22s
     if (tier_of_frust === 3) return 32000;   // then a whole 32s
     return Infinity;  // at this point (tier 4), the player has QUITE enough to stress about, so no new visitors will spawn until this high frustration / busy map is resolved
@@ -26,7 +26,7 @@ export function get_spawn_interval_from_frustration() {
 
 
 // Varaibles for player move speed
-export const PLAYER_MOVE_SPEED = 85;
+export const PLAYER_MOVE_SPEED = 100;
 
 
 // Varaibles relating to: Congestion

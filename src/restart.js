@@ -5,8 +5,8 @@
 // the one function exposed to main
 export function reset_game_impl(game_restart_options) { // (note: I'm one-line type-checking for functions to try to meet the extensibility requirement of the coursework, but the game restart should still work without them)
     // setting resources back to how it all was at game-start
-    game_restart_options.Magic.set_mgc(10);
-    game_restart_options.Staff.set_stf(1);
+    game_restart_options.Magic.set_mgc(game_restart_options.Magic.initial_mgc_value ?? 10);
+    game_restart_options.Staff.set_stf(game_restart_options.Staff.initial_base_awarded ?? 1);
     game_restart_options.Visitors.set_vstrs(0);
     game_restart_options.Frustration.set_frust(0);
 

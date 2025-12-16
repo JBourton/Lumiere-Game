@@ -292,14 +292,6 @@ function lumiere_gameplay_loop(game_timing_data) {
     time_since_last_food_penalty += change_in_time;
     if (time_since_last_food_penalty >= config.FOOD_PENALTY_INTERVAL) { // i'm applying penalty once per second
         const hungryPenalty = FoodCoverage.calculate_magic_loss_from_lack_of_foodstalls(getnpcs_on_map());
-        const foodTab = document.getElementById("tab-food");
-        if (foodTab) {
-            if (hungryPenalty) {
-                foodTab.classList.add("food-alert");
-            } else {
-                foodTab.classList.remove("food-alert");
-            }
-        }
         time_since_last_food_penalty = 0;
     }
 

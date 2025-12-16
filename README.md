@@ -136,3 +136,8 @@ Specifically, the prompt used was:
 *"I want a new file in src/components that activates a "colour blind mode". Help me to try this out. The only change that should happen is that there's a button positioned to the right of the current row of control buttons in index.html that says "Colourblind mode: " with on/off symbols. When the user clicks it, it should modify the game's styles to be suitable to colourblind people, including highlighting the paths in a colour-blind-accessible style. I want this to be as minimal on the rest of the codebase as possible, but should still be added to necessary files like game restart and other appropriate areas of the codebase, with minimal modifications to those files other than to prevent bugs. You'll need to scan the whole repo to see where the other buttons are incoporated and use them in a similar context. Use your knowledge of colourblind colours to do this, putting almost all of the logic (as much as possible) in a new file called colourblind.js in src/components. Credit yourslef (inc. model name) in every part where you apply changes.*
 
 Additionally, all the images in the game were custom-generated using Chat GPT 5.1, including the path, pavement and grass images.
+
+
+# Links to Machinations Diagrams
+- [Machinations Diagram 01: Game's Internal Resources](https://my.machinations.io/d/updated-machinations-diagram-01-games-internal-resources/27025f9bbefa11f0838a0abc5ce0dcc9)
+- [Machinations Diagram 02: Dynamic Object Interactions](https://my.machinations.io/d/updated-machinations-diagram-02-dynamic-object-interactions/33248d73bf1311f0838a0abc5ce0dcc9)

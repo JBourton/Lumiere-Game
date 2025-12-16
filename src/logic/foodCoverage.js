@@ -4,6 +4,7 @@
 import { Magic } from "./resources.js";
 import { STATE_OF_NPC } from "./visitorLogic/visitors.js";
 import { MAGIC_DEC_FROM_HUNGRINESS } from "../config.js";
+import { ATTRACTION_TYPES, ALL_ATTRACTIONS_PLACEABLE_ON_MAP as placeableDefinitions } from "./placeableDefinitions.js";
 
 export const FoodCoverage = {
 
@@ -108,6 +109,14 @@ export const FoodCoverage = {
             // Important line! I'm ONLY penalising visitors that are actually visiting an attraction, as part of the core gameplay loop
             // if a visitor's just wandering or standing still, no dramas -magic stays the same. If they're visiting an attraction for a long time without food around though, they're gonna drain magic VERY fast, particualrly if there's lots of them
             if (npc.STATE_OF_NPC !== STATE_OF_NPC.VISITING) continue;
+
+            // visitors currently at a food stall shouldn't trigger a hunger penalty
+            if (npc.targetId) {
+                const [targetCol, targetRow] = npc.targetId.split(',').map(Number);
+                const targetCell = window.placedObjects?.[targetRow]?.[targetCol];
+                const targetDef = targetCell ? placeableDefinitions[targetCell.id] : null;
+                if (targetDef?.type === ATTRACTION_TYPES.FOOD) continue;
+            }
             // pull coords for each visitor
             const npcs_col = npc.vis_col;
             const npcs_row = npc.vis_row;

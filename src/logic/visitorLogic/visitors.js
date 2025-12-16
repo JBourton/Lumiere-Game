@@ -238,29 +238,31 @@ function npc_central_controller(npc, time_change) {
 
         // Try each walkable candidate in order of distance until we find one that's actually reachable
         let reachable_target = null;
+        let best_path = null;
         for (const candidate of walkable_spots) {
-            // If NPC is already at this tile, we can visit immediately
-            if (npc.vis_col === candidate.col && npc.vis_row === candidate.row) {
-                reachable_target = candidate;
-                break;
-            }
+          // If NPC is already at this tile, we can visit immediately
+          if (npc.vis_col === candidate.col && npc.vis_row === candidate.row) {
+            reachable_target = candidate;
+            best_path = [];
+            break;
+          }
 
-            // Otherwise, validate reachability with A* pathfinding
-            const path = Pathfinding.run_full_Astar(
-                npc.vis_col,
-                npc.vis_row,
-                candidate.col,
-                candidate.row
-            );
+          // Otherwise, validate reachability with A* pathfinding
+          const path = Pathfinding.run_full_Astar(
+            npc.vis_col,
+            npc.vis_row,
+            candidate.col,
+            candidate.row
+          );
 
-            // If we found a valid path to this candidate, use it
-            if (path && path.length > 0) {
-                reachable_target = candidate;
-                npc.path = path;
-                npc.pathIndex = 0;
-                break;
+          // If we found a valid path, keep the shortest available one (closest adjacent tile)
+          if (path && path.length > 0) {
+            if (!best_path || path.length < best_path.length) {
+              reachable_target = candidate;
+              best_path = path;
             }
-            // Otherwise, continue to the next candidate
+          }
+          // Otherwise, continue to the next candidate
         }
 
         if (!reachable_target) {
@@ -302,6 +304,10 @@ function npc_central_controller(npc, time_change) {
         
         npc.goalCol = reachable_target.col;
         npc.goalRow = reachable_target.row;
+        if (best_path) {
+          npc.path = best_path;
+          npc.pathIndex = 0;
+        }
         npc.STATE_OF_NPC = STATE_OF_NPC.MOVING;
         break;
     }
