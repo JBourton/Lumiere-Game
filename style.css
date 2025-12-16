@@ -678,6 +678,24 @@ body {
     background: #4aa3ff;
     transition: width 0.25s ease;
 }
+#magic-bar.flash-red {
+    background: #e74c3c;
+    animation: magic-flash-red 0.45s ease;
+}
+#magic-bar.flash-green {
+    background: #2ecc71;
+    animation: magic-flash-green 0.45s ease;
+}
+@keyframes magic-flash-red {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.5); }
+    100% { filter: brightness(1); }
+}
+@keyframes magic-flash-green {
+    0% { filter: brightness(1); }
+    50% { filter: brightness(1.5); }
+    100% { filter: brightness(1); }
+}
 #magic-text {
     font-size: clamp(10px, 1.6vw, 18px);
     color: white;

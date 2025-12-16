@@ -52,11 +52,21 @@ document.addEventListener("DOMContentLoaded", () => {
     const visitorDisplay = document.getElementById("visitor-display");
     const frustrationBar = document.getElementById("frustration-bar");
     const frustrationLabel = document.getElementById("frustration-label");
+    let prevMagicValue = Magic.get();
 
     // now setup a listner for both magic & staff
     Magic.addListener(magiclvl => {
+        magicBar.classList.remove("flash-red", "flash-green");
+        if (magiclvl < prevMagicValue) {
+            magicBar.classList.add("flash-red");
+        } else if (magiclvl > prevMagicValue) {
+            magicBar.classList.add("flash-green");
+        }
+        prevMagicValue = magiclvl;
+
         magicBar.style.width = magiclvl + "%"; // first the magic bar
         magicText.textContent = `Magic: ${magiclvl}%`; // then the text display too
+        check_unlocks(magiclvl);
 
         // noooo the player lost the game - restart time!
         if (magiclvl <= 0) {
@@ -77,7 +87,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 
     // & then this updates the counter for total num of visitors & sees if player should unlock any more attractions
-    Visitors.addListener(visCnt => {visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${visCnt}`; check_unlocks(visCnt);})
+    Visitors.addListener(visCnt => {visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${visCnt}`;})
 
     // finally (and most complex) is the dynamic frustration bar adjusting
     Frustration.addListener(frustrationlvl => {
@@ -104,6 +114,7 @@ document.addEventListener("DOMContentLoaded", () => {
     staffDisplay.textContent = `👷 Staff: ${Staff.get()}`;
     visitorDisplay.textContent = `👨‍👩‍👧‍👦 Visitors: ${Visitors.get()}`;
     frustrationBar.style.height = Frustration.get() + "%"; // dynamic adjusting of hieght lets the palyer view live updates of visitor frustation
+    check_unlocks(Magic.get());
 
     // initialise accessibility toggle once controls are in the DOM
     initColourblindMode(); // Added by GitHub Copilot (GPT-5.1-Codex-Max (Preview)).

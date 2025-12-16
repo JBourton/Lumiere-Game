@@ -124,6 +124,10 @@ export function setupSidebar() {
             tabs.forEach(t => t.classList.remove('active'));
             // but activate the one that was clicked
             tab.classList.add('active');
+            if (tab.id !== "tab-food") {
+                const foodTab = document.getElementById("tab-food");
+                if (foodTab) foodTab.classList.remove("food-alert");
+            }
             // and then update content panel
             const tabName = tab.textContent.trim();
 

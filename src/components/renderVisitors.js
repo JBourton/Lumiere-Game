@@ -1,8 +1,7 @@
 // this file segments the visitor code to ensure modularity - visitors.js handles all the gameplay / interaction logic, whereas this file is the actual drawing of them on the map using their pngs
 
 import { getnpcs_on_map, STATE_OF_NPC } from "../logic/visitorLogic/visitors.js";  // I just use this to details about the visitors already in play
-
-const HUNGER_BUBBLE_IMG = "./assets/imgs/Speech%20Bubble%20-%20Generated%20by%20ChatGPT.png"; // lives in root imgs folder
+const HUNGER_BUBBLE_IMG = "./assets/imgs/Speech%20Bubble%20-%20Generated%20by%20ChatGPT.png"; // this is the icon that shows a visitors hungry when they're visiting an attraction outside foodstall range
 
 // these are the list of all the pngs created to represent the visitors to durham lumiere
 const VISITOR_SPRITES = [
@@ -95,8 +94,8 @@ export function draw_visitor_sprites_onto_map() {
                 hungerBubble.style.position = "absolute";
                 hungerBubble.style.left = `calc(${npc.vis_col} * var(--cell-size) + 4px)`;
                 hungerBubble.style.top  = `calc(${npc.vis_row} * var(--cell-size) - 18px)`;
-                hungerBubble.style.width = "18px";
-                hungerBubble.style.height = "18px";
+                hungerBubble.style.width = "28px";
+                hungerBubble.style.height = "28px";
                 hungerBubble.style.pointerEvents = "none";
                 hungerBubble.style.zIndex = "12";
                 lumiere_map.appendChild(hungerBubble);
