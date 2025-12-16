@@ -258,24 +258,18 @@ function place_item_on_map(x, y, item) {
 
     turn_off_the_placement_preview();  // get rid of the placement preview once the item's been placed
 
-    // Re-render map immediately so overlay shows right away
-    renderMap(
-        window.currentMap,
-        window.currentStatics,
-        window.placedObjects,
-        window.playerInstance.row,
-        window.playerInstance.col
-    );
+    // now i instantly re-render map to show overlay immediatly
+    renderMap(window.currentMap, window.currentStatics, window.placedObjects,window.playerInstance.row, window.playerInstance.col);
 
-    // Draw all the layers on top
+    // then draw all the layers on top
     draw_visitor_sprites_onto_map();
     
-    // now render the coverage area for each food stall
+    // and render coverage area for each food stall
     if (window.foodStallAnchors?.length) {
         FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
     }
 
-    // Rebuild preview after map refresh (map.js also calls this, but this is safe)
+    // finally i rebuild preview after map refresh
     if (window.__rebuildPreviewEl) window.__rebuildPreviewEl();
 }
 

@@ -262,12 +262,12 @@ function npc_central_controller(npc, time_change) {
               best_path = path;
             }
           }
-          // Otherwise, continue to the next candidate
+          // Otherwise, loop just continues to the next candidate
         }
 
         if (!reachable_target) {
             // None of the adjacent walkable tiles are reachable - try a random destination instead
-            console.warn(`[NPC] Could not find reachable path to attraction at (${next_target_attr.col},${next_target_attr.row}). Attempting to wander instead.`);
+            //console.warn(`[DEV WARNING] Couldn't find a reachable path to attraction at (${next_target_attr.col},${next_target_attr.row}). Now the visitor will just wander around until you place one.`);
             const next_target_to_walk_too = pick_random_path_destination(npc);
 
             if (!next_target_to_walk_too) {

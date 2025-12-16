@@ -25,21 +25,23 @@ window.Staff = Staff;
 window.Visitors = Visitors;
 window.Frustration = Frustration;
 
-let timerDisplay = null;
+let timer_interface_informer = null;
 let time_remaining_ms = config.TIME_LIMIT_MS;
 let last_timer_display_seconds = Math.floor(config.TIME_LIMIT_MS / 1000);
 let is_player_out_of_time = false;
 
+// logic for new time calc
 function format_timer_text(ms) {
     const totalSeconds = Math.max(0, Math.floor(ms / 1000));
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
-    return `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`;
+    let time_value_once_formatted = `${String(minutes).padStart(2, "0")}:${String(seconds).padStart(2, "0")}`
+    return time_value_once_formatted;
 }
-
+// & then interface update
 function update_timer_display() {
-    if (!timerDisplay) return;
-    timerDisplay.textContent = `⏱️ ${format_timer_text(time_remaining_ms)}`;
+    if (!timer_interface_informer) return;
+    timer_interface_informer.textContent = `⏱️ ${format_timer_text(time_remaining_ms)}`;
 }
 
 
@@ -70,7 +72,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const magicBar = document.getElementById("magic-bar"); // fetch the magic bar to start updating it throught game
     const magicText = document.getElementById("magic-text"); // fetch the magic text to keep it in sync
-    timerDisplay = document.getElementById("timer-display");
+    timer_interface_informer = document.getElementById("timer-display");
     const staffDisplay = document.getElementById("staff-display"); // same w/ staff but as a counter not a bar
     const visitorDisplay = document.getElementById("visitor-display");
     const frustrationBar = document.getElementById("frustration-bar");
@@ -153,7 +155,10 @@ document.addEventListener("DOMContentLoaded", () => {
 // render pop up to introduce player to the game
 const funky_background_audio = new AudioManager(); // turning on the tunes!
 
-funky_background_audio.toggleMute();  // [Dev note] Starting on muted because it's annoying when developing, but usually it'll start on unmuted for standard player
+// [Dev note]: now I start music automatically and ensure it's unmuted - during dev,turn this off as it gets a tad annoying
+funky_background_audio.is_muted = false;
+funky_background_audio.bg_music.muted = false;
+funky_background_audio.playMusic();
 
 // now play/pause system initialised w/ audio too
 pause_everything(funky_background_audio);

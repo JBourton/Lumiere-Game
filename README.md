@@ -67,7 +67,7 @@ Behind the scenes the map is a clean grid system, manually designed to (vaguely)
 
 ---
 
-## 🛠️ **Technical Structure**
+## **Technical Structure 👾🛠️**
 
 So my game is both manageable for development and easily adaptable to a wide player-base, the design was intentionally modular. UX and accessibility features were kept seperate from the logical gameplay layers in the following way:
 

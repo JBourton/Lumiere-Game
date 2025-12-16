@@ -7,14 +7,14 @@ import { FoodCoverage } from "../logic/foodCoverage.js";
 import { renderMap } from "../logic/map.js";
 import { draw_visitor_sprites_onto_map } from "./renderVisitors.js";
 let is_tutorial_active = false;
-let curr_step_idx = -1;
+let active_tutorial_tt_num = -1;
 let the_tooltip_el = null;
 let el_highlighted_on_DOM = null;
 let activated_cleanup_click = null;
 let tutorial_overlay_el = null;
 let tutorial_final_overlay_el = null;
 let final_tooltip_click = null;
-let _restore_lights_after_next = false;
+let restore_lights_after_next = false;
 
 
 // first, a quick check to make sure there is actually a tooltip present
@@ -304,7 +304,7 @@ function show_step(step_idx) {
     clearup_highlight_area();
 
     // restoring back to default state after tutorial messes around w/ it
-    if (_restore_lights_after_next && next_tut_step && next_tut_step.selector === '#toggle-heatmap-button') {
+    if (restore_lights_after_next && next_tut_step && next_tut_step.selector === '#toggle-heatmap-button') {
         setTimeout(() => {
             const grab_lights_tab = document.querySelector('#tab-lights');
             if (grab_lights_tab) {
@@ -312,7 +312,7 @@ function show_step(step_idx) {
             }
             // also clear any currently selected sidebar placement item
             turn_off_the_placement_preview();
-        _restore_lights_after_next = false;
+        restore_lights_after_next = false;
         }, 0);
     }
 
@@ -362,8 +362,8 @@ function show_step(step_idx) {
     // when the relevant tutorial item clicked, move onto next one
     if (next_tut_step && next_tut_step.clickAnywhere) {
         const move_to_next_tut_tt = () => {
-            curr_step_idx += 1;
-            show_step(curr_step_idx);
+            active_tutorial_tt_num += 1;
+            show_step(active_tutorial_tt_num);
         };
 
         // for this instance i let clicks anywhere outside of the highlit area advance too
@@ -379,11 +379,11 @@ function show_step(step_idx) {
         } 
     } else {
         activated_cleanup_click = connect_tutorial_item_w_advance(tut_elem_to_highlight, () => {
-            curr_step_idx += 1;
-            show_step(curr_step_idx);
+            active_tutorial_tt_num += 1;
+            show_step(active_tutorial_tt_num);
             // restore what tutorial messes w/ again
             if (next_tut_step && next_tut_step.selector === '#tab-food') {
-                _restore_lights_after_next = true;
+                restore_lights_after_next = true;
             }
         });
     }
@@ -393,25 +393,24 @@ function show_step(step_idx) {
 // now's time to jump in w/ learning, sequentially showing tooltips & highlighting areas so the user can learn how to play quickly
 function commence_the_tutorial() {
     if (is_tutorial_active) {
-        return;  // tutorial alredy going on, so skip
+        return;  // tutorial alredy going on, so i just skip
     }
     is_tutorial_active = true;
-    curr_step_idx = 0;
+    active_tutorial_tt_num = 0;
     ensure_tooltip_present(); // 1st, setup tutorial tooltip
 
     // here, i've set it up so the game is always paused throughout the tutorial, even if player tries to mess around w/ play/pause btn
     window._tutorialForcedPause = true; 
     window.refreshPauseState(); // (as game is always paused in tutorial)
-    // track any food stalls placed during the tutorial so they don't persist
+    // 2nd, track any food stalls placed during the tutorial so they don't persist
     try {
         window._tutorialPlacedFoodStalls = [];
         window._tutorialActive = true;
-    } catch (err) {
-        // ignore if window not writable for some reason
-    }
+    } catch (isuee_tracking_foodstall_placed_during_tutorial) {
+    }// inc. failsafe for the window updating not going through
 
     // now tutorial tooltips show 1 by 1 as the player goes about interacting w/ it
-    show_step(curr_step_idx);
+    show_step(active_tutorial_tt_num);
 }//note that this isn't taking away from expressing themes through game design, but is placed on the visual layer to step-teach the player
 
 
@@ -419,8 +418,8 @@ function commence_the_tutorial() {
 function terminate_the_tutorial() {
     // reset global logic trackers
     is_tutorial_active = false;
-    curr_step_idx = -1;
-    _restore_lights_after_next = false;
+    active_tutorial_tt_num = -1;
+    restore_lights_after_next = false;
 
     // ...get rid of all the tutorial styling
     clearup_highlight_area();
@@ -428,63 +427,37 @@ function terminate_the_tutorial() {
     // also get rid of placement previews from sidebar selections
     turn_off_the_placement_preview();
 
-    // If the player placed any food stalls during the tutorial, remove them now and refund staff
-    try {
-        const placed = window._tutorialPlacedFoodStalls || [];
-        if (placed.length) {
-            for (const stall of placed) {
-                // remove from placedObjects footprint
-                try {
-                    for (let yy = 0; yy < (stall.h || 1); yy++) {
-                        for (let xx = 0; xx < (stall.w || 1); xx++) {
-                            if (window.placedObjects && window.placedObjects[stall.y + yy]) {
-                                window.placedObjects[stall.y + yy][stall.x + xx] = undefined;
-                            }
-                        }
+    // now I remove the foodstall the player couldve placed during the tutorial + refund staff
+    const check_if_any_foodstalls_placed = window._tutorialPlacedFoodStalls || [];
+    if (check_if_any_foodstalls_placed.length) {
+        for (const stall_was_placed of check_if_any_foodstalls_placed) {
+            for (let ypos_tut_foodstall = 0; ypos_tut_foodstall < (stall_was_placed.h || 1); ypos_tut_foodstall++) {// getting rid from objs total
+                for (let xpos_tut_foodstall = 0; xpos_tut_foodstall < (stall_was_placed.w || 1); xpos_tut_foodstall++) {
+                    if (window.placedObjects && window.placedObjects[stall_was_placed.y + ypos_tut_foodstall]) {
+                        window.placedObjects[stall_was_placed.y + ypos_tut_foodstall][stall_was_placed.x + xpos_tut_foodstall] = undefined;
                     }
-                } catch (e) {
-                    // ignore
-                }
-
-                // remove corresponding foodStallAnchors entries matching the anchor x/y
-                if (Array.isArray(window.foodStallAnchors)) {
-                    window.foodStallAnchors = window.foodStallAnchors.filter(a => !(a.x === stall.x && a.y === stall.y));
-                }
-
-                // refund staff cost if present
-                try {
-                    if (stall.staff_cost && window.Staff && typeof window.Staff.add === 'function') {
-                        window.Staff.add(stall.staff_cost);
-                    }
-                } catch (e) {
-                    // ignore
                 }
             }
-
-            // update food coverage mask and visuals
-            try {
-                FoodCoverage.update_mask_of_fstall_coverage(window.foodStallAnchors, window.currentMap);
-                if (window.foodStallAnchors?.length) {
-                    FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
-                }
-            } catch (e) {
-                // ignore
+            if (Array.isArray(window.foodStallAnchors)) {// now their anchors get dropped too
+                window.foodStallAnchors = window.foodStallAnchors.filter(a => !(a.x === stall_was_placed.x && a.y === stall_was_placed.y));
             }
-
-            // re-render map and visitors to remove any visual remnants
-            try {
-                renderMap(window.currentMap, window.currentStatics, window.placedObjects, window.playerInstance.row, window.playerInstance.col);
-                draw_visitor_sprites_onto_map();
-            } catch (e) {
-                // ignore
+            if (stall_was_placed.staff_cost && window.Staff && typeof window.Staff.add === 'function') { // refund time!! (so players not out of pocket for tutorial actions)
+                window.Staff.add(stall_was_placed.staff_cost);
             }
         }
-        // clear tutorial tracking
-        window._tutorialPlacedFoodStalls = [];
-        window._tutorialActive = false;
-    } catch (err) {
-        // ignore
+        FoodCoverage.update_mask_of_fstall_coverage(window.foodStallAnchors, window.currentMap); // & then food coverage is accounted for
+        if (window.foodStallAnchors?.length) {
+            FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
+        }
+
+        // finally a re-renderto remove any visual bits left
+        renderMap(window.currentMap, window.currentStatics, window.placedObjects, window.playerInstance.row, window.playerInstance.col);
+        draw_visitor_sprites_onto_map();
     }
+    // clear tutorial tracking
+    window._tutorialPlacedFoodStalls = [];
+    window._tutorialActive = false;
+
     // now remove the restriction i put on making tooltips unclickable, as just on this one the player can click anywhere to end tutorial
     if (final_tooltip_click && the_tooltip_el) {
         the_tooltip_el.removeEventListener('click', final_tooltip_click);

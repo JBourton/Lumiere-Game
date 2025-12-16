@@ -712,7 +712,7 @@ body {
     0% { filter: brightness(1); }
     50% { filter: brightness(1.5); }
     100% { filter: brightness(1); }
-}
+}  /* I added these (up and down from this comment) to visually show the player when magic lvl is being harmed / improved*/
 @keyframes magic-flash-green {
     0% { filter: brightness(1); }
     50% { filter: brightness(1.5); }

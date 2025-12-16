@@ -1,5 +1,5 @@
 // now turning on the background music for some relaxing tunes
-// Credit for music: haruta @ https://opengameart.org/content/land-of-snow (attribution free)
+// Credit for music: haruta @ https://opengameart.org/content/land-of-snow (it's an attribution-free audio file I found on that website)
 
 // this class is useful for abstracting audio logic, which isn't really part of the examination criteria so I didn't want it in main.js
 export class AudioManager {
