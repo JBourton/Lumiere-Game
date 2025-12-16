@@ -138,6 +138,13 @@ Specifically, the prompt used was:
 Additionally, all the images in the game were custom-generated using Chat GPT 5.1, including the path, pavement and grass images.
 
 
-# Links to Machinations Diagrams
+## **Machinations Diagrams**
+
+### Game's Internal Resources
+![Machinations Diagram 01 - Game's Internal Resources](assets/imgs/machinations/Machinations%20Diagram%2001%20-%20Game's%20Internal%20Resources.png)
 - [Machinations Diagram 01: Game's Internal Resources](https://my.machinations.io/d/updated-machinations-diagram-01-games-internal-resources/27025f9bbefa11f0838a0abc5ce0dcc9)
+
+
+### Dynamic Object Interactions
+![Machinations Diagram 02 - Dynamic Object Interactions](assets/imgs/machinations/Machinations%20Diagram%2002%20-%20Dynamic%20Object%20Interactions.png)
 - [Machinations Diagram 02: Dynamic Object Interactions](https://my.machinations.io/d/updated-machinations-diagram-02-dynamic-object-interactions/33248d73bf1311f0838a0abc5ce0dcc9)
