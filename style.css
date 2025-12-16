@@ -352,7 +352,7 @@ body {
     z-index: 1000;
 }
 
-/* Keep the tutorial choice hidden by default; it will be shown just after the intro modal is */
+/* i keep the tutorial choice hidden by default; it'll be shown just after the intro modal is */
 #tutorialChoiceModal {
     display: none;
 }
@@ -398,7 +398,7 @@ body {
     display: inline-block;
     margin: 0.75rem 0.5rem 0 0.5rem;
     padding: 0.6rem 1rem;
-    font-size: clamp(12px, 1.8vw, 16px);
+    font-size: 12px;
     cursor: pointer;
     font-family: 'Press Start 2P', monospace;
     color: #111;
@@ -587,8 +587,9 @@ body {
     position: fixed;
     z-index: 11000;
     color: #dfd1b4;
-    font-family: 'Press Start 2P', monospace;
-    font-size: 20px;
+    /* the main font looked kinda horrible for large text blocks so I switched it up */
+    font-family: 'Segoe UI', Arial, sans-serif;
+    font-size: 14px;
     max-width: min(360px, 85vw);
     padding: 12px 14px;
     border-radius: 10px;

@@ -3,6 +3,9 @@
 
 // I coded this to be modularised and only interact w/ DOM using standard selectors
 import { turn_off_the_placement_preview } from "../logic/placementPreview.js";
+import { FoodCoverage } from "../logic/foodCoverage.js";
+import { renderMap } from "../logic/map.js";
+import { draw_visitor_sprites_onto_map } from "./renderVisitors.js";
 let is_tutorial_active = false;
 let curr_step_idx = -1;
 let the_tooltip_el = null;
@@ -272,6 +275,12 @@ const TUTORIAL_STEPS = [
         side: "left"
     },
     {
+        text: "This is the city's overall \"Magic\". Think of it like Durham's ambience. Gaining magic will unlock new attractions to decorate the city, and reaching 100% will win the game. Be careful! If you don't feed your visitors and magic falls to 0, you loose!",
+        selector: "#magic-bar",
+        side: "bottom",
+        clickAnywhere: true
+    },
+    {
         text: "This is the heatmap toggle. It’s an accessibility overlay for crowd density. Click it.",
         selector: "#toggle-heatmap-button",
         side: "bottom"
@@ -393,6 +402,13 @@ function commence_the_tutorial() {
     // here, i've set it up so the game is always paused throughout the tutorial, even if player tries to mess around w/ play/pause btn
     window._tutorialForcedPause = true; 
     window.refreshPauseState(); // (as game is always paused in tutorial)
+    // track any food stalls placed during the tutorial so they don't persist
+    try {
+        window._tutorialPlacedFoodStalls = [];
+        window._tutorialActive = true;
+    } catch (err) {
+        // ignore if window not writable for some reason
+    }
 
     // now tutorial tooltips show 1 by 1 as the player goes about interacting w/ it
     show_step(curr_step_idx);
@@ -411,6 +427,64 @@ function terminate_the_tutorial() {
     dissapear_tooltip();
     // also get rid of placement previews from sidebar selections
     turn_off_the_placement_preview();
+
+    // If the player placed any food stalls during the tutorial, remove them now and refund staff
+    try {
+        const placed = window._tutorialPlacedFoodStalls || [];
+        if (placed.length) {
+            for (const stall of placed) {
+                // remove from placedObjects footprint
+                try {
+                    for (let yy = 0; yy < (stall.h || 1); yy++) {
+                        for (let xx = 0; xx < (stall.w || 1); xx++) {
+                            if (window.placedObjects && window.placedObjects[stall.y + yy]) {
+                                window.placedObjects[stall.y + yy][stall.x + xx] = undefined;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    // ignore
+                }
+
+                // remove corresponding foodStallAnchors entries matching the anchor x/y
+                if (Array.isArray(window.foodStallAnchors)) {
+                    window.foodStallAnchors = window.foodStallAnchors.filter(a => !(a.x === stall.x && a.y === stall.y));
+                }
+
+                // refund staff cost if present
+                try {
+                    if (stall.staff_cost && window.Staff && typeof window.Staff.add === 'function') {
+                        window.Staff.add(stall.staff_cost);
+                    }
+                } catch (e) {
+                    // ignore
+                }
+            }
+
+            // update food coverage mask and visuals
+            try {
+                FoodCoverage.update_mask_of_fstall_coverage(window.foodStallAnchors, window.currentMap);
+                if (window.foodStallAnchors?.length) {
+                    FoodCoverage.redraw_all_food_coverage(window.foodStallAnchors);
+                }
+            } catch (e) {
+                // ignore
+            }
+
+            // re-render map and visitors to remove any visual remnants
+            try {
+                renderMap(window.currentMap, window.currentStatics, window.placedObjects, window.playerInstance.row, window.playerInstance.col);
+                draw_visitor_sprites_onto_map();
+            } catch (e) {
+                // ignore
+            }
+        }
+        // clear tutorial tracking
+        window._tutorialPlacedFoodStalls = [];
+        window._tutorialActive = false;
+    } catch (err) {
+        // ignore
+    }
     // now remove the restriction i put on making tooltips unclickable, as just on this one the player can click anywhere to end tutorial
     if (final_tooltip_click && the_tooltip_el) {
         the_tooltip_el.removeEventListener('click', final_tooltip_click);

@@ -239,7 +239,14 @@ function place_item_on_map(x, y, item) {
         window.foodStallAnchors.push({
             x, y,
             effect_w: item.effect_w, effect_h: item.effect_h
-        });
+        });   
+        try {// I found a bug that if the player puts down a foodstall in the tutorial, it remains present
+            if (window._tutorialActive) {// i'm logging it here instead so the tutorial can remove it at the end
+                if (!window._tutorialPlacedFoodStalls) window._tutorialPlacedFoodStalls = [];
+                window._tutorialPlacedFoodStalls.push({ x, y, id: item.id, staff_cost: item.staff_cost, w: item.w, h: item.h, effect_w: item.effect_w, effect_h: item.effect_h });
+            }
+        } catch (issue_removing_placed_foodstall) {
+        }
     }
     // now update logic (above was just visual)
     FoodCoverage.update_mask_of_fstall_coverage(window.foodStallAnchors,window.currentMap);
