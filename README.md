@@ -13,6 +13,28 @@ Your job is to balance it all without letting the whole event collapse like an o
 
 ---
 
+# **How to Play Locally 🧑‍💻**
+
+### **1. Download or extract the project folder**  
+Ensure the folder structure remains intact, especially `src/` and `assets/`.
+
+### **2. Run a local server**  
+
+#### **Option A: VS Code + Live Server**
+1. Open the project folder in VS Code  
+2. Install the **Live Server** extension  
+3. Right-click `index.html`  
+4. Choose **Open with Live Server**
+
+#### **Option B: Python**
+Run this in the project’s root directory:
+```sh
+python -m http.server 8000
+```
+Then open your browser and go to [http://localhost:8000](http://localhost:8000)
+
+---
+
 ## **What You'll Be Doing (in more detail)**
 
 ### **Placing Attractions 🏗️🏢**  
@@ -107,26 +129,6 @@ Full details are provided in the accompanying report.
 
 ---
 
-# **How to Play Locally 🧑‍💻**
-
-### **1. Download or extract the project folder**  
-Ensure the folder structure remains intact, especially `src/` and `assets/`.
-
-### **2. Run a local server**  
-
-#### **Option A: VS Code + Live Server**
-1. Open the project folder in VS Code  
-2. Install the **Live Server** extension  
-3. Right-click `index.html`  
-4. Choose **Open with Live Server**
-
-#### **Option B: Python**
-Run this in the project’s root directory:
-```sh
-python -m http.server 8000
-```
-Then open your browser and go to [http://localhost:8000](http://localhost:8000)
-
 
 
 # 🧑‍💻 **Use of Generative AI**
@@ -136,6 +138,8 @@ Specifically, the prompt used was:
 *"I want a new file in src/components that activates a "colour blind mode". Help me to try this out. The only change that should happen is that there's a button positioned to the right of the current row of control buttons in index.html that says "Colourblind mode: " with on/off symbols. When the user clicks it, it should modify the game's styles to be suitable to colourblind people, including highlighting the paths in a colour-blind-accessible style. I want this to be as minimal on the rest of the codebase as possible, but should still be added to necessary files like game restart and other appropriate areas of the codebase, with minimal modifications to those files other than to prevent bugs. You'll need to scan the whole repo to see where the other buttons are incoporated and use them in a similar context. Use your knowledge of colourblind colours to do this, putting almost all of the logic (as much as possible) in a new file called colourblind.js in src/components. Credit yourslef (inc. model name) in every part where you apply changes.*
 
 Additionally, all the images in the game were custom-generated using Chat GPT 5.1, including the path, pavement and grass images.
+
+---
 
 
 ## **Machinations Diagrams**
