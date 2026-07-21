@@ -11,6 +11,8 @@ As you decorate Durham, more visitors come to the city to see what the fuss is a
 
 Your job is to balance it all without letting the whole event collapse like an overworked student in summative season. Good work experience for an intern eh!?
 
+[!An overview picture showing an early-game screenshot of the Durham Lumiere Planning Game in action](/assets/Title%20Pic%20(for%20readme).png)
+
 ---
 
 # **How to Play Locally 🧑‍💻**
