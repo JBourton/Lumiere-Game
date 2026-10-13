@@ -13,6 +13,11 @@ Your job is to balance it all without letting the whole event collapse like an o
 
 ![An overview picture showing an early-game screenshot of the Durham Lumiere Planning Game in action](/assets/Title%20Pic%20(for%20readme).png)
 
+### **See it in action 🎬**
+Here's roughly the first minute of a run, sped up 4×. The intern works their way along Durham's paths placing string lights as the first visitors arrive, so keep an eye on the magic bar and the mini heatmap in the top-right corner. You'll see magic dip at first and then start to recover once visitors reach the lights!
+
+![A sped-up clip of the opening minute of Lumiere Festival Planner, showing string lights being placed and visitors arriving](assets/gameplay.gif)
+
 ---
 
 # **How to Play Locally 🧑‍💻**
